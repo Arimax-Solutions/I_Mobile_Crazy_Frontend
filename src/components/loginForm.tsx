@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import '../index.css';
+import { backend_url } from '../utill/url';
+
 
 interface UserData {
   username: string;
@@ -16,7 +18,7 @@ export default function LoginForm() {
   const handleLogin = async () => {
     const userData: UserData = { username: username, password: password };
     try {
-      const response = await axios.post('http://localhost:8080/auth/login', userData);
+      const response = await axios.post(backend_url+'/auth/login', userData);
       
       if (response.data.token) {
         Swal.fire({
