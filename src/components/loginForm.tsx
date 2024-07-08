@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 import '../index.css';
 
 interface UserData {
@@ -16,9 +17,32 @@ export default function LoginForm() {
     const userData: UserData = { username: username, password: password };
     try {
       const response = await axios.post('http://localhost:8080/auth/login', userData);
-      // Handle successful login (e.g., store token, redirect)
-      console.log('Login successful', response.data);
+      
+      if (response.data.token) {
+        Swal.fire({
+          title: "Success!",
+          text: "Login successful.",
+          icon: "success"
+        });
+        setUsername("");
+        setPassword("")
+        setError('');
+        // Handle successful login (e.g., store token, redirect)
+        console.log('Login successful', response.data);
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: response.data.message || "Invalid username or password.",
+          icon: "error"
+        });
+        setError('Invalid username or password');
+      }
     } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Invalid username or password.",
+        icon: "error"
+      });
       // Handle error (e.g., show error message)
       console.error('Login failed', error);
       setError('Invalid username or password');
