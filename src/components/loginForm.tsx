@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import '../index.css';
-import { backend_url } from '../utill/url';
+import { backend_url } from '../utill/utill';
+import { useNavigate } from "react-router-dom";
+
 
 
 interface UserData {
@@ -14,12 +16,14 @@ export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+
 
   const handleLogin = async () => {
     const userData: UserData = { username: username, password: password };
     try {
       const response = await axios.post(backend_url+'/auth/login', userData);
-      
+
       if (response.data.token) {
         Swal.fire({
           title: "Success!",
@@ -29,8 +33,8 @@ export default function LoginForm() {
         setUsername("");
         setPassword("")
         setError('');
-        // Handle successful login (e.g., store token, redirect)
-        console.log('Login successful', response.data);
+        localStorage.setItem('authToken', response.data.token);
+        navigate('/dashboard');
       } else {
         Swal.fire({
           title: "Error!",
@@ -45,8 +49,7 @@ export default function LoginForm() {
         text: "Invalid username or password.",
         icon: "error"
       });
-      // Handle error (e.g., show error message)
-      console.error('Login failed', error);
+  
       setError('Invalid username or password');
     }
   };
@@ -60,7 +63,7 @@ export default function LoginForm() {
           className="rounded-right w-full h-full object-cover"
         />
       </div>
-      <div className="w-1/2 flex flex-col justify-center items-center">
+      <div className="w-1/2 flex flex-col justify-center items-center ">
         <div className="mb-8">
           <img
             src="src/assets/images/logo.png"
