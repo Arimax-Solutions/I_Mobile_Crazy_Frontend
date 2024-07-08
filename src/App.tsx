@@ -1,12 +1,12 @@
 import React from 'react';
-import './App.css'
+import LoginForm from './components/loginForm';
 
 function App() {
-    return (
-        <div>
-            <h1>Hello</h1>
-        </div>
-    )
+  return (
+    <div>
+      <LoginForm />
+    </div>
+  );
 }
 
-export default App
+export default App;
