@@ -23,7 +23,7 @@ export default function LoginForm() {
     const userData: UserData = { username: username, password: password };
     try {
       const response = await axios.post(backend_url+'/auth/login', userData);
-
+      console.log(response.data.authenticatedUser.name)
       if (response.data.token) {
         Swal.fire({
           title: "Success!",
@@ -34,6 +34,8 @@ export default function LoginForm() {
         setPassword("")
         setError('');
         localStorage.setItem('authToken', response.data.token);
+        localStorage.setItem('username', response.data.authenticatedUser.name);
+        
         navigate('/dashboard');
       } else {
         Swal.fire({
