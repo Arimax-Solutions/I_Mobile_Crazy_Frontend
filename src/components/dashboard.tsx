@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
-
+import { colors } from '@mui/material';
 
 export default function Dashboard() {
   const [token, setToken] = useState('');
@@ -25,7 +25,6 @@ export default function Dashboard() {
 
   return (
     <div className='m-4'>
-
       <div className='flex justify-between '>
         <div className='flex-grow mr-[35vw]'>
           <span className='text-2xl text-white'>Hi, {name} Welcome Back!</span>
@@ -48,95 +47,74 @@ export default function Dashboard() {
         <button className='daily_cost-buttons-styles p-1 rounded-xl w-fit '>Daily Cost + icon</button>
       </div>
         
-{/* ------------------------------------------------------------------------------------------ */}
-
-    <div className='flex justify-between mt-5'>
-    <div className='background-colour-today-sales-div p-4 rounded-lg'>
-      <div className='ml-2 mt-2'>
-        <span className='text-white text-lg font-bold'>Today's Sales</span><br/>
-        <span className='text-xs text-gray-400'>Sales Summary</span>
-      </div>
-
-      <div className='flex justify-between w-full text-white mt-4'>
-        <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
-          <div className='mb-2'>
-            <img src={'src/assets/icons/Icon 1.svg'} alt='icon' className='mx-auto' />
+      <div className='flex justify-between mt-5'>
+        <div className='background-colour-today-sales-div p-3 rounded-lg flex-1 mr-4'>
+          <div className='ml-2 mt-1'>
+            <span className='text-white text-lg font-bold'>Today's Sales</span><br/>
+            <span className='text-xs text-gray-400'>Sales Summary</span>
           </div>
-          <div className='text-2xl'>$5k</div>
-          <div className='text-sm'>Total Sales</div>
-          <div className='text-xs text-orange-500'>+10% from yesterday</div>
+
+          <div className='flex justify-between w-full text-white mt-2'>
+            <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
+              <div className='mb-2'>
+                <img src={'src/assets/icons/Icon 1.svg'} alt='icon' className='mx-auto' />
+              </div>
+              <div className='text-2xl'>$5k</div>
+              <div className='text-sm'>Total Sales</div>
+              <div className='text-xs text-orange-500'>+10% from yesterday</div>
+            </div>
+            <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
+              <div className='mb-2'>
+                <img src={'src/assets/icons/Icon 2.svg'} alt='icon' className='mx-auto' />
+              </div>
+              <div className='text-2xl'>500</div>
+              <div className='text-sm'>Total Orders</div>
+              <div className='text-xs text-green-500'>+8% from yesterday</div>
+            </div>
+            <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
+              <div className='mb-2'>
+                <img src={'src/assets/icons/Icon 3.svg'} alt='icon' className='mx-auto' />
+              </div>
+              <div className='text-2xl'>12</div>
+              <div className='text-sm'>Product Sold</div>
+              <div className='text-xs text-purple-500'>+20% from yesterday</div>
+            </div>
+            <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
+              <div className='mb-2 '>
+                <img src={'src/assets/icons/Icon 4.svg'} alt='icon' className='w-fit mx-auto' />
+              </div>
+              <div className='text-2xl'>12</div>
+              <div className='text-sm'>New Customers</div>
+              <div className='text-xs text-blue-500'>+3% from yesterday</div>
+            </div>   
+          </div>
         </div>
-        <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
-          <div className='mb-2'>
-            <img src={'src/assets/icons/Icon 2.svg'} alt='icon' className='mx-auto' />
-          </div>
-          <div className='text-2xl'>500</div>
-          <div className='text-sm'>Total Orders</div>
-          <div className='text-xs text-green-500'>+8% from yesterday</div>
-        </div>
-        <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
-          <div className='mb-2'>
-            <img src={'src/assets/icons/Icon 3.svg'} alt='icon' className='mx-auto' />
-          </div>
-          <div className='text-2xl'>12</div>
-          <div className='text-sm'>Product Sold</div>
-          <div className='text-xs text-purple-500'>+20% from yesterday</div>
-        </div>
-        <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
-          <div className='mb-2 '>
-            <img src={'src/assets/icons/Icon 4.svg'} alt='icon' className='w-fit mx-auto' />
-          </div>
-          <div className='text-2xl'>12</div>
-          <div className='text-sm'>New Customers</div>
-          <div className='text-xs text-blue-500'>+3% from yesterday</div>
-        </div>   
-      </div>
-    </div>
 
-{/* -------------------------------------------------charts----------------------------------------- */}
 
-        <div className='text-white'>
+        {/* Today income chart  */}
 
-         {/* 1st chart */}
-
-          <div>
-            <Gauge
+        <div className="background-colour-today-sales-div text-white flex-1 p-3 rounded-lg flex justify-center items-center">
+          <div className="h-[30vh] w-full">
+            <Gauge className='text-white'
               value={75}
               startAngle={-110}
               endAngle={110}
               sx={{
                 [`& .${gaugeClasses.valueText}`]: {
                   fontSize: 40,
+                  fontWeight: 'bold',
+                  fill: 'red',
                   transform: 'translate(0px, 0px)',
                 },
               }}
-              text={
-                ({ value, valueMax }) => `${value} / ${valueMax}`
-              }
-                />
-          </div>
-
-          {/* second chart */}
-
-          <div>
-            <Gauge
-              value={75}
-              startAngle={-110}
-              endAngle={110}
-              sx={{
-                [`& .${gaugeClasses.valueText}`]: {
-                  fontSize: 40,
-                  transform: 'translate(0px, 0px)',
-                },
-              }}
-              text={
-                ({ value, valueMax }) => `${value} / ${valueMax}`
-              }
+              text={({ value, valueMax }) => `${value} / ${valueMax}`}
             />
           </div>
         </div>
+
+
+
       </div>
-    
     </div>
   );
 }
