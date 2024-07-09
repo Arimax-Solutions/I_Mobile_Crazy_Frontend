@@ -13,6 +13,7 @@ export default function Dashborad(){
     return(
         <div>
             {token}
+            <p className='text-white'>Reports</p>
         </div>
     )
 }
