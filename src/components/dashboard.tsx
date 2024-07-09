@@ -24,7 +24,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className='m-4'>
+    <div className='m-4 w-full'>
       <div className='flex justify-between '>
         <div className='flex-grow mr-[35vw]'>
           <span className='text-2xl text-white'>Hi, {name} Welcome Back!</span>
