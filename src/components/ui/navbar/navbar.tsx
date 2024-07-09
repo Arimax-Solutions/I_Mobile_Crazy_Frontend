@@ -13,8 +13,8 @@ function NavigationMenu() {
             <div className='mt-2'>
                 <img width={"115px"} src="src/assets/images/logo.png" alt="company logo" />
             </div>
-            <div className="overflow-y-scroll w-full self-start mb-4">
-                <ul className='mt-5 w-full pl-8 flex flex-col gap-10 mb-2 overflow-y-scroll'>
+            <div className="overflow-y-auto w-full self-start mb-4">
+                <ul className='mt-5 w-full pl-8 flex flex-col gap-10 mb-2 '>
 
                     <NavItems logo='src/assets/images/navbar/layer1.svg' name='Reports' location='/dashboard' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Stock Phones.svg' name='Stock Phones' location='/home' selected={setSelect} isSelected={select} />
