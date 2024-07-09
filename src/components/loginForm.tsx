@@ -53,40 +53,39 @@ export default function LoginForm() {
       setError('Invalid username or password');
     }
   };
-
   return (
-    <div className="flex h-screen bg-gradient-custom">
-      <div className="w-1/2 flex justify-center items-center">
+    <div className="flex flex-col md:flex-row h-screen bg-gradient-custom">
+      <div className="w-full md:w-1/2 flex justify-center items-center">
         <img
           src="src/assets/images/Group 160.png"
           alt="main image"
           className="rounded-right w-full h-full object-cover"
         />
       </div>
-      <div className="w-1/2 flex flex-col justify-center items-center ">
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-4 md:p-0">
         <div className="mb-8">
           <img
             src="src/assets/images/logo.png"
             alt="logo"
-            className="w-[15vw] h-[30vh] object-contain"
+            className="w-32 md:w-[15vw] h-auto object-contain"
           />
         </div>
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center space-y-4 w-full max-w-md">
           <input
             placeholder="user name"
-            className="p-2 rounded-md border border-gray-400 w-[30vw] m-3"
+            className="p-2 rounded-md border border-gray-400 w-full"
             value={username}
             onChange={(ev) => setUsername(ev.target.value)}
           />
           <input
             placeholder="password"
             type="password"
-            className="p-2 rounded-md border border-gray-400 w-[30vw] m-3"
+            className="p-2 rounded-md border border-gray-400 w-full"
             value={password}
             onChange={(ev) => setPassword(ev.target.value)}
           />
           {error && <div className="text-red-500">{error}</div>}
-          <button type="button" onClick={handleLogin} className="custom-border-colour w-[10vw] h-[5vh]">
+          <button type="button" onClick={handleLogin} className="custom-border-colour w-full md:w-[10vw] h-[5vh]">
             <span className="custom-font-colour">Sign In</span>
           </button>
         </div>
