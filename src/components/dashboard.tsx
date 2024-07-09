@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'; // Import BarChart from recharts
-
+import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 const data = [
   { name: 'Label 1', value: 36638465.14 },
@@ -21,9 +22,35 @@ const productData = [
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF4848'];
 
 export default function Dashboard() {
+
   const [token, setToken] = useState('');
   const [name, setName] = useState('');
+  const navigate = useNavigate();
 
+
+  const logoutFunction = () => {
+    Swal.fire({
+      title: 'Are you sure you want to logout?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, logout!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('name');
+        navigate('/');
+        Swal.fire(
+          'Logged Out!',
+          'You have been successfully logged out.',
+          'success'
+        );
+      }
+    });
+  };
+  
   const getFormattedDate = () => {
     const options = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
     const today = new Date();
@@ -44,13 +71,13 @@ export default function Dashboard() {
   return (
     <div className='m-4'>
       <div className='flex justify-between '>
-        <div className='flex-grow mr-[35vw]'>
+        <div className='flex-grow mr-[30vw]'>
           <span className='text-2xl text-white'>Hi, {name} Welcome Back!</span>
           <p className='text-white opacity-40 text-lg'>{getFormattedDate()}</p>
         </div>
         <div className='flex items-start'>
           <input placeholder='search reports' className='w-[300px] p-1 text-xl rounded-xl mr-2 input-bg-gradient-custom'/>
-          <button className='input-bg-gradient-custom p-2 bg-blue-500 rounded-full text-white'>
+          <button onClick={logoutFunction} className='input-bg-gradient-custom p-2 bg-blue-500 rounded-full text-white'>
             <img src={'src/assets/icons/Logout.svg'} className='w-fit h-[3vh]'/>
           </button>
         </div>
