@@ -56,6 +56,9 @@ export default function Dashboard() {
         </div>
       </div>
 
+          {/* buttons  */}
+
+
       <div className='flex justify-around mt-5'>
         <button className='buttons-styles'>Income Report</button>
         <button className='buttons-styles'>Stock Update</button>
@@ -66,6 +69,9 @@ export default function Dashboard() {
           Daily Cost<img src={'src/assets/icons/Icon 4.svg'} className='ml-2' alt='icon'/>
         </button>
       </div>
+
+      {/* 1st row */}
+
 
       <div className='flex justify-between mt-5'>
         <div className='background-colour-today-sales-div p-3 rounded-lg flex-1 mr-4'>
@@ -110,24 +116,32 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="background-colour-today-sales-div text-white flex-1 p-3 rounded-lg flex justify-center items-center">
-          <div className="h-[30vh] w-full">
-            <Gauge className='text-white'
-              value={75}
-              startAngle={-110}
-              endAngle={110}
-              sx={{
-                [`& .${gaugeClasses.valueText}`]: {
-                  fontSize: 40,
-                  fontWeight: 'bold',
-                  fill: 'red',
-                  transform: 'translate(0px, 0px)',
-                },
-              }}
-              text={({ value, valueMax }) => `${value} / ${valueMax}`}
-            />
+        {/* 1st row right side chart */}
+
+        <div className="background-colour-today-sales-div text-white flex-1 p-3 rounded-lg">
+          <div className="ml-2 mt-1">
+            <span className="text-white text-lg font-bold">Total Earning</span><br/>
+          </div>
+          <div className="flex justify-center items-center h-full">
+            <div className="h-[30vh] w-full">
+              <Gauge className='text-white'
+                value={75}
+                startAngle={-110}
+                endAngle={110}
+                sx={{
+                  [`& .${gaugeClasses.valueText}`]: {
+                    fontSize: 40,
+                    fontWeight: 'bold',
+                    fill: 'red',
+                    transform: 'translate(0px, 0px)',
+                  },
+                }}
+                text={({ value, valueMax }) => `${value} / ${valueMax}`}
+              />
+            </div>
           </div>
         </div>
+
       </div>
 
       {/* Second row */}
