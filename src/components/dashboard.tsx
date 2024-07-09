@@ -1,6 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
-import { colors } from '@mui/material';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'; // Import BarChart from recharts
+
+
+const data = [
+  { name: 'Label 1', value: 36638465.14 },
+  { name: 'Label 2', value: 8141881.2 },
+  { name: 'Label 3', value: 4070940.6 },
+  { name: 'Label 4', value: 12212821.83 },
+  { name: 'Label 5', value: 12212821.83 }
+];
+
+const productData = [
+  { name: 'iPhone 13 Pro', popularity: 46, color: '#FFBB28' },
+  { name: 'iPhone 12 Pro', popularity: 17, color: '#00C49F' },
+  { name: 'iPhone 8+', popularity: 19, color: '#0088FE' },
+  { name: 'iPhone X', popularity: 29, color: '#FF8042' }
+];
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF4848'];
 
 export default function Dashboard() {
   const [token, setToken] = useState('');
@@ -33,8 +51,8 @@ export default function Dashboard() {
         <div className='flex items-start'>
           <input placeholder='search reports' className='w-[300px] p-1 text-xl rounded-xl mr-2 input-bg-gradient-custom'/>
           <button className='input-bg-gradient-custom p-2 bg-blue-500 rounded-full text-white'>
-               <img src={'src/assets/icons/Logout.svg'} className='w-fit h-[3vh]'/>
-            </button>
+            <img src={'src/assets/icons/Logout.svg'} className='w-fit h-[3vh]'/>
+          </button>
         </div>
       </div>
 
@@ -44,9 +62,11 @@ export default function Dashboard() {
         <button className='buttons-styles'>Income Report</button>
         <button className='buttons-styles'>Selling Update</button>
         <button className='buttons-styles'>Return Update</button>
-        <button className='daily_cost-buttons-styles p-1 rounded-xl w-fit '>Daily Cost + icon</button>
+        <button className='daily_cost-buttons-styles p-1 rounded-xl w-fit flex items-center '>
+          Daily Cost<img src={'src/assets/icons/Icon 4.svg'} className='ml-2' alt='icon'/>
+        </button>
       </div>
-        
+
       <div className='flex justify-between mt-5'>
         <div className='background-colour-today-sales-div p-3 rounded-lg flex-1 mr-4'>
           <div className='ml-2 mt-1'>
@@ -90,9 +110,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-
-        {/* Today income chart  */}
-
         <div className="background-colour-today-sales-div text-white flex-1 p-3 rounded-lg flex justify-center items-center">
           <div className="h-[30vh] w-full">
             <Gauge className='text-white'
@@ -111,8 +128,75 @@ export default function Dashboard() {
             />
           </div>
         </div>
+      </div>
+
+      {/* Second row */}
+    
+              {/* top product */}
+
+      <div className='flex justify-between mt-5'>
+        <div className='background-colour-today-sales-div p-3 rounded-lg flex-1 mr-4'>
+          <div className='ml-2 mt-1'>
+            <span className='text-white text-lg font-bold'>Top Products</span><br/>
+          </div>
+              
+          <div className='flex justify-between w-full text-white mt-2'>
+
+          <div className='flex justify-between w-full text-white mt-2'>
+            <BarChart
+              width={600}
+              height={300}
+              data={productData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="popularity" fill="#8884d8">
+                {productData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </div>
 
 
+
+           </div>
+        </div>
+
+
+              {/* pie chart */}
+
+
+        <div className="background-colour-today-sales-div text-white flex-1 p-3 rounded-lg">
+          <div className="ml-2 mt-1">
+            <span className="text-white text-lg font-bold">Income</span><br/>
+          </div>
+          <div className="flex justify-center items-center h-full">
+             <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                        <Pie
+                          data={data}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, value }) => `${name}: ${value}`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
 
       </div>
     </div>
