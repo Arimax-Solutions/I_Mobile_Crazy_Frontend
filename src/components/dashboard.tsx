@@ -93,7 +93,7 @@ export default function Dashboard() {
                 <img src={'src/assets/icons/Icon 3.svg'} alt='icon' className='mx-auto' />
               </div>
               <div className='text-2xl'>12</div>
-              <div className='text-sm'>Product Sold</div>
+              <div className='text-sm'>Retail  Sold</div>
               <div className='text-xs text-purple-500'>+20% from yesterday</div>
             </div>
             <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
@@ -101,7 +101,7 @@ export default function Dashboard() {
                 <img src={'src/assets/icons/Icon 4.svg'} alt='icon' className='w-fit mx-auto' />
               </div>
               <div className='text-2xl'>12</div>
-              <div className='text-sm'>New Customers</div>
+              <div className='text-sm'>Whole sold</div>
               <div className='text-xs text-blue-500'>+3% from yesterday</div>
             </div>
           </div>
