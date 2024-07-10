@@ -9,7 +9,7 @@ function NavigationMenu() {
 
 
     return (
-        <nav className="pt-3 flex flex-col min-w-[270px] w-[270px] h-screen bg-[#1D1D27] rounded-r-[40px] items-center">
+        <nav className="pt-3 flex flex-col min-w-[270px] w-[270px] min-h-screen h-fit bg-[#1D1D27] rounded-r-[40px] items-center">
             <div className='mt-2 self-start pl-8'>
                 <img width={"100px"} src="src/assets/images/logo.png" alt="company logo" />
             </div>

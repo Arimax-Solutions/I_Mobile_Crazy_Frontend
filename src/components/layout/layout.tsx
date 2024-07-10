@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 
 function Layout({ children }: any) {
     return (
-        <div className="flex h-screen bg-[#14141E]">
+        <div className="flex min-h-screen bg-[#14141E]">
             <NavigationMenu />
             <Outlet />
         </div>
