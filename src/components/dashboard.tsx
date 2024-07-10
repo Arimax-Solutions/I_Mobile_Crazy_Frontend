@@ -1,7 +1,7 @@
 import React from 'react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'; 
-import TopNavbar from './TopNavbar';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line } from 'recharts'; 
+import TopNavbar from '../components/topNavbar';
 
 const data = [
   { name: 'Label 1', value: 36638465.14 },
@@ -20,6 +20,33 @@ const productData = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF4848'];
 
+
+const salesData = [
+  { month: 'January', sales: 1000 },
+  { month: 'February', sales: 2000 },
+  { month: 'March', sales: 3000 },
+  { month: 'April', sales: 1500 },
+  { month: 'May', sales: 2000 },
+  { month: 'June', sales: 2500 },
+  { month: 'July', sales: 3000 },
+  { month: 'August', sales: 3500 },
+  { month: 'September', sales: 4000 },
+  { month: 'October', sales: 4500 },
+  { month: 'November', sales: 5000 },
+  { month: 'December', sales: 5500 }
+];
+
+const weeklyOrderIncrementData = [
+  { day: 'Monday', orders: 10 },
+  { day: 'Tuesday', orders: 15 },
+  { day: 'Wednesday', orders: 20 },
+  { day: 'Thursday', orders: 25 },
+  { day: 'Friday', orders: 30 },
+  { day: 'Saturday', orders: 35 },
+  { day: 'Sunday', orders: 40 }
+];
+
+
 export default function Dashboard() {
   return (
     <div className='m-4'>
@@ -33,7 +60,7 @@ export default function Dashboard() {
         <button className='buttons-styles'>Selling Update</button>
         <button className='buttons-styles'>Return Update</button>
         <button className='daily_cost-buttons-styles p-1 rounded-xl w-fit flex items-center '>
-          Daily Cost<img src={'src/assets/icons/Icon 4.svg'} className='ml-2' alt='icon'/>
+          Daily Cost<img src={'src/assets/icons/daily cost.svg'} className='ml-2' alt='icon'/>
         </button>
       </div>
 
@@ -76,7 +103,7 @@ export default function Dashboard() {
               <div className='text-2xl'>12</div>
               <div className='text-sm'>New Customers</div>
               <div className='text-xs text-blue-500'>+3% from yesterday</div>
-            </div>   
+            </div>
           </div>
         </div>
 
@@ -160,7 +187,44 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </div>
         </div>
+        </div>
+     
+     
+     {/* 3rd row */}
+     <div className='mt-2 flex justify-between'>
+        {/* 3rd row 1st div */}
+        <div className='background-colour-today-sales-div flex-1 mr-4 rounded-lg p-1'>
+          <div className="ml-2 p-3">
+            <span className="text-white text-lg font-bold">Sales Increment</span><br/>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={salesData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="sales" stroke="#8884d8" activeDot={{ r: 8 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* 3rd row second div */}
+        <div className='background-colour-today-sales-div flex-1 rounded-lg'>
+          <div className="ml-2 p-3">
+            <span className="text-white text-lg font-bold">Weekly Order Increment</span><br/>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={weeklyOrderIncrementData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="orders" stroke="#82ca9d" activeDot={{ r: 8 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
 }
+
