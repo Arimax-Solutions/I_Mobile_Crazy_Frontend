@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from "./layout/layout";
-import TopNavbar from './TopNavbar';
+import TopNavbar from '../components/topNavbar';
 
 function Home(){
     return (
