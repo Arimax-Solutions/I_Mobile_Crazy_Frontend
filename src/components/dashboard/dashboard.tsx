@@ -1,7 +1,8 @@
+// @ts-ignore
 import React from 'react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line } from 'recharts';
-import TopNavbar from '../components/topNavbar';
+import TopNavbar from '../topNavbar.tsx';
 
 const data = [
   { name: 'Label 1', value: 36638465.14 },
@@ -51,7 +52,7 @@ export default function Dashboard() {
   return (
 
     <div className='m-4 w-full'>
-      
+
       <div className='m-4'>
         <TopNavbar />
 
@@ -181,9 +182,7 @@ export default function Dashboard() {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {data.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
+                    {data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>)}
                   </Pie>
                   <Tooltip />
                   <Legend />

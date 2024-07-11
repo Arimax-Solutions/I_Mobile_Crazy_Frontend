@@ -49,7 +49,7 @@ export default function TopNavbar() {
 
   return (
     <div className='flex justify-between'>
-      <div className='flex-grow mr-[30vw]'>
+      <div className='flex-grow mr-[28vw]'>
         <span className='text-2xl text-white'>Hi, {name} Welcome Back!</span>
         <p className='text-white opacity-40 text-lg'>{getFormattedDate()}</p>
       </div>
