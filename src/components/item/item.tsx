@@ -133,10 +133,10 @@ const Item = () => {
 
     // Function to handle deleting an item
     const handleItemDeleteOnClick = async () => {
-        // if (!selectedItem) {
-        //     console.error('No item selected for deletion');
-        //     return;
-        // }
+        if (!selectedItem) {
+            console.error('No item selected for deletion');
+            return;
+        }
 
         try {
             const response = await axios.delete(
@@ -251,7 +251,7 @@ const Item = () => {
             });
             return false;
         }
-
+    
         // Validate numeric price
         if (isNaN(parseFloat(price))) {
             Swal.fire({
@@ -262,10 +262,21 @@ const Item = () => {
             });
             return false;
         }
-
+    
+        // Validate numeric quantity
+        if (isNaN(parseFloat(qty))) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Quantity must be a number',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+    
         return true;
     };
-
+    
 
 
     return (
