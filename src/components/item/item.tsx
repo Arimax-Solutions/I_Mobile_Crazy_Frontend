@@ -286,10 +286,10 @@ const Item = () => {
             </div>
 
             {/* Buttons row */}
-            <div className='m-4 flex mt-5 justify-start'>
+            {/* <div className='m-4 flex mt-5 justify-start'>
                 <button className='mr-[8vw] buttons-styles'>ADD TO ITEM STOCK</button>
                 <button className='buttons-styles'>VIEW ALL ITEMS</button>
-            </div>
+            </div> */}
 
             {/* Inputs row */}
             <div className='text-white font-semibold'>
@@ -324,7 +324,7 @@ const Item = () => {
             
 
             {/* Table to display items */}
-            <div className='m-4'>
+            <div className='mt-5'>
                 <table className='min-w-full divide-y table-styles'>
                     <thead>
                         <tr className=''>
