@@ -1,6 +1,6 @@
 // src/components/Button.tsx
 import React from 'react';
-import '../crudbuttons/buttons.css';
+
 
 interface ButtonProps {
     onClick: () => void;
