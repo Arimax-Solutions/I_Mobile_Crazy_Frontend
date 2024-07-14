@@ -240,14 +240,14 @@ const User: React.FC = () => {
                 <TopNavbar />
             </div>
             <div className='flex items-center justify-between mt-5 my-[5vh]'>
-                <InputFields value={name} onChange={(event) => setName(event.target.value)} placeholder="   Name" />
-                <Combobox value={role} onChange={(event) => setRole(event.target.value)} options={roleOptions} placeholder="   Select Role" />
-                <InputFields value={contact_number} onChange={(event) => setContactNumber(event.target.value)} placeholder="   Contact Number" />
+                <InputFields value={name || ''} onChange={(event) => setName(event.target.value)} placeholder="   Name" />
+                <Combobox value={role || ''} onChange={(event) => setRole(event.target.value)} options={roleOptions} placeholder="   Select Role" />
+                <InputFields value={contact_number || ''} onChange={(event) => setContactNumber(event.target.value)} placeholder="   Contact Number" />
             </div>
             <div className='flex items-center justify-between'>
-                <InputFields value={email} onChange={(event) => setEmail(event.target.value)} placeholder="   Email" />
-                <InputFields value={username} onChange={(event) => setUsername(event.target.value)} placeholder="   Username" />
-                <InputFields value={password} onChange={(event) => setPassword(event.target.value)} placeholder="   Password" />
+                <InputFields value={email || ''} onChange={(event) => setEmail(event.target.value)} placeholder="   Email" />
+                <InputFields value={username || ''} onChange={(event) => setUsername(event.target.value)} placeholder="   Username" />
+                <InputFields value={password || ''} onChange={(event) => setPassword(event.target.value)} placeholder="   Password" />
             </div>
             <div className='flex mt-5 justify-end'>
                 <Button
@@ -283,27 +283,23 @@ const User: React.FC = () => {
                         <tr>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Id</th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Role</th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Contact Number</th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Email</th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Username</th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Password</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Role</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {users.map(user => (
-                            <tr
-                                key={user.user_id}
-                                className=' text-white font-semibold hover:bg-gray-50 cursor-pointer'
-                                onClick={() => handleTableRowClick(user)} // Set selected user on row click
-                            >
-                                <td className='px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-500'>{user.user_id}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.name}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.role}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.contact_number}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.email}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.username}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.password}</td>
+                    <tbody className=' divide-gray-200'>
+                        {users.map((user) => (
+                            <tr key={user.user_id} onClick={() => handleTableRowClick(user)} className='hover:bg-gray-200 cursor-pointer'>
+                                <td className='px-6 py-3 whitespace-nowrap'>{user.user_id}</td>
+                                <td className='px-6 py-3 whitespace-nowrap'>{user.name}</td>
+                                <td className='px-6 py-3 whitespace-nowrap'>{user.contact_number}</td>
+                                <td className='px-6 py-3 whitespace-nowrap'>{user.email}</td>
+                                <td className='px-6 py-3 whitespace-nowrap'>{user.username}</td>
+                                <td className='px-6 py-3 whitespace-nowrap'>{user.password}</td>
+                                <td className='px-6 py-3 whitespace-nowrap'>{user.role}</td>
                             </tr>
                         ))}
                     </tbody>
