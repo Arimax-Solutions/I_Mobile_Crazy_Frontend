@@ -22,7 +22,7 @@ function NavigationMenu() {
                     <NavItems logo='src/assets/images/navbar/Items.svg' name='Items' location='/item' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Return item.svg' name='Return Items' location='/dashboard' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Users.svg' name='Users' location='/user' selected={setSelect} isSelected={select} />
-                    <NavItems logo='src/assets/images/navbar/Shops.svg' name='Shops' location='/dashboard' selected={setSelect} isSelected={select} />
+                    <NavItems logo='src/assets/images/navbar/Shops.svg' name='Shops' location='/shop' selected={setSelect} isSelected={select} />
 
                 </ul>
                 <div className='w-full px-8 mb-5'>
