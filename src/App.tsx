@@ -7,6 +7,7 @@ import Home from './components/home';
 import Layout from './components/layout/layout';
 import Item from './components/item/item.tsx';
 import User from './components/user/user.tsx';
+import Shop from './components/shop/shop.tsx';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="home" element={<Home />} />
           <Route path="user" element={<User />} />
           <Route path="item" element={<Item />} />
+          <Route path="shop" element={<Shop />} />
         </Route>
       </Routes>
     </BrowserRouter>
