@@ -19,7 +19,7 @@ function Shop() {
     const [owner_nic, setOwnerNic] = useState("");
     const [outstanding, setOutstanding] = useState("");
     const [credit_limit, setCreditLimit] = useState("");
-    const [shopId , setShopId] = useState(null);
+    const [shopId, setShopId] = useState(null);
 
 
     async function handleItemAddOnClick() {
@@ -47,7 +47,28 @@ function Shop() {
 
     }
 
-    function handleItemUpdateOnClick() {
+    async function handleItemUpdateOnClick() {
+        try {
+            const data = formValidation()
+            await axios.put(`${backend_url}/api/shop`, {
+                ...data,shop_id:shopId
+            });
+            await Swal.fire({
+                title: 'Success!',
+                text: 'Shop update successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            clear();
+        } catch (e) {
+            await Swal.fire({
+                title: 'Something happen!',
+                text: 'Can not update shop',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            console.log(e);
+        }
 
     }
 
@@ -67,10 +88,10 @@ function Shop() {
         fetchAllShopData();
     }
 
-    function setValue(value:any){
+    function setValue(value: any) {
         setShopName(value.shop_name);
         setAddress(value.address);
-        setContactNumber(value.contact_number);
+        setContactNumber(0 + value.contact_number.toString());
         setEmail(value.email);
         setOwnerNic(value.owner_nic);
         setOutstanding(value.outStanding);
@@ -85,7 +106,7 @@ function Shop() {
                 title: 'Error!',
                 text: 'Please fill all fields',
                 icon: 'error',
-                confirmButtonText: 'OK'
+                confirmButtonText: 'OK',
             });
             throw new Error("please fill the form")
         }
@@ -165,11 +186,11 @@ function Shop() {
         }
     }
 
-    function tableRowHandleClick(id: number,value:any) {
+    function tableRowHandleClick(id: number, value: any) {
         console.log(id);
         console.log(value);
         setValue(value);
-        
+
     }
 
     useEffect(() => {
@@ -235,7 +256,7 @@ function Shop() {
                             <tr
                                 key={item.shop_id}
                                 className=' text-white font-semibold hover:bg-gray-50'
-                                onClick={() => tableRowHandleClick(item.shop_id,item)}
+                                onClick={() => tableRowHandleClick(item.shop_id, item)}
                             >
                                 <td className='px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-500'>{item.shop_id}</td>
                                 <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.shop_name}</td>
