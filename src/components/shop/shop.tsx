@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TopNavbar from "../topNavbar";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -19,12 +19,12 @@ function Shop() {
     const [owner_nic, setOwnerNic] = useState("");
     const [outstanding, setOutstanding] = useState("");
     const [credit_limit, setCreditLimit] = useState("");
+    const [shopId , setShopId] = useState(null);
 
 
     async function handleItemAddOnClick() {
-
         try {
-           const formData = formValidation();
+            const formData = formValidation();
             await axios.post(`${backend_url}/api/shop`, {
                 ...formData
             });
@@ -34,17 +34,17 @@ function Shop() {
                 icon: 'success',
                 confirmButtonText: 'OK'
             });
-            setShopName("");
-            setAddress("");
-            setContactNumber("");
-            setEmail("");
-            setOwnerNic("");
-            setOutstanding("");
-            setCreditLimit("")
-
+            clear();
         } catch (e) {
             console.log(e);
         }
+    }
+
+    async function fetchAllShopData() {
+
+        const response = await axios.get(`${backend_url}/api/shop`);
+        setShops(response.data.data);
+
     }
 
     function handleItemUpdateOnClick() {
@@ -55,6 +55,29 @@ function Shop() {
 
     }
 
+    function clear() {
+        setShopName("");
+        setAddress("");
+        setContactNumber("");
+        setEmail("");
+        setOwnerNic("");
+        setOutstanding("");
+        setCreditLimit("");
+        setShopId(null)
+        fetchAllShopData();
+    }
+
+    function setValue(value:any){
+        setShopName(value.shop_name);
+        setAddress(value.address);
+        setContactNumber(value.contact_number);
+        setEmail(value.email);
+        setOwnerNic(value.owner_nic);
+        setOutstanding(value.outStanding);
+        setCreditLimit(value.credit_limit)
+        setShopId(value.shop_id)
+        // fetchAllShopData();
+    }
 
     function formValidation() {
         if (!shop_name && !address && !contact_number && !email && !owner_nic && !outstanding && !credit_limit) {
@@ -85,7 +108,6 @@ function Shop() {
     }
 
     function isValidNumber(value: string) {
-
         if (/^-?\d+$/.test(value)) {
             // The value is an integer
             return parseInt(value, 10);
@@ -132,7 +154,6 @@ function Shop() {
 
     function isValidEmail(email: string) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
         if (!emailRegex.test(email)) {
             Swal.fire({
                 title: 'Error!',
@@ -143,6 +164,17 @@ function Shop() {
             throw new Error("please fill the form")
         }
     }
+
+    function tableRowHandleClick(id: number,value:any) {
+        console.log(id);
+        console.log(value);
+        setValue(value);
+        
+    }
+
+    useEffect(() => {
+        fetchAllShopData();
+    }, [0])
 
     return (
         <div className="m-4 w-full">
@@ -199,22 +231,22 @@ function Shop() {
                         </tr>
                     </thead>
                     <tbody>
-                        {/* {items.map((item) => (
+                        {shops.map((item: any) => (
                             <tr
-                                key={item.item_id}
+                                key={item.shop_id}
                                 className=' text-white font-semibold hover:bg-gray-50'
-                                onClick={() => handleTableRowClick(item)}
+                                onClick={() => tableRowHandleClick(item.shop_id,item)}
                             >
-                                <td className='px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-500'>{item.item_id}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.category}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.name}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.brand}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.colour}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.price}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.warranty_period}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.qty}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-500'>{item.shop_id}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.shop_name}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.address}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.contact_number}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.email}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.owner_nic}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.outStanding}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.credit_limit}</td>
                             </tr>
-                        ))} */}
+                        ))}
                     </tbody>
                 </table>
 
