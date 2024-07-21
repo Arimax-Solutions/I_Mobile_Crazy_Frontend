@@ -1,32 +1,147 @@
 import React, { useState } from "react";
 import TopNavbar from "../topNavbar";
+import Swal from "sweetalert2";
+import axios from "axios";
+import { backend_url } from "../../utill/utill";
 
-interface Ishops{
-    
+
+interface Ishops {
+
 }
 
 function Shop() {
 
-    const [shops ,setShops] = useState([]);
-    const [shop_name , setShopName] = useState("");
-    const [address , setAddress] = useState("");
+    const [shops, setShops] = useState([]);
+    const [shop_name, setShopName] = useState("");
+    const [address, setAddress] = useState("");
     const [contact_number, setContactNumber] = useState("");
-    const [email,setEmail] = useState("");
-    const [owner_nic,setOwnerNic] = useState("");
-    const [outstanding,setOutstanding] = useState("");
-    const [credit_limit,setCreditLimit] = useState("");
+    const [email, setEmail] = useState("");
+    const [owner_nic, setOwnerNic] = useState("");
+    const [outstanding, setOutstanding] = useState("");
+    const [credit_limit, setCreditLimit] = useState("");
 
 
-    function handleItemAddOnClick(){
+    async function handleItemAddOnClick() {
+
+        try {
+           const formData = formValidation();
+            await axios.post(`${backend_url}/api/shop`, {
+                ...formData
+            });
+            await Swal.fire({
+                title: 'Success!',
+                text: 'Shop saved successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            setShopName("");
+            setAddress("");
+            setContactNumber("");
+            setEmail("");
+            setOwnerNic("");
+            setOutstanding("");
+            setCreditLimit("")
+
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    function handleItemUpdateOnClick() {
 
     }
 
-    function handleItemUpdateOnClick(){
-        
+    function handleItemDeleteOnClick() {
+
     }
 
-    function handleItemDeleteOnClick(){
 
+    function formValidation() {
+        if (!shop_name && !address && !contact_number && !email && !owner_nic && !outstanding && !credit_limit) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please fill all fields',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            throw new Error("please fill the form")
+        }
+
+        isValidEmail(email);
+        isValidNIC(owner_nic)
+        const contactNumber = isValidPhoneNumber(contact_number);
+        const outStanding = isValidNumber(outstanding);
+        const creditLimit = isValidNumber(credit_limit);
+        return {
+            "shop_name": shop_name,
+            "address": address,
+            "email": email,
+            "contact_number": contactNumber,
+            "outStanding": outStanding,
+            "owner_nic": owner_nic,
+            "credit_limit": creditLimit,
+            "is_deleted": false
+        }
+    }
+
+    function isValidNumber(value: string) {
+
+        if (/^-?\d+$/.test(value)) {
+            // The value is an integer
+            return parseInt(value, 10);
+        } else if (/^-?\d+\.\d+$/.test(value)) {
+            // The value is a float
+            return parseFloat(value);
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter the valid Numbers',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            throw new Error("Not a valid number")
+        }
+    }
+
+    function isValidPhoneNumber(contactNumber: string) {
+        const phoneNumberRegex = /^[0]{1}[7]{1}[01245678]{1}[0-9]{7}$/
+        if (!phoneNumberRegex.test(contactNumber)) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter the valid contact number',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            throw new Error("please fill the form")
+        }
+        return Number.parseInt(contactNumber);
+    }
+
+    function isValidNIC(nic: string) {
+        const nicRegex = /^(([5,6,7,8,9]{1})([0-9]{1})([0,1,2,3,5,6,7,8]{1})([0-9]{6})([v|V|x|X]))|(([1,2]{1})([0,9]{1})([0-9]{2})([0,1,2,3,5,6,7,8]{1})([0-9]{7}))/
+        if (!nicRegex.test(nic)) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter the valid NIC number',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            throw new Error("please fill the form")
+        }
+    }
+
+    function isValidEmail(email: string) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter the valid email',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            throw new Error("please fill the form")
+        }
     }
 
     return (
@@ -53,7 +168,7 @@ function Shop() {
                         <input className='text-feild' value={credit_limit} onChange={(ev) => setCreditLimit(ev.target.value)} placeholder='credit limit' />
                         {/* Buttons for add, delete, update */}
                         <div className='flex justify-between items-end'>
-                    
+
                             <div className='flex'>
                                 <button onClick={handleItemAddOnClick} className='mr-[6vw] buttons-styles bg-green-button w-[7vw] h-[5vh] text-center rounded-xl flex justify-center items-center'>
                                     <img src={'src/assets/icons/Add Btn.svg'} className='mr-[0.3vw]' alt='add icon' />ADD</button>
