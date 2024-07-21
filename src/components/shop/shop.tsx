@@ -88,6 +88,7 @@ function Shop() {
                     text: "Your file has been deleted.",
                     icon: "success"
                 });
+                fetchAllShopData();
             });
             // if (result.isConfirmed) {
 
