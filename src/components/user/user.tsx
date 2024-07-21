@@ -19,7 +19,7 @@ interface UserData {
 
 const User: React.FC = () => {
     const [users, setUsers] = useState<UserData[]>([]);
-    const [selectedUser, setSelectedUser] = useState<UserData | null>(null); // Track selected user
+    const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [name, setName] = useState('');
     const [role, setRole] = useState('');
     const [contact_number, setContactNumber] = useState('');
@@ -35,10 +35,8 @@ const User: React.FC = () => {
     const roleOptions = [
         { value: 'ADMIN', label: 'Admin' },
         { value: 'USER', label: 'User' },
-        // Add more roles as needed
     ];
 
-    // validate inputs
     const validateForm = (): boolean => {
         if (!name || !contact_number || !email || !username || !password) {
             Swal.fire({
@@ -52,7 +50,6 @@ const User: React.FC = () => {
         return true;
     };
 
-    // fetch users
     const fetchItems = async () => {
         const token = localStorage.getItem('authToken');
         if (token) {
@@ -76,7 +73,6 @@ const User: React.FC = () => {
         }
     };
 
-    // add users 
     const handleAddUser = async () => {
         const newUser = {
             name,
@@ -90,7 +86,6 @@ const User: React.FC = () => {
         if (!validateForm()) {
             return;
         }
-        console.log(newUser)
 
         try {
             const response = await axios.post(`${backend_url}/auth/register`, newUser, {
@@ -99,9 +94,7 @@ const User: React.FC = () => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log(response.data.data)
-            if(response.data.data!=null){
-                // Show success alert
+            if (response.data.data != null) {
                 Swal.fire({
                     title: 'Success!',
                     text: 'User added successfully',
@@ -109,7 +102,6 @@ const User: React.FC = () => {
                     confirmButtonText: 'OK'
                 });
 
-                // Clear input fields after successful addition
                 setName('');
                 setUsername('');
                 setPassword('');
@@ -117,11 +109,8 @@ const User: React.FC = () => {
                 setEmail('');
                 fetchItems();
             }
-           
         } catch (error) {
             console.error('Error adding user:', error);
-
-            // Show error alert
             Swal.fire({
                 title: 'Error!',
                 text: 'Failed to add user',
@@ -131,7 +120,6 @@ const User: React.FC = () => {
         }
     };
 
-    // delete users 
     const handleItemDeleteOnClick = async (userId: number) => {
         if (!validateForm()) {
             return;
@@ -143,12 +131,10 @@ const User: React.FC = () => {
                 },
             });
 
-           
             const updatedUsers = users.filter(user => user.user_id !== userId);
             setUsers(updatedUsers);
             setSelectedUser(null);
 
-            // Show success alert
             Swal.fire({
                 title: 'Success!',
                 text: 'User deleted successfully',
@@ -164,8 +150,6 @@ const User: React.FC = () => {
 
         } catch (error) {
             console.error('Error deleting user:', error);
-
-            // Show error alert
             Swal.fire({
                 title: 'Error!',
                 text: 'Failed to delete user',
@@ -188,7 +172,6 @@ const User: React.FC = () => {
         if (!validateForm()) {
             return;
         }
-
 
         try {
             const response = await axios.put(`${backend_url}/api/users/${selectedUser?.user_id}`, newUser, {
@@ -213,8 +196,6 @@ const User: React.FC = () => {
 
         } catch (error) {
             console.error('Error updating user:', error);
-
-            // Show error alert
             Swal.fire({
                 title: 'Error!',
                 text: 'Failed to update user',
@@ -259,7 +240,7 @@ const User: React.FC = () => {
                     ADD
                 </Button>
                 <Button
-                    onClick={() => handleItemDeleteOnClick(selectedUser?.user_id || 0)} // Ensure to pass a default value if selectedUser is null
+                    onClick={() => handleItemDeleteOnClick(selectedUser?.user_id || 0)}
                     className='mr-[6vw] buttons-styles bg-red-button w-[8vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
                     iconSrc={'src/assets/icons/Delete Btn.svg'}
                     iconAlt='delete icon'
@@ -277,7 +258,7 @@ const User: React.FC = () => {
             </div>
 
             {/* Table to display users */}
-            <div className='mt-5'>
+            <div className='mt-5 w-[78vw] overflow-x-auto'>
                 <table className='min-w-full divide-y table-styles'>
                     <thead>
                         <tr>
@@ -290,16 +271,16 @@ const User: React.FC = () => {
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Role</th>
                         </tr>
                     </thead>
-                    <tbody className=' divide-gray-200'>
+                    <tbody className='divide-y divide-gray-200'>
                         {users.map((user) => (
                             <tr key={user.user_id} onClick={() => handleTableRowClick(user)} className='hover:bg-gray-200 cursor-pointer'>
-                                <td className='px-6 py-3 whitespace-nowrap'>{user.user_id}</td>
-                                <td className='px-6 py-3 whitespace-nowrap'>{user.name}</td>
-                                <td className='px-6 py-3 whitespace-nowrap'>{user.contact_number}</td>
-                                <td className='px-6 py-3 whitespace-nowrap'>{user.email}</td>
-                                <td className='px-6 py-3 whitespace-nowrap'>{user.username}</td>
-                                <td className='px-6 py-3 whitespace-nowrap'>{user.password}</td>
-                                <td className='px-6 py-3 whitespace-nowrap'>{user.role}</td>
+                                <td className='px-6 py-4 whitespace-nowrap'>{user.user_id}</td>
+                                <td className='px-6 py-4 whitespace-nowrap'>{user.name}</td>
+                                <td className='px-6 py-4 whitespace-nowrap'>{user.contact_number}</td>
+                                <td className='px-6 py-4 whitespace-nowrap'>{user.email}</td>
+                                <td className='px-6 py-4 whitespace-nowrap'>{user.username}</td>
+                                <td className='px-6 py-4 whitespace-nowrap'>{user.password}</td>
+                                <td className='px-6 py-4 whitespace-nowrap'>{user.role}</td>
                             </tr>
                         ))}
                     </tbody>

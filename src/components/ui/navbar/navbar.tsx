@@ -17,7 +17,7 @@ function NavigationMenu() {
                 <ul className='mt-5 w-full pl-8 flex flex-col gap-10 mb-2 '>
 
                     <NavItems logo='src/assets/images/navbar/layer1.svg' name='Reports' location='/dashboard' selected={setSelect} isSelected={select} />
-                    <NavItems logo='src/assets/images/navbar/Stock Phones.svg' name='Stock Phones' location='/home' selected={setSelect} isSelected={select} />
+                    <NavItems logo='src/assets/images/navbar/Stock Phones.svg' name='Stock Phones' location='/StockPhones' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Return Phones.svg' name='Return Phones' location='/dashboard' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Items.svg' name='Items' location='/item' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Return item.svg' name='Return Items' location='/dashboard' selected={setSelect} isSelected={select} />
