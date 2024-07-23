@@ -50,26 +50,23 @@ const weeklyOrderIncrementData = [
 
 export default function Dashboard() {
   return (
-
     <div className='m-4 w-full'>
-
       <div className='m-4'>
         <TopNavbar />
-
-
-        {/* buttons  */}
-        <div className='flex justify-around mt-5'>
-          <button className='buttons-styles'>Income Report</button>
-          <button className='buttons-styles'>Stock Update</button>
-          <button className='buttons-styles'>Income Report</button>
-          <button className='buttons-styles'>Selling Update</button>
-          <button className='buttons-styles'>Return Update</button>
-          <button className='daily_cost-buttons-styles p-1 rounded-xl w-fit flex items-center '>
+  
+        {/* Buttons */}
+        <div className='flex flex-wrap justify-around mt-5 gap-2'>
+          <button className='buttons-styles w-full sm:w-auto'>Income Report</button>
+          <button className='buttons-styles w-full sm:w-auto'>Stock Update</button>
+          <button className='buttons-styles w-full sm:w-auto'>Income Report</button>
+          <button className='buttons-styles w-full sm:w-auto'>Selling Update</button>
+          <button className='buttons-styles w-full sm:w-auto'>Return Update</button>
+          <button className='daily_cost-buttons-styles p-1 rounded-xl w-full sm:w-auto flex items-center'>
             Daily Cost<img src={'src/assets/icons/daily cost.svg'} className='ml-2' alt='icon' />
           </button>
         </div>
-
-      {/* 1st row */}
+  
+         {/* 1st row */}
       <div className='flex justify-between mt-5'>
         <div className='background-colour-today-sales-div p-3 rounded-lg flex-1 mr-4'>
           <div className='ml-2 mt-1'>
@@ -111,14 +108,14 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
-          {/* 1st row right side chart */}
+  
+          {/* 1st Row Right Side Chart */}
           <div className="background-colour-today-sales-div text-white flex-1 p-3 rounded-lg">
             <div className="ml-2 mt-1">
               <span className="text-white text-lg font-bold">Total Earning</span><br />
             </div>
             <div className="flex justify-center items-center h-full">
-              <div className="h-[30vh] w-full">
+              <div className="h-[30vh] w-full ">
                 <Gauge className='text-white'
                   value={75}
                   startAngle={-110}
@@ -137,14 +134,14 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
-        {/* Second row */}
-        <div className='flex justify-between mt-5'>
-          <div className='background-colour-today-sales-div p-3 rounded-lg flex-1 mr-4'>
+  
+        {/* Second Row */}
+        <div className='flex flex-col lg:flex-row lg:justify-between mt-5 gap-4'>
+          <div className='background-colour-today-sales-div p-3 rounded-lg flex-1'>
             <div className='ml-2 mt-1'>
               <span className='text-white text-lg font-bold'>Top Products</span><br />
             </div>
-            <div className='flex justify-between w-full text-white mt-2'>
+            <div className='flex justify-center'>
               <BarChart
                 width={600}
                 height={300}
@@ -163,8 +160,8 @@ export default function Dashboard() {
               </BarChart>
             </div>
           </div>
-
-          {/* Pie chart */}
+  
+          {/* Pie Chart */}
           <div className="background-colour-today-sales-div text-white flex-1 p-3 rounded-lg">
             <div className="ml-2 mt-1">
               <span className="text-white text-lg font-bold">Income</span><br />
@@ -191,12 +188,11 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
-
-        {/* 3rd row */}
-        <div className='mt-2 flex justify-between'>
-          {/* 3rd row 1st div */}
-          <div className='background-colour-today-sales-div flex-1 mr-4 rounded-lg p-1'>
+  
+        {/* 3rd Row */}
+        <div className='flex flex-col lg:flex-row mt-2 gap-4'>
+          {/* 3rd Row 1st Div */}
+          <div className='background-colour-today-sales-div flex-1 rounded-lg p-1'>
             <div className="ml-2 p-3">
               <span className="text-white text-lg font-bold">Sales Increment</span><br />
             </div>
@@ -210,8 +206,8 @@ export default function Dashboard() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-
-          {/* 3rd row second div */}
+  
+          {/* 3rd Row 2nd Div */}
           <div className='background-colour-today-sales-div flex-1 rounded-lg'>
             <div className="ml-2 p-3">
               <span className="text-white text-lg font-bold">Weekly Order Increment</span><br />
@@ -228,7 +224,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-      </div>
-      );
-}
-
+    </div>
+  );
+}  
