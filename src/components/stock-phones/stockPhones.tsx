@@ -313,7 +313,7 @@ export default function StockPhones() {
 
 
     return (
-        <div className='text-white font-semibold 2xl:max-w-fit xl:max-w-[80vw] lg:max-w-[72vw] md:max-w-[65vw] sm:max-w-[65vw]'>
+        <div className='m-4 w-full text-white font-semibold xl:max-w-[80vw] lg:max-w-[72vw] md:max-w-[65vw] sm:max-w-[65vw]'>
             <div className="m-4">
                 <TopNavbar />
             </div>
