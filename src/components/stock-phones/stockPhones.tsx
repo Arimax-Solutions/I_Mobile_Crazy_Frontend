@@ -100,7 +100,6 @@ export default function StockPhones() {
                     },
                 });
                 if (response.data && Array.isArray(response.data.data)) {
-                    console.log(response)
                     setPhones(response.data.data);
                 } else {
                     console.error('Invalid data format received from server:', response.data);
@@ -135,14 +134,12 @@ export default function StockPhones() {
     };
 
     const handlePushOnClick = async () => {
-        console.log(phoneModels)
         const newPhone: NewPhone = {
             name: stockName,
             description: description,
             qty: parseInt(quantity),
             models: phoneModels,
         };
-        console.log(newPhone)
         try {
             const response = await axios.post(`${backend_url}/api/stock`, newPhone, {
                 headers: {
@@ -151,7 +148,7 @@ export default function StockPhones() {
                 },
             });
 
-            if (response.data.data) {
+            if (response.status==201) {
                 Swal.fire({
                     title: 'Success!',
                     text: 'Phone added successfully',
@@ -278,57 +275,81 @@ export default function StockPhones() {
         }
     };
 
-    const handleTableRowClick = (phone: Phone) => {
+    const handleTableRowClick = async (phone: Phone) => {
         setSelectedPhone(phone);
         setStockName(phone.name);
         setDescription(phone.description);
         setQuantity(phone.qty.toString());
-        setModel(phone.model);
-        setImeiNumber(phone.imeiNumber);
-        setStorage(phone.storage);
-        setIosVersion(phone.iosVersion);
-        setBatteryHealth(phone.batteryHealth);
-        setColour(phone.colour);
+        
+        try {
+            const response = await axios.get(`${backend_url}/api/stock/models/${phone.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            // Assuming response.data is the array of models
+            if (Array.isArray(response.data)) {
+                setModelsTable(response.data);
+            } else {
+                console.error('Invalid data format received from server:', response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching phone models:', error);
+        }
+    };
+    
+    // Function to handle clicks on the model table rows
+    const handleModelTableRowClick = (model: phoneModels) => {
+        setModel(model.name);
+        if (model.imeiNumbers.length > 0) {
+            const imeiData = model.imeiNumbers[0];
+            setImeiNumber(imeiData.imei.toString());
+            setStorage(imeiData.storage);
+            setIosVersion(imeiData.ios_version);
+            setBatteryHealth(imeiData.battery_health.toString());
+            setColour(imeiData.colour);
+        }
     };
 
+
     return (
-        <div className="m-4 w-full">
+        <div className='text-white font-semibold 2xl:max-w-fit xl:max-w-[80vw] lg:max-w-[72vw] md:max-w-[65vw] sm:max-w-[65vw]'>
             <div className="m-4">
                 <TopNavbar />
             </div>
 
             {/* Inputs row */}
             <div className='text-white font-semibold'>
-                <div className='mt-5 flex justify-between'>
+                <div className='mt-5 flex flex-col sm:flex-row justify-between'>
                     <input
-                        className='text-feild'
+                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={stockName}
                         onChange={(ev) => setStockName(ev.target.value)}
                         placeholder='   Stock Name'
                     />
                     <input
-                        className='text-feild'
+                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={description}
                         onChange={(ev) => setDescription(ev.target.value)}
                         placeholder='   Description'
                     />
                     <input
-                        className='text-feild'
+                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={quantity}
                         onChange={(ev) => setQuantity(ev.target.value)}
                         placeholder='   Quantity'
                     />
                 </div>
 
-                <div className='mt-5 flex justify-between'>
+                <div className='mt-5 flex flex-col sm:flex-row justify-between '>
                     <input
-                        className='text-feild'
+                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={model}
                         onChange={(ev) => setModel(ev.target.value)}
                         placeholder='   Model'
                     />
                     <input
-                        className='text-feild'
+                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={imeiNumber}
                         onChange={(ev) => setImeiNumber(ev.target.value)}
                         placeholder='   IMEI Number'
@@ -341,15 +362,15 @@ export default function StockPhones() {
                     />
                 </div>
 
-                <div className='mt-5 flex justify-between'>
+                <div className='mt-5 flex flex-col sm:flex-row justify-between'>
                     <input
-                        className='text-feild'
+                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={iosVersion}
                         onChange={(ev) => setIosVersion(ev.target.value)}
                         placeholder='   IOS Version'
                     />
                     <input
-                        className='text-feild'
+                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={batteryHealth}
                         onChange={(ev) => setBatteryHealth(ev.target.value)}
                         placeholder='   Battery Health'
@@ -363,113 +384,110 @@ export default function StockPhones() {
                 </div>
             </div>
 
-            {/* Models Table */}
-            <div className='mt-5'>
-                <h2 className='text-white font-semibold mb-2'>Models</h2>
-                <table className='table-auto w-full text-white'>
-                    <thead>
-                        <tr>
-                            <th className='px-4 py-2'>Model</th>
-                            <th className='px-4 py-2'>Stock Added Date</th>
-                            <th className='px-4 py-2'>IMEI Number</th>
-                            <th className='px-4 py-2'>Storage</th>
-                            <th className='px-4 py-2'>Colour</th>
-                            <th className='px-4 py-2'>IOS Version</th>
-                            <th className='px-4 py-2'>Battery Health</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {modelsTable.map((model, index) => (
-                            <tr key={index} className="hover:bg-gray-700 cursor-pointer">
-                                <td className='border px-4 py-2'>{model.name}</td>
-                                <td className='border px-4 py-2'>{model.stockAddedDate}</td>
-                                <td className='border px-4 py-2'>{model.imeiNumbers[0]?.imei}</td>
-                                <td className='border px-4 py-2'>{model.imeiNumbers[0]?.storage}</td>
-                                <td className='border px-4 py-2'>{model.imeiNumbers[0]?.colour}</td>
-                                <td className='border px-4 py-2'>{model.imeiNumbers[0]?.ios_version}</td>
-                                <td className='border px-4 py-2'>{model.imeiNumbers[0]?.battery_health}</td>
+
+
+         {/* Second table (list of phone models) */}
+         <div className="mt-5 text-white">
+                <h2 className="text-xl font-semibold mb-4">Phone Models</h2>
+                <div className="overflow-x-auto">
+                    <table className="min-w-full bg-gray-800 text-white">
+                        <thead>
+                            <tr>
+                                <th className="py-2 px-4 border-b border-gray-700">Model Name</th>
+                                <th className="py-2 px-4 border-b border-gray-700">Stock Added Date</th>
+                                <th className="py-2 px-4 border-b border-gray-700">IMEI Number</th>
+                                <th className="py-2 px-4 border-b border-gray-700">Storage</th>
+                                <th className="py-2 px-4 border-b border-gray-700">iOS Version</th>
+                                <th className="py-2 px-4 border-b border-gray-700">Battery Health</th>
+                                <th className="py-2 px-4 border-b border-gray-700">Colour</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* buttons */}
-            <div className='flex mt-5 justify-end'>
-                <Button
-                    onClick={handleAddPhone}
-                    className='mr-[6vw] buttons-styles bg-green-button w-[7vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                    iconSrc={'src/assets/icons/Add Btn.svg'}
-                    iconAlt='add icon'
-                >
-                    ADD
-                </Button>
-                <Button
-                    onClick={() => handleItemDeleteOnClick(selectedPhone?.id || 0)}
-                    className='mr-[6vw] buttons-styles bg-red-button w-[8vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                    iconSrc={'src/assets/icons/Delete Btn.svg'}
-                    iconAlt='delete icon'
-                >
-                    DELETE
-                </Button>
-                <Button
-                    onClick={handleItemUpdateOnClick}
-                    className='buttons-styles bg-blue-button w-[8vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                    iconSrc={'src/assets/icons/Update Btn.svg'}
-                    iconAlt='update icon'
-                >
-                    UPDATE
-                </Button>
-
-                <Button
-                    onClick={handlePushOnClick}
-                    className='mr-[6vw] buttons-styles bg-green-button w-[7vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                    iconSrc={'src/assets/icons/Add Btn.svg'}
-                    iconAlt='add icon'
-                >
-                    Push
-                </Button>
-            </div>
+                        </thead>
+                        <tbody>
+                            {modelsTable.map((model, index) => (
+                                <tr key={index} onClick={() => handleModelTableRowClick(model)}>
+                                    <td className="py-2 px-4 border-b border-gray-700">{model.name}</td>
+                                    <td className="py-2 px-4 border-b border-gray-700">{model.stockAddedDate}</td>
+                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.imei).join(', ')}</td>
+                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.storage).join(', ')}</td>
+                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.ios_version).join(', ')}</td>
+                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.battery_health).join(', ')}</td>
+                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.colour).join(', ')}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+          
+          
+          
+          {/* buttons */}
+         </div>
 
 
-            {/* Table for displaying existing phone stock */}
-            <div className='mt-10'>
-                <h2 className='text-white font-semibold mb-2'>Existing Phone Stock</h2>
-                <table className='table-auto w-full text-white'>
-                    <thead>
-                        <tr>
-                            <th className='px-4 py-2'>Name</th>
-                            <th className='px-4 py-2'>Description</th>
-                            <th className='px-4 py-2'>Quantity</th>
-                            <th className='px-4 py-2'>Model</th>
-                            <th className='px-4 py-2'>IMEI Number</th>
-                            <th className='px-4 py-2'>Storage</th>
-                            <th className='px-4 py-2'>Colour</th>
-                            <th className='px-4 py-2'>IOS Version</th>
-                            <th className='px-4 py-2'>Battery Health</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {phones.map((phone) => (
-                            <tr
-                                key={phone.id}
-                                className='hover:bg-gray-700 cursor-pointer'
-                                onClick={() => handleTableRowClick(phone)}
-                            >
-                                <td className='border px-4 py-2'>{phone.name}</td>
-                                <td className='border px-4 py-2'>{phone.description}</td>
-                                <td className='border px-4 py-2'>{phone.qty}</td>
-                                <td className='border px-4 py-2'>{phone.model}</td>
-                                <td className='border px-4 py-2'>{phone.imeiNumber}</td>
-                                <td className='border px-4 py-2'>{phone.storage}</td>
-                                <td className='border px-4 py-2'>{phone.colour}</td>
-                                <td className='border px-4 py-2'>{phone.iosVersion}</td>
-                                <td className='border px-4 py-2'>{phone.batteryHealth}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+         <div className='flex mt-5 gap-x-[3vw] justify-end'>
+            <Button
+                onClick={handleAddPhone}
+                className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
+                iconSrc={'src/assets/icons/Add Btn.svg'}
+                iconAlt='add icon'
+            >
+                ADD
+            </Button>
+            <Button
+                onClick={() => handleItemDeleteOnClick(selectedPhone?.id || 0)}
+                className='buttons-styles bg-red-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
+                iconSrc={'src/assets/icons/Delete Btn.svg'}
+                iconAlt='delete icon'
+            >
+                DELETE
+            </Button>
+            <Button
+                onClick={handleItemUpdateOnClick}
+                className='buttons-styles bg-blue-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
+                iconSrc={'src/assets/icons/Update Btn.svg'}
+                iconAlt='update icon'
+            >
+                UPDATE
+            </Button>
+            <Button
+                onClick={handlePushOnClick}
+                className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
+                iconSrc={'src/assets/icons/Add Btn.svg'}
+                iconAlt='add icon'
+            >
+                PUSH
+            </Button>
+        </div>
+
+
+
+        {/* First table (list of phones) */}
+               <div className="mt-5 text-white">
+                        <h2 className="text-xl font-semibold mb-4">List of Stocks</h2>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full bg-gray-800 text-white">
+                                <thead>
+                                    <tr>
+                                        <th className="py-2 px-4 border-b border-gray-700">ID</th>
+                                        <th className="py-2 px-4 border-b border-gray-700">Name</th>
+                                        <th className="py-2 px-4 border-b border-gray-700">Description</th>
+                                        <th className="py-2 px-4 border-b border-gray-700">Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {phones.map((phone) => (
+                                        <tr key={phone.id} onClick={() => handleTableRowClick(phone)} className="cursor-pointer hover:bg-gray-700">
+                                            <td className="py-2 px-4 border-b border-gray-700">{phone.id}</td>
+                                            <td className="py-2 px-4 border-b border-gray-700">{phone.name}</td>
+                                            <td className="py-2 px-4 border-b border-gray-700">{phone.description}</td>
+                                            <td className="py-2 px-4 border-b border-gray-700">{phone.qty}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
         </div>
     );
 }

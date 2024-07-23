@@ -48,13 +48,13 @@ export default function TopNavbar() {
   };
 
   return (
-    <div className='flex justify-between'>
-      <div className='flex-grow mr-[28vw]'>
-        <span className='text-2xl text-white'>Hi, {name} Welcome Back!</span>
+    <div className='flex justify-between '>
+      <div className='flex-grow sm:mr-[10vw] mb-4 sm:mb-0'>
+      <span className='text-2xl text-white block sm:inline'>Hi, {name} Welcome Back!</span>
         <p className='text-white opacity-40 text-lg'>{getFormattedDate()}</p>
       </div>
-      <div className='flex items-start'>
-        <input placeholder='  search reports' className='w-[300px] p-1 text-xl rounded-xl mr-2 input-bg-gradient-custom'/>
+      <div className='flex items-center sm:items-start'>
+        <input placeholder='  search reports' className='w-full sm:w-[300px] p-1 text-xl rounded-xl mb-4 sm:mb-0 sm:mr-2 input-bg-gradient-custom'/>
         <button onClick={logoutFunction} className='input-bg-gradient-custom p-2 bg-blue-500 rounded-full text-white'>
           <img src={'src/assets/icons/Logout.svg'} className='w-fit h-[3vh]'/>
         </button>
