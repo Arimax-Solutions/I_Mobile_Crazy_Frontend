@@ -6,6 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Button from '../crudbuttons/buttons';
 import Swal from "sweetalert2";
 import axios from 'axios';
+import { backend_url } from '../../utill/utill';
 
 const storageOptions = [
     { value: '64GB', label: '64GB' },
@@ -20,17 +21,32 @@ const colourOptions = [
     { value: 'White', label: 'White' },
 ];
 
+interface PhoneData {
+    id: string;
+    imeiNumber: string;
+    model: string;
+    storage: string;
+    colour: string;
+    reason: string;
+    name: string;
+    outstanding: string;
+    date: string;
+    contact: string;
+}
+
 export default function ReturnPhone() {
-    const [imeiNumber, setImeiNumber] = useState('');
-    const [model, setModel] = useState('');
-    const [storage, setStorage] = useState('');
-    const [colour, setColour] = useState('');
-    const [reason, setReason] = useState('');
-    const [name, setName] = useState('');
-    const [outstanding, setOutstanding] = useState('');
+    const [imeiNumber, setImeiNumber] = useState<string>('');
+    const [model, setModel] = useState<string>('');
+    const [storage, setStorage] = useState<string>('');
+    const [colour, setColour] = useState<string>('');
+    const [reason, setReason] = useState<string>('');
+    const [name, setName] = useState<string>('');
+    const [outstanding, setOutstanding] = useState<string>('');
     const [date, setDate] = useState<Date | null>(null);
-    const [contact, setContact] = useState('');
-    const [token, setToken] = useState('');
+    const [contact, setContact] = useState<string>('');
+    const [token, setToken] = useState<string>('');
+    const [items, setItems] = useState<PhoneData[]>([]);
+    const [selectedItem, setSelectedItem] = useState<PhoneData | null>(null);
 
     useEffect(() => {
         // Retrieve token from localStorage
@@ -38,7 +54,28 @@ export default function ReturnPhone() {
         if (storedToken) {
             setToken(storedToken);
         }
-    }, []);
+
+        // Fetch data from the backend
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('${backend_url}/api/return/phones', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                setItems(response.data);
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to fetch return phone data',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        };
+
+        fetchData();
+    }, [token]);
 
     const validateForm = (): boolean => {
         if (!imeiNumber || !name || !model || !colour || !storage || !colour || !reason || !outstanding || !date || !contact) {
@@ -50,21 +87,54 @@ export default function ReturnPhone() {
             });
             return false;
         }
-    
+
         return true;
     };
 
-    const handleItemUpdateOnClick= () =>{
+   
+    const handleItemDeleteOnClick = async() => {
+        if (!selectedItem) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'No item selected for update',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
 
-    }
-    const handleItemDeleteOnClick= () =>{
-
-    }
-    const handleSave = async () => {
-      
         if (!validateForm()) return;
 
-        const phoneData = {
+        try {
+            const response = await axios.put(`${backend_url}/api/return/phone/${selectedItem.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            if (response.status === 200) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Phone data delete successfully',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            }
+
+        } catch (error) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to delete return phone data',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    };
+
+    const handleSave = async () => {
+        if (!validateForm()) return;
+
+        const phoneData: PhoneData = {
             imeiNumber,
             model,
             storage,
@@ -72,32 +142,107 @@ export default function ReturnPhone() {
             reason,
             name,
             outstanding,
-            date,
+            date: date?.toISOString() || '',
             contact
         };
 
         try {
-            const response = await axios.post('${backend_url}/api/phones', phoneData, {
+            const response = await axios.post('${backend_url}/api/return/phone', phoneData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
 
-            Swal.fire({
-                title: 'Success!',
-                text: 'Phone data saved successfully',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
+            if (response.data.data.status === 201) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Phone data saved successfully',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            }
+
         } catch (error) {
             Swal.fire({
                 title: 'Error!',
-                text: 'Failed to save phone data',
+                text: 'Failed to save return phone data',
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
         }
+    };
+
+
+    const handleItemUpdateOnClick = async () => {
+        if (!selectedItem) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'No item selected for update',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        if (!validateForm()) return;
+
+        const updatedPhoneData: PhoneData = {
+            ...selectedItem,
+            imeiNumber,
+            model,
+            storage,
+            colour,
+            reason,
+            name,
+            outstanding,
+            date: date?.toISOString() || '',
+            contact
+        };
+
+        try {
+            const response = await axios.put(`${backend_url}/api/return/phone/${selectedItem.id}`, updatedPhoneData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.status === 200) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Phone data updated successfully',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+
+                // Update the local state with the updated item
+                setItems(prevItems =>
+                    prevItems.map(item => item.id === selectedItem.id ? updatedPhoneData : item)
+                );
+            }
+
+        } catch (error) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to update return phone data',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    };
+
+    const handleTableRowClick = (item: PhoneData) => {
+        setSelectedItem(item);
+        setImeiNumber(item.imeiNumber);
+        setModel(item.model);
+        setStorage(item.storage);
+        setColour(item.colour);
+        setReason(item.reason);
+        setName(item.name);
+        setOutstanding(item.outstanding);
+        setDate(new Date(item.date));
+        setContact(item.contact);
     };
 
     return (
@@ -199,6 +344,40 @@ export default function ReturnPhone() {
                 >
                     UPDATE
                 </Button>
+            </div>
+
+            {/* table */}
+            <div className='mt-5 overflow-auto max-h-[50vh]'>
+                <table className='w-full text-white'>
+                    <thead>
+                        <tr>
+                            <th className='p-2 border'>Model</th>
+                            <th className='p-2 border'>IMEI Number</th>
+                            <th className='p-2 border'>Storage</th>
+                            <th className='p-2 border'>Colour</th>
+                            <th className='p-2 border'>Name</th>
+                            <th className='p-2 border'>Outstanding</th>
+                            <th className='p-2 border'>Date</th>
+                            <th className='p-2 border'>Contact</th>
+                            <th className='p-2 border'>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {items.map((item, index) => (
+                            <tr key={index} className='cursor-pointer' onClick={() => handleTableRowClick(item)}>
+                                <td className='p-2 border'>{item.model}</td>
+                                <td className='p-2 border'>{item.imeiNumber}</td>
+                                <td className='p-2 border'>{item.storage}</td>
+                                <td className='p-2 border'>{item.colour}</td>
+                                <td className='p-2 border'>{item.name}</td>
+                                <td className='p-2 border'>{item.outstanding}</td>
+                                <td className='p-2 border'>{item.date}</td>
+                                <td className='p-2 border'>{item.contact}</td>
+                                <td className='p-2 border'>{item.reason}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
