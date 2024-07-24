@@ -10,6 +10,7 @@ import User from './components/user/user.tsx';
 import Shop from './components/shop/shop.tsx';
 import StockPhones from './components/stock-phones/stockPhones.tsx';
 import ReturnPhone from './components/return-phone/retun-phone.tsx';
+import Order from './components/order/order.tsx';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="shop" element={<Shop />} />
           <Route path="stockPhones" element={<StockPhones />} />
           <Route path="returnPhone" element={<ReturnPhone />} />
+          <Route path="order" element={<Order />} />
         </Route>
       </Routes>
     </BrowserRouter>
