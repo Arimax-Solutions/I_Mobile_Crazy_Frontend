@@ -78,7 +78,10 @@ export default function Order() {
                         ))} */}
                     </tbody> }
                 </table>
-
+            </div>
+            <div className='w-full flex gap-2 mt-5 justify-end'>
+                <button className='bg-[#00900F] p-1 rounded-md text-white font-bold'>Proceed To Payment</button>
+                <button className='bg-[#B10000] p-1 rounded-md text-white font-bold'>Cancel Payment</button>
             </div>
         </div>
     );
