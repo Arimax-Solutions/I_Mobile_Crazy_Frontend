@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import * as crudButton from '../crudbuttons/buttons';
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -23,8 +24,13 @@ const style = {
 export default function Order() {
 
     const [open, setOpen] = React.useState(false);
+    const [openAddItem, setOpenAddItem] = React.useState(false);
+    const [openAddPhone, setOpenAddPhone] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const handleAddPhoneOpenModel = () => setOpenAddPhone(true);
+    const handleAddPhoneCloseModel = () => setOpenAddPhone(false);
+
 
 
     return (
@@ -38,7 +44,7 @@ export default function Order() {
                     <div className='flex items-center gap-10'>
                         <p className='font-bold text-[#5386ED] text-3xl'>#00000253</p>
                         <button onClick={handleOpen} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Customer</button>
-                        <button className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Phone</button>
+                        <button onClick={handleAddPhoneOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Phone</button>
                         <button className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3' >Add Item</button>
                     </div>
                     <div>
@@ -109,7 +115,7 @@ export default function Order() {
                 <button className='bg-[#B10000] p-1 rounded-md text-white font-bold'>Cancel Payment</button>
             </div>
 
-            {/* models */}
+            {/* model add customer */}
             <div>
                 {/* <Button onClick={handleOpen}>Open modal</Button> */}
                 <Modal
@@ -151,6 +157,83 @@ export default function Order() {
                         <div className='w-full flex gap-2 mt-5 justify-center'>
                             <button className='bg-[#00900F] p-2 rounded-md text-white font-bold'>Save customer</button>
                             <button className='bg-[#B10000] p-2 rounded-md text-white font-bold'>Cancel</button>
+                        </div>
+                    </Box>
+                </Modal>
+            </div>
+
+            {/* model add phones  */}
+            <div>
+                {/* <Button onClick={handleOpen}>Open modal</Button> */}
+                <Modal
+                    open={openAddPhone}
+                    onClose={handleAddPhoneCloseModel}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        <Typography className='' id="modal-modal-title" variant="h5" component="h2">
+                            Add Phone
+                        </Typography>
+                        <div className='w-full flex flex-col mt-2'>
+                            <input
+                                className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                value={""}
+                                // onChange={(ev) => setModel(ev.target.value)}
+                                placeholder='   IMEI Number'
+                            />
+                            <div className='flex'>
+                                <input
+                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                    value={""}
+                                    // onChange={(ev) => setModel(ev.target.value)}
+                                    placeholder='   Model'
+                                />
+                                <input
+                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                    value={""}
+                                    // onChange={(ev) => setModel(ev.target.value)}
+                                    placeholder='   Storage'
+                                />
+                            </div>
+                            <div>
+                                <input
+                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                    value={""}
+                                    // onChange={(ev) => setModel(ev.target.value)}
+                                    placeholder='   Warranty Period'
+                                />
+                                <input
+                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                    value={""}
+                                    // onChange={(ev) => setModel(ev.target.value)}
+                                    placeholder='   Color'
+                                />
+                            </div>
+                            <div>
+                                <input
+                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                    value={""}
+                                    // onChange={(ev) => setModel(ev.target.value)}
+                                    placeholder='   Battery Health'
+                                />
+                                <input
+                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                    value={""}
+                                    // onChange={(ev) => setModel(ev.target.value)}
+                                    placeholder='   Price'
+                                />
+                            </div>
+                        </div>
+                        <div className='w-full flex gap-2 mt-5 justify-end'>
+                            <crudButton.default
+                                onClick={() => {}}
+                                className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
+                                iconSrc={'src/assets/icons/Add Btn.svg'}
+                                iconAlt='add icon'
+                            >
+                                ADD
+                            </crudButton.default>
                         </div>
                     </Box>
                 </Modal>
