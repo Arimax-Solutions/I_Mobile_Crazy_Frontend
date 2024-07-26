@@ -246,7 +246,7 @@ export default function Order() {
                 {/* <Button onClick={handleOpen}>Open modal</Button> */}
                 <Modal
                     open={openAddItem}
-                    onClose={handleAddItemOpenModel}
+                    onClose={handleAddItemCloseModel}
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
