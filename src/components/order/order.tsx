@@ -6,6 +6,8 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import * as crudButton from '../crudbuttons/buttons';
 import RetailOrder from './reatail-order';
+import WholeSaleOrder from './wholesale-order';
+import { Outlet } from 'react-router-dom';
 
 
 
@@ -29,12 +31,19 @@ export default function Order() {
     const [open, setOpen] = React.useState(false);
     const [openAddItem, setOpenAddItem] = React.useState(false);
     const [openAddPhone, setOpenAddPhone] = React.useState(false);
+    const [openAddPhoneWholeSale, setOpenAddPhoneWholeSale] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const handleAddPhoneOpenModel = () => setOpenAddPhone(true);
     const handleAddPhoneCloseModel = () => setOpenAddPhone(false);
     const handleAddItemOpenModel = () => setOpenAddItem(true);
     const handleAddItemCloseModel = () => setOpenAddItem(false);
+    const handleWholesaleAddItemCloseModel = () => setOpenAddPhoneWholeSale(false);
+    const handleWholesaleAddItemOpenModel = () => setOpenAddPhoneWholeSale(true);
+
+    
+
+
     const [orderType, setOrderType] = useState<string>("retail");
 
 
@@ -57,7 +66,7 @@ export default function Order() {
                                 <button onClick={handleAddItemOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3' >Add Item</button>
                             </>
                             ):(
-                                <button onClick={handleOpen} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Phone</button>
+                                <button onClick={handleWholesaleAddItemOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Phone</button>
                             )
                         }
                     </div>
@@ -65,6 +74,7 @@ export default function Order() {
                         <select onChange={(e) => setOrderType(e.target.value)} name="choice" className='bg-[#5386ED] text-white font-bold p-2 rounded-md'>
                             <option className='bg-black text-white' value="retail" selected>Retail Order</option>
                             <option className='bg-black text-white' value="wholesale" >Wholesale Order</option>
+                            <option className='bg-black text-white' value="return" >Return Order</option>
                         </select>
                     </div>
                 </div>
@@ -82,13 +92,21 @@ export default function Order() {
                             handleAddNewPhoneModelClose={handleAddPhoneCloseModel}
                         />
                     ) : (
-                        <>
-                        </>
+                        
+                        orderType === "wholesale" ? (
+                            <WholeSaleOrder  isAddNewPhoneModelOpen={openAddPhoneWholeSale} handleAddNewPhoneModelClose={handleWholesaleAddItemCloseModel}/>
+
+                        ):
+                        (
+                            <>
+                                <p>return</p>
+                            </>
+                        )
+                        
                     )
                 }
 
             </div>
-
 
         </div>
     );
