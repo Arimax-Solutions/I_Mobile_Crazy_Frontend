@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TopNavbar from '../topNavbar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import * as crudButton from '../crudbuttons/buttons';
+import { isValidEmail, isValidNIC, isValidPhoneNumber, notNullString } from '../../utill/validation';
+import Swal from 'sweetalert2';
+import axios from 'axios';
+import { backend_url } from '../../utill/utill';
 
 interface IProp {
     isAddNewCustomerModelOpen: boolean,
@@ -31,6 +35,43 @@ const style = {
 
 export default function RetailOrder(prop: IProp) {
 
+    const [customerName, setCustomerName] = useState("");
+    const [customerEmail, setCustomerEmail] = useState("");
+    const [customerContactNumber, setCustomerContactNumber] = useState("");
+    const [customerNic, setCustomerNic] = useState("");
+
+    async function handleSaveCustomer() {   
+        try {
+            notNullString(customerName);
+            isValidNIC(customerNic);
+            isValidEmail(customerEmail);
+            const phoneNumber = isValidPhoneNumber(customerContactNumber)
+
+            await axios.post(`${backend_url}/api/customer`, {
+                "name": customerName,
+                "email": customerEmail,
+                "contact_phone": phoneNumber,
+                "nic": customerNic,
+            });
+            prop.handleAddNewCustomerModelClose();
+            await Swal.fire({
+                title: 'Success!',
+                text: 'Customer saved successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+
+        } catch (e) {
+            prop.handleAddNewCustomerModelClose();
+            console.log(e);
+            await Swal.fire({
+                title: 'Error!',
+                text: 'something happen cannot save cusotmer',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
 
     return (
         <>
@@ -97,6 +138,7 @@ export default function RetailOrder(prop: IProp) {
             <div>
                 {/* <Button onClick={handleOpen}>Open modal</Button> */}
                 <Modal
+                    className='z-auto'
                     open={prop.isAddNewCustomerModelOpen}
                     onClose={prop.handleAddNewCustomerModelClose}
                     aria-labelledby="modal-modal-title"
@@ -109,31 +151,31 @@ export default function RetailOrder(prop: IProp) {
                         <div className='w-full flex flex-col items-center mt-2'>
                             <input
                                 className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                value={""}
-                                // onChange={(ev) => setModel(ev.target.value)}
+                                value={customerName}
+                                onChange={(ev) => setCustomerName(ev.target.value)}
                                 placeholder='   Contact Name'
                             />
                             <input
                                 className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                value={""}
-                                // onChange={(ev) => setModel(ev.target.value)}
+                                value={customerEmail}
+                                onChange={(ev) => setCustomerEmail(ev.target.value)}
                                 placeholder='   Email'
                             />
                             <input
                                 className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                value={""}
-                                // onChange={(ev) => setModel(ev.target.value)}
+                                value={customerContactNumber}
+                                onChange={(ev) => setCustomerContactNumber(ev.target.value)}
                                 placeholder='   Whatsapp Number'
                             />
                             <input
                                 className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                value={""}
-                                // onChange={(ev) => setModel(ev.target.value)}
+                                value={customerNic}
+                                onChange={(ev) => setCustomerNic(ev.target.value)}
                                 placeholder='   Nic'
                             />
                         </div>
                         <div className='w-full flex gap-2 mt-5 justify-center'>
-                            <button className='bg-[#00900F] p-2 rounded-md text-white font-bold'>Save customer</button>
+                            <button className='bg-[#00900F] p-2 rounded-md text-white font-bold' onClick={handleSaveCustomer}>Save customer</button>
                             <button className='bg-[#B10000] p-2 rounded-md text-white font-bold'>Cancel</button>
                         </div>
                     </Box>
