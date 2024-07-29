@@ -341,7 +341,7 @@ export default function StockPhones() {
                     />
                 </div>
 
-                <div className='mt-5 flex flex-col sm:flex-row justify-between '>
+                <div className='mt-3 flex flex-col sm:flex-row justify-between '>
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={model}
@@ -362,7 +362,7 @@ export default function StockPhones() {
                     />
                 </div>
 
-                <div className='mt-5 flex flex-col sm:flex-row justify-between'>
+                <div className='mt-3 flex flex-col sm:flex-row justify-between'>
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={iosVersion}

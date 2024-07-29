@@ -22,7 +22,7 @@ const colourOptions = [
 ];
 
 interface PhoneData {
-    id: string;
+    id?: string;
     imeiNumber: string;
     model: string;
     storage: string;
@@ -33,6 +33,7 @@ interface PhoneData {
     date: string;
     contact: string;
 }
+
 
 export default function ReturnPhone() {
     const [imeiNumber, setImeiNumber] = useState<string>('');
@@ -58,7 +59,7 @@ export default function ReturnPhone() {
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.get('${backend_url}/api/return/phones', {
+                const response = await axios.get(`${backend_url}/api/return/phones`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -91,8 +92,7 @@ export default function ReturnPhone() {
         return true;
     };
 
-   
-    const handleItemDeleteOnClick = async() => {
+    const handleItemDeleteOnClick = async () => {
         if (!selectedItem) {
             Swal.fire({
                 title: 'Error!',
@@ -146,15 +146,18 @@ export default function ReturnPhone() {
             contact
         };
 
+        console.log(phoneData)
         try {
-            const response = await axios.post('${backend_url}/api/return/phone', phoneData, {
+            const response = await axios.post(`${backend_url}/api/return/phone`, phoneData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
+            console.log(response)
 
             if (response.data.data.status === 201) {
+
                 Swal.fire({
                     title: 'Success!',
                     text: 'Phone data saved successfully',
@@ -172,7 +175,6 @@ export default function ReturnPhone() {
             });
         }
     };
-
 
     const handleItemUpdateOnClick = async () => {
         if (!selectedItem) {
@@ -245,6 +247,60 @@ export default function ReturnPhone() {
         setContact(item.contact);
     };
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
+    const handleSearch = async () => {
+        if (!imeiNumber) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter an IMEI Number',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+    
+        try {
+            const response = await axios.get(`${backend_url}/api/imei/return/${imeiNumber}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+    
+            const phoneData = response.data;
+            if (phoneData) {
+                // Update state with retrieved data
+                setSelectedItem(phoneData);
+                setModel(phoneData.model);
+                setStorage(phoneData.storage);
+                setColour(phoneData.colour);
+                setName(phoneData.name);
+                setContact(phoneData.contact);
+                setDate(new Date(phoneData.date)); 
+                setOutstanding(phoneData.outstanding);
+                setReason(phoneData.reason);
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'No data found for the given IMEI Number',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to search for the IMEI Number',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    };
+    
     return (
         <div className='m-4 w-full'>
             <div className="m-4">
@@ -256,15 +312,17 @@ export default function ReturnPhone() {
                 <div className='mt-5 flex flex-col sm:flex-row justify-between '>
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={model}
-                        onChange={(ev) => setModel(ev.target.value)}
-                        placeholder='   Model'
-                    />
-                    <input
-                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={imeiNumber}
                         onChange={(ev) => setImeiNumber(ev.target.value)}
                         placeholder='   IMEI Number'
+                        onKeyDown={handleKeyDown}
+
+                    />
+                    <input
+                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                        value={model}
+                        onChange={(ev) => setModel(ev.target.value)}
+                        placeholder='   Model'
                     />
                     <Combobox
                         value={storage}
