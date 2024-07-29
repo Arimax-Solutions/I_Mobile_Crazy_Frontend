@@ -22,7 +22,7 @@ const colourOptions = [
 ];
 
 interface PhoneData {
-    id: string;
+    id?: string;
     imeiNumber: string;
     model: string;
     storage: string;
@@ -33,6 +33,7 @@ interface PhoneData {
     date: string;
     contact: string;
 }
+
 
 export default function ReturnPhone() {
     const [imeiNumber, setImeiNumber] = useState<string>('');
@@ -58,7 +59,7 @@ export default function ReturnPhone() {
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.get('${backend_url}/api/return/phones', {
+                const response = await axios.get(`${backend_url}/api/return/phones`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -91,8 +92,7 @@ export default function ReturnPhone() {
         return true;
     };
 
-   
-    const handleItemDeleteOnClick = async() => {
+    const handleItemDeleteOnClick = async () => {
         if (!selectedItem) {
             Swal.fire({
                 title: 'Error!',
@@ -146,15 +146,18 @@ export default function ReturnPhone() {
             contact
         };
 
+        console.log(phoneData)
         try {
-            const response = await axios.post('${backend_url}/api/return/phone', phoneData, {
+            const response = await axios.post(`${backend_url}/api/return/phone`, phoneData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
+            console.log(response)
 
             if (response.data.data.status === 201) {
+
                 Swal.fire({
                     title: 'Success!',
                     text: 'Phone data saved successfully',
@@ -173,8 +176,6 @@ export default function ReturnPhone() {
         }
     };
 
-
-    //
     const handleItemUpdateOnClick = async () => {
         if (!selectedItem) {
             Swal.fire({
@@ -252,7 +253,6 @@ export default function ReturnPhone() {
         }
     };
 
-
     const handleSearch = async () => {
         if (!imeiNumber) {
             Swal.fire({
@@ -263,22 +263,26 @@ export default function ReturnPhone() {
             });
             return;
         }
-
+    
         try {
             const response = await axios.get(`${backend_url}/api/imei/return/${imeiNumber}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+    
             const phoneData = response.data;
             if (phoneData) {
-                console.log(phoneData)
+                // Update state with retrieved data
                 setSelectedItem(phoneData);
                 setModel(phoneData.model);
                 setStorage(phoneData.storage);
                 setColour(phoneData.colour);
                 setName(phoneData.name);
                 setContact(phoneData.contact);
+                setDate(new Date(phoneData.date)); 
+                setOutstanding(phoneData.outstanding);
+                setReason(phoneData.reason);
             } else {
                 Swal.fire({
                     title: 'Error!',
@@ -296,6 +300,7 @@ export default function ReturnPhone() {
             });
         }
     };
+    
     return (
         <div className='m-4 w-full'>
             <div className="m-4">
