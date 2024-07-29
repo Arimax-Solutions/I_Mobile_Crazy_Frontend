@@ -230,6 +230,7 @@ const User: React.FC = () => {
                 <InputFields value={username || ''} onChange={(event) => setUsername(event.target.value)} placeholder="   Username" />
                 <InputFields value={password || ''} onChange={(event) => setPassword(event.target.value)} placeholder="   Password" />
             </div>
+
             <div className='flex mt-5 justify-end'>
                 <Button
                     onClick={() => handleAddUser()}

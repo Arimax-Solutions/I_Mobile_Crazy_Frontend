@@ -12,6 +12,7 @@ import StockPhones from './components/stock-phones/stockPhones.tsx';
 import ReturnPhone from './components/return-phone/retun-phone.tsx';
 import Order from './components/order/order.tsx';
 import ProceedPayment from './components/proceed-payment/proceed-payment.tsx';
+import ReturnItem from "./components/return-item/return-item.tsx";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="home" element={<Home />} />
           <Route path="user" element={<User />} />
           <Route path="item" element={<Item />} />
+          <Route path="returnItem" element={<ReturnItem />} />
           <Route path="shop" element={<Shop />} />
           <Route path="stockPhones" element={<StockPhones />} />
           <Route path="returnPhone" element={<ReturnPhone />} />

@@ -20,7 +20,7 @@ function NavigationMenu() {
                     <NavItems logo='src/assets/images/navbar/Stock Phones.svg' name='Stock Phones' location='/StockPhones' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Return Phones.svg' name='Return Phones' location='/returnPhone' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Items.svg' name='Items' location='/item' selected={setSelect} isSelected={select} />
-                    <NavItems logo='src/assets/images/navbar/Return item.svg' name='Return Items' location='/dashboard' selected={setSelect} isSelected={select} />
+                    <NavItems logo='src/assets/images/navbar/Return item.svg' name='Return Items' location='/returnItem' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Users.svg' name='Users' location='/user' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Shops.svg' name='Shops' location='/shop' selected={setSelect} isSelected={select} />
                     <NavItems logo='src/assets/images/navbar/Shops.svg' name='order' location='/order' selected={setSelect} isSelected={select} />
