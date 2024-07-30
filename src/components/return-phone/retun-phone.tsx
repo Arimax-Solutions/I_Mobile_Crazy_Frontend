@@ -270,8 +270,8 @@ export default function ReturnPhone() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-    
-            const phoneData = response.data;
+            console.log(response)
+            const phoneData = response.data.data;
             if (phoneData) {
                 // Update state with retrieved data
                 setSelectedItem(phoneData);
