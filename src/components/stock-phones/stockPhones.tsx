@@ -24,21 +24,21 @@ interface NewPhone {
     name: string;
     description: string;
     qty: number;
-    models: phoneModels[];
+    models: PhoneModel[];
 }
 
-interface phoneModels {
+interface PhoneModel {
     name: string;
     stockAddedDate: string;
-    imeiNumbers: iminumberPhones[];
+    imeiNumbers: ImeiNumberPhone[];
 }
 
-interface iminumberPhones {
-    imei: number;
+interface ImeiNumberPhone {
+    imei: string;
     storage: string;
     colour: string;
     ios_version: string;
-    battery_health: number;
+    battery_health: string;
 }
 
 export default function StockPhones() {
@@ -56,8 +56,8 @@ export default function StockPhones() {
     const [token, setToken] = useState('');
     const [phones, setPhones] = useState<Phone[]>([]);
     const [selectedPhone, setSelectedPhone] = useState<Phone | null>(null);
-    const [phoneModels, setPhoneModels] = useState<phoneModels[]>([]);
-    const [modelsTable, setModelsTable] = useState<phoneModels[]>([]);
+    const [phoneModels, setPhoneModels] = useState<PhoneModel[]>([]);
+    const [modelsTable, setModelsTable] = useState<PhoneModel[]>([]);
 
     const colourOptions = [
         { value: 'Gold', label: 'Gold' },
@@ -115,22 +115,30 @@ export default function StockPhones() {
     const handleAddPhone = () => {
         if (!validateForm()) return;
 
-        const newPhoneModel: phoneModels = {
+        const newPhoneModel: PhoneModel = {
             name: model,
             stockAddedDate: formattedDate,
             imeiNumbers: [
                 {
-                    imei: parseInt(imeiNumber),
+                    imei: imeiNumber,
                     storage: storage,
                     colour: colour,
                     ios_version: iosVersion,
-                    battery_health: parseInt(batteryHealth),
+                    battery_health: batteryHealth,
                 },
             ],
         };
-        
+
         setPhoneModels([...phoneModels, newPhoneModel]);
-        setModelsTable([...modelsTable, newPhoneModel]); 
+        setModelsTable([...modelsTable, newPhoneModel]);
+
+        // Reset form fields
+        setModel('');
+        setImeiNumber('');
+        setStorage('');
+        setColour('');
+        setIosVersion('');
+        setBatteryHealth('');
     };
 
     const handlePushOnClick = async () => {
@@ -148,7 +156,7 @@ export default function StockPhones() {
                 },
             });
 
-            if (response.status==201) {
+            if (response.status === 201) {
                 Swal.fire({
                     title: 'Success!',
                     text: 'Phone added successfully',
@@ -161,7 +169,7 @@ export default function StockPhones() {
                 setDescription('');
                 setQuantity('');
                 setPhoneModels([]);
-                setModelsTable([]); // Clear the table state
+                setModelsTable([]);
             }
         } catch (error) {
             console.error('Error adding phone:', error);
@@ -176,63 +184,39 @@ export default function StockPhones() {
 
     const handleItemUpdateOnClick = async () => {
         if (!selectedPhone) return;
-
-        const updatedPhone: Phone = {
-            ...selectedPhone,
+    
+        const updatedPhone = {
+            id: selectedPhone.id,
             name: stockName,
-            description: description,
             qty: parseInt(quantity),
-            model: model,
-            imeiNumber: imeiNumber,
-            storage: storage,
-            iosVersion: iosVersion,
-            batteryHealth: batteryHealth,
-            colour: colour,
+            description: description,
+            models: phoneModels,
         };
-
-        if (!validateForm()) {
-            return;
-        }
-
+    
+        console.log('Updating phone with data:', updatedPhone); // Debugging line
+    
         try {
             const response = await axios.put(`${backend_url}/api/stock/${selectedPhone.id}`, updatedPhone, {
                 headers: {
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
                 },
             });
-
-            if (response.data.data) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Phone updated successfully',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-
-                const updatedPhones = phones.map(phone => phone.id === selectedPhone.id ? response.data.data : phone);
-                setPhones(updatedPhones);
-                setSelectedPhone(null);
-                setStockName('');
-                setDescription('');
-                setQuantity('');
-                setModel('');
-                setImeiNumber('');
-                setStorage('');
-                setIosVersion('');
-                setBatteryHealth('');
-                setColour('');
+    
+            console.log('Response from server:', response); // Debugging line
+    
+            if (response.status === 200) {
+                Swal.fire('Success', 'Phone updated successfully', 'success');
+                fetchItems(); // Ensure this updates the state with the latest data
+            } else {
+                Swal.fire('Error', 'Failed to update phone', 'error');
             }
         } catch (error) {
-            console.error('Error updating phone:', error);
-            Swal.fire({
-                title: 'Error!',
-                text: 'Failed to update phone',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+            console.error('Failed to update phone:', error);
+            Swal.fire('Error', 'An error occurred while updating the phone', 'error');
         }
     };
+    
 
     const handleItemDeleteOnClick = async (phoneId: number) => {
         if (!selectedPhone) return;
@@ -280,14 +264,14 @@ export default function StockPhones() {
         setStockName(phone.name);
         setDescription(phone.description);
         setQuantity(phone.qty.toString());
-        
+
         try {
             const response = await axios.get(`${backend_url}/api/stock/models/${phone.id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            // Assuming response.data is the array of models
+
             if (Array.isArray(response.data)) {
                 setModelsTable(response.data);
             } else {
@@ -297,19 +281,21 @@ export default function StockPhones() {
             console.error('Error fetching phone models:', error);
         }
     };
-    
-    // Function to handle clicks on the model table rows
-    const handleModelTableRowClick = (model: phoneModels) => {
+
+    const handleModelTableRowClick = (model: PhoneModel) => {
         setModel(model.name);
         if (model.imeiNumbers.length > 0) {
             const imeiData = model.imeiNumbers[0];
-            setImeiNumber(imeiData.imei.toString());
+            setImeiNumber(imeiData.imei);
             setStorage(imeiData.storage);
-            setIosVersion(imeiData.ios_version);
-            setBatteryHealth(imeiData.battery_health.toString());
             setColour(imeiData.colour);
+            setIosVersion(imeiData.ios_version);
+            setBatteryHealth(imeiData.battery_health);
         }
     };
+
+
+
 
 
     return (
@@ -386,13 +372,14 @@ export default function StockPhones() {
 
 
 
-         {/* Second table (list of phone models) */}
-         <div className="mt-5 text-white">
+           {/* Second table (list of phone models) */}
+            <div className="mt-5 text-white" style={{ height: '35vh', overflowY: 'auto' }}>
                 <h2 className="text-xl font-semibold mb-4">Phone Models</h2>
                 <div className="overflow-x-auto">
                     <table className="min-w-full bg-gray-800 text-white">
                         <thead>
                             <tr>
+                                <th className="py-2 px-4 border-b border-gray-700">ID</th> {/* Added ID column */}
                                 <th className="py-2 px-4 border-b border-gray-700">Model Name</th>
                                 <th className="py-2 px-4 border-b border-gray-700">Stock Added Date</th>
                                 <th className="py-2 px-4 border-b border-gray-700">IMEI Number</th>
@@ -405,6 +392,7 @@ export default function StockPhones() {
                         <tbody>
                             {modelsTable.map((model, index) => (
                                 <tr key={index} onClick={() => handleModelTableRowClick(model)}>
+                                    <td className="py-2 px-4 border-b border-gray-700">{index + 1}</td> {/* Display ID */}
                                     <td className="py-2 px-4 border-b border-gray-700">{model.name}</td>
                                     <td className="py-2 px-4 border-b border-gray-700">{model.stockAddedDate}</td>
                                     <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.imei).join(', ')}</td>
@@ -417,7 +405,7 @@ export default function StockPhones() {
                         </tbody>
                     </table>
                 </div>
-          
+
           
           
           {/* buttons */}
