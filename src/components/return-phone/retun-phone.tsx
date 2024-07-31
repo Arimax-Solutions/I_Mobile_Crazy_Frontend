@@ -36,6 +36,7 @@ interface PhoneData {
 
 
 export default function ReturnPhone() {
+    
     const [imeiNumber, setImeiNumber] = useState<string>('');
     const [model, setModel] = useState<string>('');
     const [storage, setStorage] = useState<string>('');
@@ -270,17 +271,20 @@ export default function ReturnPhone() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response)
-            const phoneData = response.data.data;
+    
+            const phoneData = response.data;
+            console.log(phoneData);
+
             if (phoneData) {
                 // Update state with retrieved data
                 setSelectedItem(phoneData);
-                setModel(phoneData.model);
+                // setModel(phoneData.model);
                 setStorage(phoneData.storage);
                 setColour(phoneData.colour);
-                setName(phoneData.name);
-                setContact(phoneData.contact);
-                setDate(new Date(phoneData.date)); 
+                setName(phoneData.customer.name);
+                setContact(phoneData.customer.contact_phone);
+
+    
                 setOutstanding(phoneData.outstanding);
                 setReason(phoneData.reason);
             } else {
@@ -300,6 +304,8 @@ export default function ReturnPhone() {
             });
         }
     };
+
+    
     
     return (
         <div className='m-4 w-full'>
@@ -312,7 +318,7 @@ export default function ReturnPhone() {
                 <div className='mt-5 flex flex-col sm:flex-row justify-between '>
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={imeiNumber}
+                        value={imeiNumber || ''}
                         onChange={(ev) => setImeiNumber(ev.target.value)}
                         placeholder='   IMEI Number'
                         onKeyDown={handleKeyDown}
@@ -320,12 +326,12 @@ export default function ReturnPhone() {
                     />
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={model}
+                        value={model || ''}
                         onChange={(ev) => setModel(ev.target.value)}
                         placeholder='   Model'
                     />
                     <Combobox
-                        value={storage}
+                        value={storage || ''}
                         onChange={(ev) => setStorage(ev.target.value)}
                         options={storageOptions}
                         placeholder='Storage'
@@ -334,21 +340,21 @@ export default function ReturnPhone() {
 
                 <div className='mt-3 flex flex-col sm:flex-row justify-between '>
                     <input
+                            className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                            value={name}
+                            onChange={(ev) => setName(ev.target.value)}
+                            placeholder='   Name'
+                        />
+
+                    <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={contact}
+                        value={contact || ''}
                         onChange={(ev) => setContact(ev.target.value)}
                         placeholder='   Contact Number'
                     />
-                    <DatePicker
-                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        selected={date}
-                        onChange={(date) => setDate(date)}
-                        placeholderText='   Date'
-                        dateFormat='MM/dd/yyyy'
-                        showPopperArrow={false}
-                    />
+                
                     <Combobox
-                        value={colour}
+                        value={colour || ''}
                         onChange={(ev) => setColour(ev.target.value)}
                         options={colourOptions}
                         placeholder='  Colour'
@@ -356,18 +362,22 @@ export default function ReturnPhone() {
                 </div>
 
                 <div className='mt-3 flex flex-col sm:flex-row justify-between'>
+                    <DatePicker
+                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                        selected={date || null}
+                        onChange={(date) => setDate(date)}
+                        placeholderText='   Date'
+                        dateFormat='MM/dd/yyyy'
+                        showPopperArrow={false}
+                    />
+
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={reason}
                         onChange={(ev) => setReason(ev.target.value)}
                         placeholder='   Reason'
                     />
-                    <input
-                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={name}
-                        onChange={(ev) => setName(ev.target.value)}
-                        placeholder='   Name'
-                    />
+                   
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={outstanding}
