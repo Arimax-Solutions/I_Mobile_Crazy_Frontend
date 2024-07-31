@@ -22,30 +22,31 @@ const colourOptions = [
 ];
 
 interface PhoneData {
-    id?: string;
-    imeiNumber: string;
+    return_phone_id?: string;
+    imei: string;
     model: string;
     storage: string;
     colour: string;
     reason: string;
     name: string;
-    outstanding: string;
+    outStanding: string;
     date: string;
-    contact: string;
+    contact_number: string;
+    customer_id?: string;
 }
 
-
 export default function ReturnPhone() {
-    
-    const [imeiNumber, setImeiNumber] = useState<string>('');
+    const [imei, setImei] = useState<string>('');
     const [model, setModel] = useState<string>('');
     const [storage, setStorage] = useState<string>('');
     const [colour, setColour] = useState<string>('');
     const [reason, setReason] = useState<string>('');
     const [name, setName] = useState<string>('');
-    const [outstanding, setOutstanding] = useState<string>('');
+    const [outStanding, setOutStanding] = useState<string>('');
     const [date, setDate] = useState<Date | null>(null);
-    const [contact, setContact] = useState<string>('');
+    const [contact_number, setContact_number] = useState<string>('');
+    const [customer_id, setCustomer_id] = useState<string>('');
+    const [return_phone_id, setReturn_phone_id] = useState<string>('');
     const [token, setToken] = useState<string>('');
     const [items, setItems] = useState<PhoneData[]>([]);
     const [selectedItem, setSelectedItem] = useState<PhoneData | null>(null);
@@ -60,12 +61,12 @@ export default function ReturnPhone() {
         // Fetch data from the backend
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${backend_url}/api/return/phones`, {
+                const response = await axios.get(`${backend_url}/api/return/phone`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                setItems(response.data);
+                setItems(response.data.data);
             } catch (error) {
                 Swal.fire({
                     title: 'Error!',
@@ -80,7 +81,7 @@ export default function ReturnPhone() {
     }, [token]);
 
     const validateForm = (): boolean => {
-        if (!imeiNumber || !name || !model || !colour || !storage || !colour || !reason || !outstanding || !date || !contact) {
+        if (!imei || !name || !model || !colour || !storage || !reason || !outStanding || !date || !contact_number) {
             Swal.fire({
                 title: 'Error!',
                 text: 'Please fill all fields',
@@ -94,32 +95,45 @@ export default function ReturnPhone() {
     };
 
     const handleItemDeleteOnClick = async () => {
-        if (!selectedItem) {
+        if (!selectedItem?.return_phone_id) {
+            console.log("Selected Item:", selectedItem); // Debugging line
             Swal.fire({
                 title: 'Error!',
-                text: 'No item selected for update',
+                text: 'No item selected for deletion',
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
             return;
         }
 
-        if (!validateForm()) return;
-
         try {
-            const response = await axios.put(`${backend_url}/api/return/phone/${selectedItem.id}`, {
+            const response = await axios.delete(`${backend_url}/api/return/phone/${selectedItem.return_phone_id}`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
             if (response.status === 200) {
                 Swal.fire({
                     title: 'Success!',
-                    text: 'Phone data delete successfully',
+                    text: 'Phone data deleted successfully',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });
+                // Remove the deleted item from local state
+                setItems(items.filter(item => item.return_phone_id !== selectedItem.return_phone_id));
+                // Clear form fields
+                setSelectedItem(null);
+                setImei('');
+                setModel('');
+                setStorage('');
+                setColour('');
+                setReason('');
+                setName('');
+                setOutStanding('');
+                setDate(null);
+                setContact_number('');
+                setCustomer_id('');
             }
 
         } catch (error) {
@@ -136,18 +150,18 @@ export default function ReturnPhone() {
         if (!validateForm()) return;
 
         const phoneData: PhoneData = {
-            imeiNumber,
+            imei,
             model,
             storage,
             colour,
             reason,
             name,
-            outstanding,
+            outStanding,
             date: date?.toISOString() || '',
-            contact
+            contact_number,
+            customer_id 
         };
 
-        console.log(phoneData)
         try {
             const response = await axios.post(`${backend_url}/api/return/phone`, phoneData, {
                 headers: {
@@ -155,16 +169,16 @@ export default function ReturnPhone() {
                     'Content-Type': 'application/json'
                 }
             });
-            console.log(response)
 
-            if (response.data.data.status === 201) {
-
+            if (response.status === 201) {
                 Swal.fire({
                     title: 'Success!',
                     text: 'Phone data saved successfully',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });
+                // Optionally, you can refresh the list of items
+                setItems([...items, response.data]);
             }
 
         } catch (error) {
@@ -178,7 +192,7 @@ export default function ReturnPhone() {
     };
 
     const handleItemUpdateOnClick = async () => {
-        if (!selectedItem) {
+        if (!selectedItem?.return_phone_id) {
             Swal.fire({
                 title: 'Error!',
                 text: 'No item selected for update',
@@ -192,19 +206,19 @@ export default function ReturnPhone() {
 
         const updatedPhoneData: PhoneData = {
             ...selectedItem,
-            imeiNumber,
+            imei,
             model,
             storage,
             colour,
             reason,
             name,
-            outstanding,
+            outStanding,
             date: date?.toISOString() || '',
-            contact
+            contact_number
         };
-
+console.log(selectedItem.return_phone_id)
         try {
-            const response = await axios.put(`${backend_url}/api/return/phone/${selectedItem.id}`, updatedPhoneData, {
+            const response = await axios.put(`${backend_url}/api/return/phone/${selectedItem.return_phone_id}`, updatedPhoneData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -221,7 +235,7 @@ export default function ReturnPhone() {
 
                 // Update the local state with the updated item
                 setItems(prevItems =>
-                    prevItems.map(item => item.id === selectedItem.id ? updatedPhoneData : item)
+                    prevItems.map(item => item.return_phone_id === selectedItem.return_phone_id ? updatedPhoneData : item)
                 );
             }
 
@@ -236,16 +250,19 @@ export default function ReturnPhone() {
     };
 
     const handleTableRowClick = (item: PhoneData) => {
+        console.log("Selected Item:", item);
         setSelectedItem(item);
-        setImeiNumber(item.imeiNumber);
+        setImei(item.imei);
         setModel(item.model);
         setStorage(item.storage);
         setColour(item.colour);
         setReason(item.reason);
         setName(item.name);
-        setOutstanding(item.outstanding);
+        setOutStanding(item.outStanding);
         setDate(new Date(item.date));
-        setContact(item.contact);
+        setContact_number(item.contact_number);
+        setCustomer_id(item.customer_id || '');
+        setReturn_phone_id(item.return_phone_id || '');
     };
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -255,7 +272,7 @@ export default function ReturnPhone() {
     };
 
     const handleSearch = async () => {
-        if (!imeiNumber) {
+        if (!imei) {
             Swal.fire({
                 title: 'Error!',
                 text: 'Please enter an IMEI Number',
@@ -264,48 +281,48 @@ export default function ReturnPhone() {
             });
             return;
         }
-    
+
         try {
-            const response = await axios.get(`${backend_url}/api/imei/return/${imeiNumber}`, {
+            const response = await axios.get(`${backend_url}/api/imei/return/${imei}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-    
+
             const phoneData = response.data;
-            console.log(phoneData);
 
             if (phoneData) {
                 // Update state with retrieved data
                 setSelectedItem(phoneData);
-                setModel(phoneData.modelId.name);
+                setModel(phoneData.model);
                 setStorage(phoneData.storage);
                 setColour(phoneData.colour);
-                setName(phoneData.customer.name);
-                setContact(phoneData.customer.contact_phone);
-
-    
-                setOutstanding(phoneData.outstanding);
                 setReason(phoneData.reason);
+                setName(phoneData.name);
+                setOutStanding(phoneData.outStanding);
+                setDate(new Date(phoneData.date));
+                setContact_number(phoneData.contact_number);
+                setCustomer_id(phoneData.customer_id || '');
             } else {
                 Swal.fire({
                     title: 'Error!',
-                    text: 'No data found for the given IMEI Number',
+                    text: 'No phone data found for this IMEI',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
             }
+
         } catch (error) {
             Swal.fire({
                 title: 'Error!',
-                text: 'Failed to search for the IMEI Number',
+                text: 'Failed to fetch phone data',
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
         }
     };
 
-    
+
     
     return (
         <div className='m-4 w-full'>
@@ -318,8 +335,8 @@ export default function ReturnPhone() {
                 <div className='mt-5 flex flex-col sm:flex-row justify-between '>
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={imeiNumber || ''}
-                        onChange={(ev) => setImeiNumber(ev.target.value)}
+                        value={imei || ''}
+                        onChange={(ev) => setImei(ev.target.value)}
                         placeholder='   IMEI Number'
                         onKeyDown={handleKeyDown}
 
@@ -348,8 +365,8 @@ export default function ReturnPhone() {
 
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={contact || ''}
-                        onChange={(ev) => setContact(ev.target.value)}
+                        value={contact_number || ''}
+                        onChange={(ev) => setContact_number(ev.target.value)}
                         placeholder='   Contact Number'
                     />
                 
@@ -380,8 +397,8 @@ export default function ReturnPhone() {
                    
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={outstanding}
-                        onChange={(ev) => setOutstanding(ev.target.value)}
+                        value={outStanding}
+                        onChange={(ev) => setOutStanding(ev.target.value)}
                         placeholder='   Outstanding'
                     />
                 </div>
@@ -419,28 +436,30 @@ export default function ReturnPhone() {
                 <table className='w-full text-white'>
                     <thead>
                         <tr>
+                           <th className='p-2 border'>ID</th>
                             <th className='p-2 border'>Model</th>
                             <th className='p-2 border'>IMEI Number</th>
                             <th className='p-2 border'>Storage</th>
                             <th className='p-2 border'>Colour</th>
                             <th className='p-2 border'>Name</th>
-                            <th className='p-2 border'>Outstanding</th>
+                            <th className='p-2 border'>outStanding</th>
                             <th className='p-2 border'>Date</th>
-                            <th className='p-2 border'>Contact</th>
+                            <th className='p-2 border'>contact_number</th>
                             <th className='p-2 border'>Reason</th>
                         </tr>
                     </thead>
                     <tbody>
                         {items.map((item, index) => (
                             <tr key={index} className='cursor-pointer' onClick={() => handleTableRowClick(item)}>
+                                <td className='p-2 border'>{item.return_phone_id}</td>
                                 <td className='p-2 border'>{item.model}</td>
-                                <td className='p-2 border'>{item.imeiNumber}</td>
+                                <td className='p-2 border'>{item.imei}</td>
                                 <td className='p-2 border'>{item.storage}</td>
                                 <td className='p-2 border'>{item.colour}</td>
                                 <td className='p-2 border'>{item.name}</td>
-                                <td className='p-2 border'>{item.outstanding}</td>
+                                <td className='p-2 border'>{item.outStanding}</td>
                                 <td className='p-2 border'>{item.date}</td>
-                                <td className='p-2 border'>{item.contact}</td>
+                                <td className='p-2 border'>{item.contact_number}</td>
                                 <td className='p-2 border'>{item.reason}</td>
                             </tr>
                         ))}
