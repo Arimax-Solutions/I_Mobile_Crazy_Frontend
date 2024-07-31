@@ -141,7 +141,6 @@ export default function ReturnItem() {
         }
     };
 
-
     const handleTableRowClick = (user: ReturnPhones) => {
         setSelectedReturnPhone(user);
         setBrand(user.brand);
@@ -150,6 +149,7 @@ export default function ReturnItem() {
         setName(user.name);
         setReason(user.reason);
     };
+
     const handleItemUpdateOnClick = async () => {
         if (!selectedReturnPhone) {
             Swal.fire({
