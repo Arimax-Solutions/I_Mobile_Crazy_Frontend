@@ -220,13 +220,16 @@ export default function StockPhones() {
 
     const handleItemDeleteOnClick = async (phoneId: number) => {
         if (!selectedPhone) return;
+    
 
+        console.log(phoneId)
         try {
-            await axios.delete(`${backend_url}/api/stock/${phoneId}`, {
+            const response = await axios.delete(`${backend_url}/api/stock/${phoneId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
+            console.log(response)
 
             const updatedPhones = phones.filter(phone => phone.id !== phoneId);
             setPhones(updatedPhones);

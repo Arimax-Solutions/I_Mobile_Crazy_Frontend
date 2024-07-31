@@ -278,7 +278,7 @@ export default function ReturnPhone() {
             if (phoneData) {
                 // Update state with retrieved data
                 setSelectedItem(phoneData);
-                // setModel(phoneData.model);
+                setModel(phoneData.modelId.name);
                 setStorage(phoneData.storage);
                 setColour(phoneData.colour);
                 setName(phoneData.customer.name);
