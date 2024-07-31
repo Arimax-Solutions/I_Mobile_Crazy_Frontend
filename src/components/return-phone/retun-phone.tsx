@@ -4,7 +4,7 @@ import Combobox from '../combobox/combobox';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Button from '../crudbuttons/buttons';
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2';
 import axios from 'axios';
 import { backend_url } from '../../utill/utill';
 
@@ -50,6 +50,7 @@ export default function ReturnPhone() {
     const [token, setToken] = useState<string>('');
     const [items, setItems] = useState<PhoneData[]>([]);
     const [selectedItem, setSelectedItem] = useState<PhoneData | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
         // Retrieve token from localStorage
@@ -57,9 +58,14 @@ export default function ReturnPhone() {
         if (storedToken) {
             setToken(storedToken);
         }
+    }, []);
 
+    useEffect(() => {
         // Fetch data from the backend
         const fetchData = async () => {
+            if (!token) return;
+
+            setIsLoading(true);
             try {
                 const response = await axios.get(`${backend_url}/api/return/phone`, {
                     headers: {
@@ -74,6 +80,8 @@ export default function ReturnPhone() {
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -90,13 +98,11 @@ export default function ReturnPhone() {
             });
             return false;
         }
-
         return true;
     };
 
     const handleItemDeleteOnClick = async () => {
         if (!selectedItem?.return_phone_id) {
-            console.log("Selected Item:", selectedItem); // Debugging line
             Swal.fire({
                 title: 'Error!',
                 text: 'No item selected for deletion',
@@ -120,22 +126,10 @@ export default function ReturnPhone() {
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });
-                // Remove the deleted item from local state
                 setItems(items.filter(item => item.return_phone_id !== selectedItem.return_phone_id));
-                // Clear form fields
                 setSelectedItem(null);
-                setImei('');
-                setModel('');
-                setStorage('');
-                setColour('');
-                setReason('');
-                setName('');
-                setOutStanding('');
-                setDate(null);
-                setContact_number('');
-                setCustomer_id('');
+                clearForm();
             }
-
         } catch (error) {
             Swal.fire({
                 title: 'Error!',
@@ -177,10 +171,9 @@ export default function ReturnPhone() {
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });
-                // Optionally, you can refresh the list of items
                 setItems([...items, response.data]);
+                clearForm();
             }
-
         } catch (error) {
             Swal.fire({
                 title: 'Error!',
@@ -216,7 +209,7 @@ export default function ReturnPhone() {
             date: date?.toISOString() || '',
             contact_number
         };
-console.log(selectedItem.return_phone_id)
+
         try {
             const response = await axios.put(`${backend_url}/api/return/phone/${selectedItem.return_phone_id}`, updatedPhoneData, {
                 headers: {
@@ -232,13 +225,11 @@ console.log(selectedItem.return_phone_id)
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });
-
-                // Update the local state with the updated item
                 setItems(prevItems =>
                     prevItems.map(item => item.return_phone_id === selectedItem.return_phone_id ? updatedPhoneData : item)
                 );
+                clearForm();
             }
-
         } catch (error) {
             Swal.fire({
                 title: 'Error!',
@@ -250,7 +241,6 @@ console.log(selectedItem.return_phone_id)
     };
 
     const handleTableRowClick = (item: PhoneData) => {
-        console.log("Selected Item:", item);
         setSelectedItem(item);
         setImei(item.imei);
         setModel(item.model);
@@ -292,7 +282,6 @@ console.log(selectedItem.return_phone_id)
             const phoneData = response.data;
 
             if (phoneData) {
-                // Update state with retrieved data
                 setSelectedItem(phoneData);
                 setModel(phoneData.model);
                 setStorage(phoneData.storage);
@@ -303,25 +292,40 @@ console.log(selectedItem.return_phone_id)
                 setDate(new Date(phoneData.date));
                 setContact_number(phoneData.contact_number);
                 setCustomer_id(phoneData.customer_id || '');
+                setReturn_phone_id(phoneData.return_phone_id || '');
             } else {
                 Swal.fire({
                     title: 'Error!',
-                    text: 'No phone data found for this IMEI',
+                    text: 'IMEI not found',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
+                clearForm();
             }
-
         } catch (error) {
             Swal.fire({
                 title: 'Error!',
-                text: 'Failed to fetch phone data',
+                text: 'Failed to fetch return phone data',
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
         }
     };
 
+    const clearForm = () => {
+        setImei('');
+        setModel('');
+        setStorage('');
+        setColour('');
+        setReason('');
+        setName('');
+        setOutStanding('');
+        setDate(null);
+        setContact_number('');
+        setCustomer_id('');
+        setReturn_phone_id('');
+        setSelectedItem(null);
+    };
 
     
     return (
