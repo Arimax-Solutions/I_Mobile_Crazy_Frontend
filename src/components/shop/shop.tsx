@@ -41,10 +41,8 @@ function Shop() {
     }
 
     async function fetchAllShopData() {
-
         const response = await axios.get(`${backend_url}/api/shop`);
         setShops(response.data.data);
-
     }
 
     async function handleItemUpdateOnClick() {

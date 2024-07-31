@@ -34,7 +34,6 @@ interface PhoneData {
     contact: string;
 }
 
-
 export default function ReturnPhone() {
     const [imeiNumber, setImeiNumber] = useState<string>('');
     const [model, setModel] = useState<string>('');
