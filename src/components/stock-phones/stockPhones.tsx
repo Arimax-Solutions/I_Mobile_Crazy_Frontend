@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import TopNavbar from '../topNavbar';
 import Combobox from '../combobox/combobox';
@@ -58,7 +59,7 @@ export default function StockPhones() {
     const [selectedPhone, setSelectedPhone] = useState<Phone | null>(null);
     const [phoneModels, setPhoneModels] = useState<PhoneModel[]>([]);
     const [modelsTable, setModelsTable] = useState<PhoneModel[]>([]);
-
+    const [isPushDisabled, setIsPushDisabled] = useState(false);
     const colourOptions = [
         { value: 'Gold', label: 'Gold' },
         { value: 'White', label: 'White' },
@@ -267,7 +268,7 @@ export default function StockPhones() {
         setStockName(phone.name);
         setDescription(phone.description);
         setQuantity(phone.qty.toString());
-
+        setIsPushDisabled(true);
         try {
             const response = await axios.get(`${backend_url}/api/stock/models/${phone.id}`, {
                 headers: {
@@ -287,6 +288,7 @@ export default function StockPhones() {
 
     const handleModelTableRowClick = (model: PhoneModel) => {
         setModel(model.name);
+
         if (model.imeiNumbers.length > 0) {
             const imeiData = model.imeiNumbers[0];
             setImeiNumber(imeiData.imei);
@@ -442,12 +444,13 @@ export default function StockPhones() {
             </Button>
             <Button
                 onClick={handlePushOnClick}
-                className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
+                className={`buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center ${isPushDisabled ? 'hidden' : ''}`}
                 iconSrc={'src/assets/icons/Add Btn.svg'}
                 iconAlt='add icon'
             >
                 PUSH
             </Button>
+
         </div>
 
 
