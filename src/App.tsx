@@ -29,7 +29,7 @@ function App() {
           <Route path="stockPhones" element={<StockPhones />} />
           <Route path="returnPhone" element={<ReturnPhone />} />
           <Route path="order" element={<Order />} />
-          <Route path=':orderType' element={<ProceedPayment />}/>
+          <Route path='orderType/:orderType' element={<ProceedPayment />}/>
         </Route>
       </Routes>
     </BrowserRouter>
