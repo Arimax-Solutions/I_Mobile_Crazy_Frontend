@@ -76,7 +76,6 @@ export default function ProceedPayment() {
     try {
       const response = await axios.post(`${backend_url}/api/retailOrder`, order);
       // Handle success response
-      console.log(response.data.status)
       if (response.data.status === 200) {
         Swal.fire({
             title: 'Success!',
