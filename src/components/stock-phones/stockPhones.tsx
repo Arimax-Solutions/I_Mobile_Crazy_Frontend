@@ -16,7 +16,7 @@ interface Phone {
     model: string;
     imeiNumber: string;
     storage: string;
-    iosVersion: string;
+    iosversion: string;
     batteryHealth: string;
     colour: string;
 }
@@ -38,8 +38,8 @@ interface ImeiNumberPhone {
     imei: string;
     storage: string;
     colour: string;
-    ios_version: string;
-    battery_health: string;
+    iosversion: string;
+    batteryHealth: string;
 }
 
 export default function StockPhones() {
@@ -51,7 +51,7 @@ export default function StockPhones() {
     const [model, setModel] = useState('');
     const [imeiNumber, setImeiNumber] = useState('');
     const [storage, setStorage] = useState('');
-    const [iosVersion, setIosVersion] = useState('');
+    const [iosversion, setIosversion] = useState('');
     const [batteryHealth, setBatteryHealth] = useState('');
     const [colour, setColour] = useState('');
     const [token, setToken] = useState('');
@@ -78,7 +78,7 @@ export default function StockPhones() {
     }, []);
 
     const validateForm = (): boolean => {
-        if (!stockName || !description || !quantity || !model || !imeiNumber || !storage || !iosVersion || !batteryHealth || !colour) {
+        if (!stockName || !description || !quantity || !model || !imeiNumber || !storage || !iosversion || !batteryHealth || !colour) {
             Swal.fire({
                 title: 'Error!',
                 text: 'Please fill all fields',
@@ -100,6 +100,8 @@ export default function StockPhones() {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
+
+                console.log(response.data)
                 if (response.data && Array.isArray(response.data.data)) {
                     setPhones(response.data.data);
                 } else {
@@ -115,7 +117,7 @@ export default function StockPhones() {
 
     const handleAddPhone = () => {
         if (!validateForm()) return;
-
+    
         const newPhoneModel: PhoneModel = {
             name: model,
             stockAddedDate: formattedDate,
@@ -124,23 +126,35 @@ export default function StockPhones() {
                     imei: imeiNumber,
                     storage: storage,
                     colour: colour,
-                    ios_version: iosVersion,
-                    battery_health: batteryHealth,
+                    iosversion: iosversion,
+                    batteryHealth: batteryHealth,
                 },
             ],
         };
-
-        setPhoneModels([...phoneModels, newPhoneModel]);
-        setModelsTable([...modelsTable, newPhoneModel]);
-
+    
+        // Log the new phone model before adding it to the state
+        console.log("newPhoneModel:", newPhoneModel);
+    
+        // Add the new phone model to the phoneModels and modelsTable arrays
+        const updatedPhoneModels = [...phoneModels, newPhoneModel];
+        const updatedModelsTable = [...modelsTable, newPhoneModel];
+    
+        setPhoneModels(updatedPhoneModels);
+        setModelsTable(updatedModelsTable);
+    
+        // Log the updated state arrays after setting the state
+        console.log("updatedPhoneModels:", updatedPhoneModels);
+        console.log("updatedModelsTable:", updatedModelsTable);
+    
         // Reset form fields
         setModel('');
         setImeiNumber('');
         setStorage('');
         setColour('');
-        setIosVersion('');
+        setIosversion('');
         setBatteryHealth('');
     };
+    
 
     const handlePushOnClick = async () => {
         const newPhone: NewPhone = {
@@ -194,7 +208,7 @@ export default function StockPhones() {
             models: phoneModels,
         };
     
-        console.log('Updating phone with data:', updatedPhone); // Debugging line
+        console.log('Updating phone with data:', JSON.stringify(updatedPhone, null, 2)); // Inspect the data structure
     
         try {
             const response = await axios.put(`${backend_url}/api/stock/${selectedPhone.id}`, updatedPhone, {
@@ -217,6 +231,8 @@ export default function StockPhones() {
             Swal.fire('Error', 'An error occurred while updating the phone', 'error');
         }
     };
+    
+    
     
 
     const handleItemDeleteOnClick = async (phoneId: number) => {
@@ -249,7 +265,7 @@ export default function StockPhones() {
             setModel('');
             setImeiNumber('');
             setStorage('');
-            setIosVersion('');
+            setIosversion('');
             setBatteryHealth('');
             setColour('');
         } catch (error) {
@@ -294,8 +310,8 @@ export default function StockPhones() {
             setImeiNumber(imeiData.imei);
             setStorage(imeiData.storage);
             setColour(imeiData.colour);
-            setIosVersion(imeiData.ios_version);
-            setBatteryHealth(imeiData.battery_health);
+            setIosversion(imeiData.iosversion);
+            setBatteryHealth(imeiData.batteryHealth);
         }
     };
 
@@ -356,8 +372,8 @@ export default function StockPhones() {
                 <div className='mt-3 flex flex-col sm:flex-row justify-between'>
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={iosVersion}
-                        onChange={(ev) => setIosVersion(ev.target.value)}
+                        value={iosversion}
+                        onChange={(ev) => setIosversion(ev.target.value)}
                         placeholder='   IOS Version'
                     />
                     <input
@@ -402,8 +418,8 @@ export default function StockPhones() {
                                     <td className="py-2 px-4 border-b border-gray-700">{model.stockAddedDate}</td>
                                     <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.imei).join(', ')}</td>
                                     <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.storage).join(', ')}</td>
-                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.ios_version).join(', ')}</td>
-                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.battery_health).join(', ')}</td>
+                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.iosversion).join(', ')}</td>
+                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.batteryHealth).join(', ')}</td>
                                     <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.colour).join(', ')}</td>
                                 </tr>
                             ))}
