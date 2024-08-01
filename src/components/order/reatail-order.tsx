@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import TopNavbar from '../topNavbar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import * as crudButton from '../crudbuttons/buttons';
-import { isValidEmail, isValidNIC, isValidPhoneNumber, notNullString } from '../../utill/validation';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { backend_url } from '../../utill/utill';
+import { isValidEmail, isValidNIC, isValidPhoneNumber, notNullString } from "../../utill/validation.ts";
+import {useNavigate} from "react-router-dom";
+import ProceedPayment from "../proceed-payment/proceed-payment.tsx";
 
 interface IProp {
     isAddNewCustomerModelOpen: boolean,
@@ -34,25 +34,79 @@ const style = {
 };
 
 export default function RetailOrder(prop: IProp) {
-
-    const [customerName, setCustomerName] = useState("");
     const [customerEmail, setCustomerEmail] = useState("");
     const [customerContactNumber, setCustomerContactNumber] = useState("");
     const [customerNic, setCustomerNic] = useState("");
+    const [phone, setPhone] = useState({
+        imei: "",
+        modelId: "",
+        modelName: "",  // Include modelName field
+        storage: "",
+        warranty: "",
+        colour: "",
+        batteryHealth: "",
+        price: ""
+    });
 
-    async function handleSaveCustomer() {   
+    const [phones, setPhones] = useState<Array<typeof phone>>([]);
+    const [multiplePhones, setMultiplePhones] = useState<Array<typeof phone>>([]);
+    const [contactNumber, setContactNumber] = useState<string>("");
+    const [customerName, setCustomerName] = useState<string>("");
+    const [customerId, setCustomerId] = useState<string>("");
+
+
+    const navigate = useNavigate();
+    async function fetchPhoneDetails(imei: string) {
+        try {
+            const response = await axios.get(`${backend_url}/api/imei/check-sale/${imei}`);
+            const { modelId, storage, warranty, colour, batteryHealth, price } = response.data;
+            const modelName = modelId ? modelId.name : 'Default Model Name';  // Extract modelId.name
+
+            setPhone({
+                imei,
+                modelId: modelId?.id || 'Default Model ID',  // Optionally use modelId.id
+                modelName,  // Set modelName here
+                storage: storage || 'Unknown Storage',
+                warranty: warranty,
+                colour: colour || 'Default Color',
+                batteryHealth: batteryHealth || 'Unknown Battery Health',
+                price: price || '0'
+            });
+        } catch (error) {
+            console.error("Error fetching phone details:", error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Unable to fetch phone details',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+    function handleEnterKeyPress(event: React.KeyboardEvent<HTMLInputElement>) {
+        if (event.key === 'Enter') {
+            event.preventDefault();  // Prevent default form submission
+            fetchPhoneDetails(phone.imei);
+        }
+    }
+
+    async function handleSaveCustomer() {
         try {
             notNullString(customerName);
             isValidNIC(customerNic);
             isValidEmail(customerEmail);
-            const phoneNumber = isValidPhoneNumber(customerContactNumber)
+            const phoneNumber = isValidPhoneNumber(customerContactNumber);
 
-            await axios.post(`${backend_url}/api/customer`, {
-                "name": customerName,
-                "email": customerEmail,
-                "contact_phone": phoneNumber,
-                "nic": customerNic,
+            const response = await axios.post(`${backend_url}/api/customer`, {
+                name: customerName,
+                email: customerEmail,
+                contact_phone: phoneNumber,
+                nic: customerNic,
             });
+
+            //const { id } = response.data; // Adjust this to match the actual response structure
+
+            //setCustomerId(id);
             prop.handleAddNewCustomerModelClose();
             await Swal.fire({
                 title: 'Success!',
@@ -60,39 +114,180 @@ export default function RetailOrder(prop: IProp) {
                 icon: 'success',
                 confirmButtonText: 'OK'
             });
-
         } catch (e) {
             prop.handleAddNewCustomerModelClose();
-            console.log(e);
+            console.error(e);
             await Swal.fire({
                 title: 'Error!',
-                text: 'something happen cannot save cusotmer',
+                text: 'Something happened, cannot save customer',
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
         }
     }
 
+
+    function handleAddPhone() {
+        setPhones([...phones, ...multiplePhones]);
+        setMultiplePhones([]);
+        prop.handleAddNewPhoneModelClose();
+    }
+
+    function handleAddMultiplePhones() {
+        if (phone.imei) { // Ensure IMEI is not empty
+            setPhones(prevPhones => [...prevPhones, phone]);  // Add phone to state
+            setPhone({
+                imei: "",
+                modelId: "",
+                modelName: "",  // Reset modelName here
+                storage: "",
+                warranty: "",
+                colour: "",
+                batteryHealth: "",
+                price: ""
+            });  // Reset phone form
+            prop.handleAddNewPhoneModelClose();  // Close modal
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: 'IMEI cannot be empty',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+
+    const [itemData, setItemData] = useState({
+        item_id: '',
+        category: '',
+        brand: '',
+        name: '',
+        colour: '',
+        warranty_period: '',
+        qty: '',
+        price: ''
+    });
+
+    const [items, setItems] = useState([]);
+
+    const handleFetchItemData = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8080/api/items/search/${itemData.name}`);
+            if (response.data.status === 200 && response.data.data.length > 0) {
+                const item = response.data.data[0];
+                setItemData({
+                    item_id: item.item_id,
+                    category: item.category,
+                    brand: item.brand,
+                    name: item.name,
+                    colour: item.colour,
+                    warranty_period: item.warranty_period,
+                    qty: item.qty,
+                    price: item.price
+                });
+            } else {
+                setItemData({
+                    item_id: '',
+                    category: '',
+                    brand: '',
+                    name: '',
+                    colour: '',
+                    warranty_period: '',
+                    qty: '',
+                    price: ''
+                });
+                alert('No items found');
+            }
+        } catch (error) {
+            console.error('Error fetching item data:', error);
+        }
+    };
+
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            handleFetchItemData();
+        }
+    };
+
+    const handleAddItem = () => {
+        if (itemData.name) {
+            setItems([...items, itemData]); // Add the new item to the list
+            setItemData({
+                item_id: '',
+                category: '',
+                brand: '',
+                name: '',
+                colour: '',
+                warranty_period: '',
+                qty: '',
+                price: ''
+            });
+            prop.handleAddNewItemModelClose(); // Close the modal
+        } else {
+            alert('Please enter item details before adding.');
+        }
+    };
+
+    const handleProceedToPayment = (orderType: string) => {
+        console.log("ID : " + customerId);
+        navigate(`/orderType/${orderType}`, {
+            state: { phones, items, customerName, contactNumber, customerId },
+        });
+    };
+
+
+    const handleContactNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setContactNumber(e.target.value);
+    };
+
+    const handleCustomerIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setcustomerId(e.target.value);
+    };
+
+    const fetchCustomerName = async () => {
+        try {
+            const response = await fetch(`${backend_url}/api/customer/contact/${contactNumber}`);
+            const result = await response.json();
+
+            if (result.status === 200 && result.data.length > 0) {
+                const customer = result.data[0];
+                setCustomerName(customer.name);
+                setCustomerId(customer.customer_id)
+            } else {
+                setCustomerName("Customer not found");
+            }
+        } catch (error) {
+            console.error("Error fetching customer data:", error);
+            setCustomerName("Error fetching customer data");
+        }
+    };
+
+    const handleContactNumberKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            fetchCustomerName();
+        }
+    };
+
     return (
         <>
-            <div className='flex justify-between mt-5 items-center'>
-                <div className='flex items-center'>
+            {/* ... Existing code ... */}
+            <div className='mt-4'>
+                <div className={`flex justify-between items-end`}>
                     <input
-                        className='w-full text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={""}
-                        // onChange={(ev) => setModel(ev.target.value)}
-                        placeholder='   Contact Number'
+                        type="text"
+                        value={contactNumber}
+                        onChange={handleContactNumberChange}
+                        onKeyPress={handleContactNumberKeyPress}
+                        placeholder="  Contact number"
+                        className='text-feild text-white font-semibold'
                     />
-                    <button className='flex flex-col items-center h-full text-field border-1 border-[#5386ED] text-white mb-4 md:mb-0 '>
-                        <img src="src/assets/icons/search-alt-2-svgrepo-com 1.svg" alt="" />
-                    </button>
-                </div>
-                <div>
                     <input
-                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={""}
-                        // onChange={(ev) => setModel(ev.target.value)}
-                        placeholder='   Contact Name'
+                        type="text"
+                        value={customerName}
+                        placeholder="  Customer name"
+                        className='text-feild text-white font-semibold'
+                        readOnly
                     />
                 </div>
             </div>
@@ -100,41 +295,76 @@ export default function RetailOrder(prop: IProp) {
             <div className='mt-5'>
                 <table className='min-w-full divide-y table-styles border-2'>
                     <thead>
-                        <tr className=''>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Id</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Category</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Brand</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Color</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Price</th>
-                            {/* <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Warranty Period</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Qty</th> */}
-                        </tr>
+                    <tr className='bg-gray-800 text-gray-400 text-xs'>
+                        <th className='px-2 py-1 text-left whitespace-nowrap'>IMEI</th>
+                        <th className='px-2 py-1 text-left whitespace-nowrap'>Model</th>
+                        <th className='px-2 py-1 text-left whitespace-nowrap'>Storage</th>
+                        <th className='px-2 py-1 text-left whitespace-nowrap'>Warranty</th>
+                        <th className='px-2 py-1 text-left whitespace-nowrap'>Color</th>
+                        <th className='px-2 py-1 text-left whitespace-nowrap'>Battery Health</th>
+                        <th className='px-2 py-1 text-left whitespace-nowrap'>Price</th>
+                    </tr>
                     </thead>
-                    {<tbody className='min-h-80 h-80 border-green-600 border-2'>
-                        {/* {items.map((item) => (
-                            <tr
-                                key={item.item_id}
-                                className=' text-white font-semibold hover:bg-gray-50'
-                                onClick={() => handleTableRowClick(item)}
-                            >
-                                <td className='px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-500'>{item.item_id}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.category}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.name}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.brand}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.colour}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.price}</td>
-                            </tr>
-                        ))} */}
-                    </tbody>}
+                    <tbody className='overflow-y-auto max-h-80'>
+                    {phones.map((phone, index) => (
+                        <tr key={index} className='text-white font-semibold hover:bg-gray-700 text-xs'>
+                            <td className='px-2 py-1 truncate'>{phone.imei}</td>
+                            <td className='px-2 py-1 truncate'>{phone.modelName}</td>  {/* Updated */}
+                            <td className='px-2 py-1 truncate'>{phone.storage}</td>
+                            <td className='px-2 py-1 truncate'>{phone.warranty}</td>
+                            <td className='px-2 py-1 truncate'>{phone.colour}</td>
+                            <td className='px-2 py-1 truncate'>{phone.batteryHealth}</td>
+                            <td className='px-2 py-1 truncate'>{phone.price}</td>
+                        </tr>
+                    ))}
+                    </tbody>
                 </table>
             </div>
-            <div className='w-full flex gap-2 mt-5 justify-end'>
-                <button className='bg-[#00900F] p-1 rounded-md text-white font-bold'>Proceed To Payment</button>
-                <button className='bg-[#B10000] p-1 rounded-md text-white font-bold'>Cancel Payment</button>
-            </div>
 
-            {/* model add customer */}
+                {items.length > 0 && (
+                    <div className='mt-5'>
+                        <table className='min-w-full divide-y table-styles border-2'>
+                            <thead>
+                            <tr className='bg-gray-800 text-gray-400 text-xs'>
+                                <th className='px-2 py-1 text-left whitespace-nowrap'>Brand</th>
+                                <th className='px-2 py-1 text-left whitespace-nowrap'>Category</th>
+                                <th className='px-2 py-1 text-left whitespace-nowrap'>Colour</th>
+                                <th className='px-2 py-1 text-left whitespace-nowrap'>Name</th>
+                                <th className='px-2 py-1 text-left whitespace-nowrap'>Price</th>
+                                <th className='px-2 py-1 text-left whitespace-nowrap'>Qty</th>
+                                <th className='px-2 py-1 text-left whitespace-nowrap'>Warranty</th>
+                            </tr>
+                            </thead>
+                            <tbody className='overflow-y-auto max-h-80'>
+                            {items.map((item, index) => (
+                                <tr key={index} className='text-white font-semibold hover:bg-gray-700 text-xs'>
+                                    <td className='px-2 py-1 truncate'>{item.brand}</td>
+                                    <td className='px-2 py-1 truncate'>{item.category}</td>
+                                    <td className='px-2 py-1 truncate'>{item.colour}</td>
+                                    <td className='px-2 py-1 truncate'>{item.name}</td>
+                                    <td className='px-2 py-1 truncate'>{item.price}</td>
+                                    <td className='px-2 py-1 truncate'>{item.qty}</td>
+                                    <td className='px-2 py-1 truncate'>{item.warranty_period}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                <div className='w-full flex gap-2 mt-5 justify-end'>
+                    <button
+                        className='bg-[#00900F] p-1 rounded-md text-white font-bold'
+                        onClick={() => handleProceedToPayment('retail-order')}
+                    >
+                        Proceed To Payment
+                    </button>
+                    <button className='bg-[#B10000] p-1 rounded-md text-white font-bold'>
+                        Cancel Payment
+                    </button>
+                </div>
+
+
+                {/* Add Customer Modal */}
             <div>
                 {/* <Button onClick={handleOpen}>Open modal</Button> */}
                 <Modal
@@ -175,93 +405,15 @@ export default function RetailOrder(prop: IProp) {
                             />
                         </div>
                         <div className='w-full flex gap-2 mt-5 justify-center'>
-                            <button className='bg-[#00900F] p-2 rounded-md text-white font-bold' onClick={handleSaveCustomer}>Save customer</button>
-                            <button className='bg-[#B10000] p-2 rounded-md text-white font-bold'>Cancel</button>
+                            <Button onClick={handleSaveCustomer} variant="contained" color="success">Add</Button>
+                            <Button onClick={prop.handleAddNewCustomerModelClose} variant="contained" color="error">Close</Button>
                         </div>
                     </Box>
                 </Modal>
             </div>
 
-            {/* model add phones  */}
+            {/* Add Phone Modal */}
             <div>
-                {/* <Button onClick={handleOpen}>Open modal</Button> */}
-                <Modal
-                    open={prop.isAddNewItemsModelOpen}
-                    onClose={prop.handleAddNewItemModelClose}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <Box sx={style}>
-                        <Typography className='' id="modal-modal-title" variant="h5" component="h2">
-                            Add Item
-                        </Typography>
-                        <div className='w-full flex flex-col mt-2'>
-                            <input
-                                className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                value={""}
-                                // onChange={(ev) => setModel(ev.target.value)}
-                                placeholder='   IMEI Number'
-                            />
-                            <div className='flex'>
-                                <input
-                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
-                                    placeholder='   Model'
-                                />
-                                <input
-                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
-                                    placeholder='   Storage'
-                                />
-                            </div>
-                            <div>
-                                <input
-                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
-                                    placeholder='   Warranty Period'
-                                />
-                                <input
-                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
-                                    placeholder='   Color'
-                                />
-                            </div>
-                            <div>
-                                <input
-                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
-                                    placeholder='   Battery Health'
-                                />
-                                <input
-                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
-                                    placeholder='   Price'
-                                />
-                            </div>
-                        </div>
-                        <div className='w-full flex gap-2 mt-5 justify-end'>
-                            <crudButton.default
-                                onClick={() => { }}
-                                className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                                iconSrc={'src/assets/icons/Add Btn.svg'}
-                                iconAlt='add icon'
-                            >
-                                ADD
-                            </crudButton.default>
-                        </div>
-                    </Box>
-                </Modal>
-            </div>
-
-            {/* model add items*/}
-            <div>
-                {/* <Button onClick={handleOpen}>Open modal</Button> */}
                 <Modal
                     open={prop.isAddNewPhoneModelOpen}
                     onClose={prop.handleAddNewPhoneModelClose}
@@ -275,66 +427,133 @@ export default function RetailOrder(prop: IProp) {
                         <div className='w-full flex flex-col mt-2'>
                             <input
                                 className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                value={""}
-                                // onChange={(ev) => setModel(ev.target.value)}
+                                value={phone.imei}
+                                onChange={(ev) => setPhone({ ...phone, imei: ev.target.value })}
+                                onKeyDown={handleEnterKeyPress}  // Handle Enter key press
                                 placeholder='   IMEI Number'
                             />
                             <div className='flex'>
                                 <input
                                     className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
-                                    placeholder='   Model'
+                                    value={phone.modelName}  // Display modelName
+                                    onChange={(ev) => setPhone({ ...phone, modelName: ev.target.value })}
+                                    placeholder='   Model Name'
                                 />
                                 <input
                                     className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
+                                    value={phone.storage}
+                                    onChange={(ev) => setPhone({ ...phone, storage: ev.target.value })}
                                     placeholder='   Storage'
                                 />
-                            </div>
-                            <div>
                                 <input
                                     className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
-                                    placeholder='   Warranty Period'
+                                    value={phone.warranty}
+                                    onChange={(ev) => setPhone({ ...phone, warranty: ev.target.value })}
+                                    placeholder='   Warranty'
+                                />
+                            </div>
+                            <div className='flex'>
+                                <input
+                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                    value={phone.colour}
+                                    onChange={(ev) => setPhone({ ...phone, colour: ev.target.value })}
+                                    placeholder='   Colour'
                                 />
                                 <input
                                     className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
-                                    placeholder='   Color'
-                                />
-                            </div>
-                            <div>
-                                <input
-                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
+                                    value={phone.batteryHealth}
+                                    onChange={(ev) => setPhone({ ...phone, batteryHealth: ev.target.value })}
                                     placeholder='   Battery Health'
                                 />
                                 <input
                                     className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={""}
-                                    // onChange={(ev) => setModel(ev.target.value)}
+                                    value={phone.price}
+                                    onChange={(ev) => setPhone({ ...phone, price: ev.target.value })}
                                     placeholder='   Price'
                                 />
                             </div>
-                        </div>
-                        <div className='w-full flex gap-2 mt-5 justify-end'>
-                            <crudButton.default
-                                onClick={() => { }}
-                                className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                                iconSrc={'src/assets/icons/Add Btn.svg'}
-                                iconAlt='add icon'
-                            >
-                                ADD
-                            </crudButton.default>
+                            <div className='w-full flex gap-2 mt-5 justify-end'>
+                                <Button onClick={handleAddMultiplePhones} variant="contained" color="success">Add</Button>
+                                <Button onClick={prop.handleAddNewPhoneModelClose} variant="contained" color="error">Close</Button>
+                            </div>
                         </div>
                     </Box>
                 </Modal>
             </div>
+
+            {/* model add items*/}
+             <div>
+                    <Modal
+                        open={prop.isAddNewItemsModelOpen}
+                        onClose={prop.handleAddNewItemModelClose}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <Box sx={{ ...style }}>
+                            <Typography id="modal-modal-title" variant="h5" component="h2">
+                                Add Item
+                            </Typography>
+                            <div className='w-full flex flex-col mt-2'>
+                                <input
+                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                    value={itemData.name}
+                                    onChange={(ev) => setItemData({...itemData, name: ev.target.value})}
+                                    onKeyDown={handleKeyPress}
+                                    placeholder='Item Name'
+                                />
+                                <div className='flex'>
+                                    <input
+                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                        value={itemData.category}
+                                        onChange={(ev) => setItemData({...itemData, category: ev.target.value})}
+                                        placeholder='Category'
+                                    />
+                                    <input
+                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                        value={itemData.brand}
+                                        onChange={(ev) => setItemData({...itemData, brand: ev.target.value})}
+                                        placeholder='Brand'
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                        value={itemData.colour}
+                                        onChange={(ev) => setItemData({...itemData, colour: ev.target.value})}
+                                        placeholder='Color'
+                                    />
+                                    <input
+                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                        value={itemData.warranty_period}
+                                        onChange={(ev) => setItemData({...itemData, warranty_period: ev.target.value})}
+                                        placeholder='Warranty Period'
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                        value={itemData.qty}
+                                        onChange={(ev) => setItemData({...itemData, qty: ev.target.value})}
+                                        placeholder='Quantity'
+                                    />
+                                    <input
+                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                        value={itemData.price}
+                                        onChange={(ev) => setItemData({...itemData, price: ev.target.value})}
+                                        placeholder='Price'
+                                    />
+                                </div>
+                            </div>
+
+                            <div className='w-full flex gap-2 mt-5 justify-end'>
+                                <Button onClick={handleAddItem} variant="contained" color="success">Add</Button>
+                                <Button onClick={prop.handleAddNewItemModelClose} variant="contained" color="error">Close</Button>
+                            </div>
+                        </Box>
+                    </Modal>
+
+                </div>
+                <ProceedPayment phones={phones} itemData={itemData} customerName={customerName} contactNumber={contactNumber} customerId={customerId} />
         </>
     );
 }
