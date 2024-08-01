@@ -3,6 +3,7 @@ import TopNavbar from '../topNavbar';
 import {useLocation, useParams} from 'react-router-dom';
 import axios from "axios";
 import {backend_url} from "../../utill/utill.ts";
+import Swal from "sweetalert2";
 
 export default function ProceedPayment() {
   const { orderType } = useParams();
@@ -75,7 +76,15 @@ export default function ProceedPayment() {
     try {
       const response = await axios.post(`${backend_url}/api/retailOrder`, order);
       // Handle success response
-      console.log('Order saved successfully:', response.data);
+      console.log(response.data.status)
+      if (response.data.status === 200) {
+        Swal.fire({
+            title: 'Success!',
+            text: 'Item added successfully',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        })
+      }
     } catch (error) {
       // Handle error response
       console.error('Error saving order:', error);
@@ -269,112 +278,4 @@ export default function ProceedPayment() {
       return <p className='text-white'>404 Not Found</p>;
   }
 
-  return (
-      <>
-        <div className='m-4 w-full'>
-          <div className="m-4">
-            <TopNavbar />
-          </div>
-          <div className='bg-[#14141E] rounded-md p-3 text-white'>
-            <div className='flex justify-between'>
-              <div>
-                <button>Cash payment</button>
-                <button>Card payment</button>
-              </div>
-              <div>
-                <p className='text-3xl text-[#5386ED]'>#00000253</p>
-              </div>
-            </div>
-            <hr className='my-3' />
-            <div className='flex'>
-              <div className='flex-1'>
-                <table className='w-full'>
-                  <thead>
-                  <tr>
-                    <th>Shop Name</th>
-                    <th>Contact Number</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr>
-                    <td>
-                      <div className='mt-5'>
-                        <p>Sub Total</p>
-                      </div>
-                    </td>
-                    <td>
-                      <div className='mt-5'>
-                        <p>50000.00</p>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr><td>Discount</td><td>500.00</td></tr>
-                  <tr><td>Discount Price</td><td>5000.00</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <div>
-                <div className='h-full w-1 bg-[#717171] mx-5'></div>
-              </div>
-              <div className='flex-1'>
-                <table className='w-full'>
-                  <thead>
-                  <tr>
-                    <th className='text-[#5386ED] text-xl'>Make Payment</th>
-                    <th></th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr>
-                    <td>
-                      <div className='mt-4'>
-                        <p>Customer amount</p>
-                      </div>
-                    </td>
-                    <td>
-                      <div className='mt-1'>
-                        <p>50000.00</p>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className='mt-1'>
-                        <p>Total amount</p>
-                      </div>
-                    </td>
-                    <td>
-                      <div className='mt-1'>
-                        <p>50000.00</p>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className='mt-5'>
-                        <p>Balance</p>
-                      </div>
-                    </td>
-                    <td>
-                      <div className='mt-5'>
-                        <p>50000.00</p>
-                      </div>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-                <div className='flex flex-col gap-2 mt-3' >
-                  <button className='bg-[#5356EC] p-2'>
-                    Confirm Payment
-                  </button>
-                  <button className='border-2 border-[#5356EC] p-2 bg-[#343434]'>
-                    Cancel payment
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
-  );
 }
