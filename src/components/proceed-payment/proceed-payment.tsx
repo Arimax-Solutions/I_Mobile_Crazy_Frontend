@@ -4,6 +4,7 @@ import {useLocation, useParams} from 'react-router-dom';
 import axios from "axios";
 import {backend_url} from "../../utill/utill.ts";
 import Swal from "sweetalert2";
+import { jsPDF } from 'jspdf';
 
 export default function ProceedPayment() {
   const { orderType } = useParams();
@@ -75,20 +76,168 @@ export default function ProceedPayment() {
 
     try {
       const response = await axios.post(`${backend_url}/api/retailOrder`, order);
-      // Handle success response
-      if (response.data.status === 200) {
-        Swal.fire({
-            title: 'Success!',
-            text: 'Item added successfully',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        })
+
+      // Import jsPDF if not already imported
+// import jsPDF from 'jspdf';
+
+// Create a new jsPDF instance
+      const doc = new jsPDF();
+
+// Constants for layout
+      const topMargin = 20;
+      const sectionMargin = 10; // Margin between sections
+      const rowHeight = 10; // Height of each row
+      const pageWidth = 210; // A4 page width in mm
+      const pageHeight = 297; // A4 page height in mm
+      const leftMargin = 10; // Increased margin for content to fit within page
+      const rigthMargin = 140; // Increased margin for content to fit within page
+      const leftInsideMargin = 20;
+      const marginTop = 20;
+
+
+      doc.setDrawColor(0, 0, 0); // Black color for border
+      doc.rect(leftMargin, topMargin, pageWidth - 2 * leftMargin, pageHeight - 2 * topMargin);
+
+
+      const headerY = topMargin + 10;
+      doc.setFontSize(18);
+      doc.setTextColor(0, 0, 255); // Blue color for header text
+      doc.text('INVOICE', pageWidth / 2, headerY, null, null, 'center');
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0); // Black color for other text
+      doc.text('I MOBILE CRAZY', pageWidth / 2, headerY + 10, null, null, 'center');
+      doc.text('NO.22, Kaluthara road', pageWidth / 2, headerY + 15, null, null, 'center');
+      doc.text('Bandaragama, Western 12530, Sri Lanka', pageWidth / 2, headerY + 20, null, null, 'center');
+      doc.text('Phone: 0777-234075', pageWidth / 2, headerY + 25, null, null, 'center');
+      doc.text('Fax: uldkrg@gmail.com', pageWidth / 2, headerY + 30, null, null, 'center');
+
+// Draw header border with rounded corners
+      doc.setDrawColor(0, 0, 0); // Black color for border
+      //doc.roundedRect(leftMargin, headerY - 10, pageWidth - 2 * leftMargin, 50, 5, 5); // x, y, width, height, rx, ry
+
+// Customer and Invoice Details
+      const customerY = headerY + 50;
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0); // Black color for text
+      doc.text('BILL TO:', leftInsideMargin, customerY);
+      doc.text(order.customer.name, leftInsideMargin, customerY + 5);
+      doc.text(order.customer.contact_phone, leftInsideMargin, customerY + 10);
+
+      doc.text(`Invoice Number: ${order.retail_order_id}`, rigthMargin, customerY);
+      doc.text(`Invoice Date: ${new Date(order.date).toLocaleDateString()}`, rigthMargin, customerY + 5);
+      doc.text(`Payment Due: ${new Date(order.date).toLocaleDateString()}`, rigthMargin, customerY + 10);
+
+
+// Table headers
+      const tableHeaderY = customerY +20 + marginTop;
+      const headers = ['Items', 'Quantity', 'Price', 'Amount'];
+      const headerWidths = [60, 40, 40, 50]; // Widths of each column
+      const headerStartX = [leftInsideMargin, leftMargin + 80, leftMargin + 120, leftMargin + 150]; // X positions for each column
+
+      doc.setFillColor(0, 0, 128);
+      doc.setTextColor(255, 255, 255);
+
+      doc.rect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, rowHeight, 'F');
+
+      doc.setFontSize(12);
+
+// Center text in the header row
+      headers.forEach((header, index) => {
+        const x = headerStartX[index] + 2; // Apply the left margin
+        const y = tableHeaderY - (rowHeight / 2) + 4; // Adjust y to center text
+        doc.text(header, x, y, null, null, 'left');
+      });
+
+// Reset text color for table content
+      doc.setTextColor(0, 0, 0); // Black text
+
+// Draw table header border
+      doc.rect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, rowHeight); // x, y, width, height
+
+// Start Y for items
+      let startY = tableHeaderY + rowHeight;
+
+// Include item data only if available
+      if (order.items.length > 0) {
+        order.items.forEach((item, index) => {
+          doc.text(`${item.name} - ${item.warranty_period} WARRANTY`, leftInsideMargin, startY + index * 10);
+          doc.text(`${item.qty}`, leftMargin + 80, startY + index * 10);
+          doc.text(`₨${item.price.toFixed(2)}`, leftMargin + 120, startY + index * 10);
+          doc.text(`₨${(item.qty * item.price).toFixed(2)}`, leftMargin + 150, startY + index * 10);
+        });
+
+        // Draw items border with rounded corners
+        doc.roundedRect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, startY - tableHeaderY + order.items.length * 10, 5, 5); // x, y, width, height, rx, ry
+
+        // Update Y for IMEIs
+        startY = startY + order.items.length * 10 + sectionMargin;
       }
+
+// Include IMEI data only if available
+      if (order.imeis.length > 0) {
+        doc.text('Phones', leftMargin, startY);
+        order.imeis.forEach((imei, index) => {
+          doc.text(`${imei.model} - ${imei.imei} - ${imei.warranty}`, leftMargin, startY + (index + 1) * 10);
+        });
+
+        // Draw IMEIs border with rounded corners
+        doc.roundedRect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, startY - tableHeaderY + order.imeis.length * 10 + 10, 5, 5); // x, y, width, height, rx, ry
+
+        // Update Y for totals
+        startY = startY + order.imeis.length * 10 + 10 + sectionMargin;
+      }
+
+// Total
+      doc.text(`Subtotal: ₨${order.actual_price.toFixed(2)}`, leftMargin + 130, startY);
+      doc.text(`Discount: ₨${order.discount.toFixed(2)}`, leftMargin + 130, startY + 10);
+      doc.text(`Total: ₨${order.total_amount.toFixed(2)}`, leftMargin + 130, startY + 20);
+      //doc.text(`Amount Due (LKR): ₨${order.total_amount.toFixed(2)}`, leftMargin + 130, startY + 30);
+
+// Draw total border with rounded corners
+      doc.roundedRect(leftMargin, startY - 10, pageWidth - 2 * leftMargin, 40, 5, 5); // x, y, width, height, rx, ry
+
+// Notes / Terms
+      const notesY = startY + 50 + sectionMargin;
+      doc.text('Notes / Terms', leftMargin, notesY);
+      doc.setFontSize(10);
+      doc.text('* Warranty covers only manufacturer\'s defects. Damages or defects due to negligence, misuse, improper operation,', leftMargin, notesY + 10);
+      doc.text('  power fluctuation, lightning, natural disasters, sabotage, or accidents are EXCLUDED from this warranty.', leftMargin, notesY + 15);
+      doc.text('* Repairs or replacements necessitated by such causes are not covered by the warranty and are subject to charges.', leftMargin, notesY + 20);
+      doc.text('* PLEASE SUBMIT THE INVOICE FOR WARRANTY CLAIMS.', leftMargin, notesY + 25);
+      doc.text('* All communication after sales will be based on the prevailing market.', leftMargin, notesY + 30);
+
+// Draw notes border with rounded corners
+      doc.roundedRect(leftMargin, notesY - 10, pageWidth - 2 * leftMargin, 60, 5, 5); // x, y, width, height, rx, ry
+
+// Save the PDF
+      doc.save(`${order.customer.name}.bill.pdf`);
+
+
+
+
+      // SweetAlert success message
+      await Swal.fire({
+        title: 'Success!',
+        text: 'Order saved successfully',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      });
+
+      // Update the UI after successful save
+      console.log('Order saved successfully:', response.data);
     } catch (error) {
-      // Handle error response
+      // SweetAlert error message
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Error saving order',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+
       console.error('Error saving order:', error);
     }
   };
+
 
 
   switch (orderType) {
@@ -277,4 +426,112 @@ export default function ProceedPayment() {
       return <p className='text-white'>404 Not Found</p>;
   }
 
+  return (
+      <>
+        <div className='m-4 w-full'>
+          <div className="m-4">
+            <TopNavbar />
+          </div>
+          <div className='bg-[#14141E] rounded-md p-3 text-white'>
+            <div className='flex justify-between'>
+              <div>
+                <button>Cash payment</button>
+                <button>Card payment</button>
+              </div>
+              <div>
+                <p className='text-3xl text-[#5386ED]'>#00000253</p>
+              </div>
+            </div>
+            <hr className='my-3' />
+            <div className='flex'>
+              <div className='flex-1'>
+                <table className='w-full'>
+                  <thead>
+                  <tr>
+                    <th>Shop Name</th>
+                    <th>Contact Number</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td>
+                      <div className='mt-5'>
+                        <p>Sub Total</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div className='mt-5'>
+                        <p>50000.00</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr><td>Discount</td><td>500.00</td></tr>
+                  <tr><td>Discount Price</td><td>5000.00</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <div className='h-full w-1 bg-[#717171] mx-5'></div>
+              </div>
+              <div className='flex-1'>
+                <table className='w-full'>
+                  <thead>
+                  <tr>
+                    <th className='text-[#5386ED] text-xl'>Make Payment</th>
+                    <th></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td>
+                      <div className='mt-4'>
+                        <p>Customer amount</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div className='mt-1'>
+                        <p>50000.00</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div className='mt-1'>
+                        <p>Total amount</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div className='mt-1'>
+                        <p>50000.00</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div className='mt-5'>
+                        <p>Balance</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div className='mt-5'>
+                        <p>50000.00</p>
+                      </div>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+                <div className='flex flex-col gap-2 mt-3' >
+                  <button className='bg-[#5356EC] p-2'>
+                    Confirm Payment
+                  </button>
+                  <button className='border-2 border-[#5356EC] p-2 bg-[#343434]'>
+                    Cancel payment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+  );
 }

@@ -283,15 +283,22 @@ export default function ReturnPhone() {
 
             if (phoneData) {
                 setSelectedItem(phoneData);
-                setModel(phoneData.model);
+                setModel(phoneData.modelId.name);
                 setStorage(phoneData.storage);
                 setColour(phoneData.colour);
                 setReason(phoneData.reason);
-                setName(phoneData.name);
-                setOutStanding(phoneData.outStanding);
-                setDate(new Date(phoneData.date));
-                setContact_number(phoneData.contact_number);
-                setCustomer_id(phoneData.customer_id || '');
+
+                if (phoneData.customer) {
+                    setName(phoneData.customer.name);
+                    setContact_number(phoneData.customer.contact_phone);
+                    setCustomer_id(phoneData.customer.customer_id || '');
+                } else if (phoneData.shop) {
+                    setName(phoneData.shop.shop_name);
+                    setContact_number(phoneData.shop.contact_number);
+                }
+
+                setOutStanding(phoneData.price);
+                // setDate(new Date(phoneData.date));
                 setReturn_phone_id(phoneData.return_phone_id || '');
             } else {
                 Swal.fire({
@@ -311,6 +318,7 @@ export default function ReturnPhone() {
             });
         }
     };
+
 
     const clearForm = () => {
         setImei('');
@@ -403,7 +411,7 @@ export default function ReturnPhone() {
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={outStanding}
                         onChange={(ev) => setOutStanding(ev.target.value)}
-                        placeholder='   Outstanding'
+                        placeholder='   Unit Price'
                     />
                 </div>
             </div>

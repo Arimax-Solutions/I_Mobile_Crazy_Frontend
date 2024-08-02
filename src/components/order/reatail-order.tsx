@@ -255,7 +255,13 @@ export default function RetailOrder(prop: IProp) {
                 setCustomerName(customer.name);
                 setCustomerId(customer.customer_id)
             } else {
-                setCustomerName("Customer not found");
+                //setCustomerName("Customer not found");
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Customer not found',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             }
         } catch (error) {
             console.error("Error fetching customer data:", error);
@@ -383,7 +389,7 @@ export default function RetailOrder(prop: IProp) {
                                 className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                                 value={customerName}
                                 onChange={(ev) => setCustomerName(ev.target.value)}
-                                placeholder='   Contact Name'
+                                placeholder='   Customer Name'
                             />
                             <input
                                 className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
