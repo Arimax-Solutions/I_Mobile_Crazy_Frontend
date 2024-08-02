@@ -393,39 +393,45 @@ export default function StockPhones() {
 
 
 
-           {/* Second table (list of phone models) */}
-            <div className="mt-5 text-white" style={{ height: '35vh', overflowY: 'auto' }}>
-                <h2 className="text-xl font-semibold mb-4">Phone Models</h2>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full bg-gray-800 text-white">
-                        <thead>
-                            <tr>
-                                <th className="py-2 px-4 border-b border-gray-700">ID</th> {/* Added ID column */}
-                                <th className="py-2 px-4 border-b border-gray-700">Model Name</th>
-                                <th className="py-2 px-4 border-b border-gray-700">Stock Added Date</th>
-                                <th className="py-2 px-4 border-b border-gray-700">IMEI Number</th>
-                                <th className="py-2 px-4 border-b border-gray-700">Storage</th>
-                                <th className="py-2 px-4 border-b border-gray-700">iOS Version</th>
-                                <th className="py-2 px-4 border-b border-gray-700">Battery Health</th>
-                                <th className="py-2 px-4 border-b border-gray-700">Colour</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {modelsTable.map((model, index) => (
-                                <tr key={index} onClick={() => handleModelTableRowClick(model)}>
-                                    <td className="py-2 px-4 border-b border-gray-700">{index + 1}</td> {/* Display ID */}
-                                    <td className="py-2 px-4 border-b border-gray-700">{model.name}</td>
-                                    <td className="py-2 px-4 border-b border-gray-700">{model.stockAddedDate}</td>
-                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.imei).join(', ')}</td>
-                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.storage).join(', ')}</td>
-                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.iosversion).join(', ')}</td>
-                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.batteryHealth).join(', ')}</td>
-                                    <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.colour).join(', ')}</td>
+          {/* Second table (list of phone models) */}
+                <div className="mt-5 text-white" style={{ height: '35vh', overflowY: 'auto' }}>
+                    <h2 className="text-xl font-semibold mb-4">Phone Models</h2>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full bg-gray-800 text-white">
+                            <thead>
+                                <tr>
+                                    <th className="py-2 px-4 border-b border-gray-700">ID</th> {/* Added ID column */}
+                                    <th className="py-2 px-4 border-b border-gray-700">Model Name</th>
+                                    <th className="py-2 px-4 border-b border-gray-700">Stock Added Date</th>
+                                    <th className="py-2 px-4 border-b border-gray-700">IMEI Number</th>
+                                    <th className="py-2 px-4 border-b border-gray-700">Storage</th>
+                                    <th className="py-2 px-4 border-b border-gray-700">iOS Version</th>
+                                    <th className="py-2 px-4 border-b border-gray-700">Battery Health</th>
+                                    <th className="py-2 px-4 border-b border-gray-700">Colour</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {modelsTable.map((model, index) => (
+                                    model ? ( // Check if model is not null or undefined
+                                        <tr key={index} onClick={() => handleModelTableRowClick(model)}>
+                                            <td className="py-2 px-4 border-b border-gray-700">{index + 1}</td> {/* Display ID */}
+                                            <td className="py-2 px-4 border-b border-gray-700">{model.name}</td>
+                                            <td className="py-2 px-4 border-b border-gray-700">{model.stockAddedDate}</td>
+                                            <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.imei).join(', ')}</td>
+                                            <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.storage).join(', ')}</td>
+                                            <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.iosversion).join(', ')}</td>
+                                            <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.batteryHealth).join(', ')}</td>
+                                            <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.colour).join(', ')}</td>
+                                        </tr>
+                                    ) : (
+                                        <tr key={index}>
+                                        </tr>
+                                    )
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
 
           
           
@@ -470,9 +476,8 @@ export default function StockPhones() {
         </div>
 
 
-
-        {/* First table (list of phones) */}
-               <div className="mt-5 text-white">
+                    {/* First table (list of phones) */}
+                    <div className="mt-5 text-white">
                         <h2 className="text-xl font-semibold mb-4">List of Stocks</h2>
                         <div className="overflow-x-auto">
                             <table className="min-w-full bg-gray-800 text-white">
@@ -485,8 +490,8 @@ export default function StockPhones() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {phones.map((phone) => (
-                                        <tr key={phone.id} onClick={() => handleTableRowClick(phone)} className="cursor-pointer hover:bg-gray-700">
+                                    {phones.map((phone, index) => (
+                                        <tr key={phone.id || index} onClick={() => handleTableRowClick(phone)} className="cursor-pointer hover:bg-gray-700">
                                             <td className="py-2 px-4 border-b border-gray-700">{phone.id}</td>
                                             <td className="py-2 px-4 border-b border-gray-700">{phone.name}</td>
                                             <td className="py-2 px-4 border-b border-gray-700">{phone.description}</td>
@@ -497,6 +502,8 @@ export default function StockPhones() {
                             </table>
                         </div>
                     </div>
+
+
 
         </div>
     );

@@ -63,16 +63,15 @@ export default function ReturnItem() {
         if (!selectedReturnPhone) {
             Swal.fire({
                 title: 'Error!',
-                text: 'No item selected for update',
+                text: 'No item selected for delete',
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
             return;
         }
 
-
         try {
-            const response = await axios.put(`${backend_url}/api/returnItem/${selectedReturnPhone.return_phone_id}`, {
+            const response = await axios.delete(`${backend_url}/api/returnItem/${selectedReturnPhone.return_phone_id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }
@@ -81,10 +80,22 @@ export default function ReturnItem() {
             if (response.status === 200) {
                 Swal.fire({
                     title: 'Success!',
-                    text: 'Item data delete successfully',
+                    text: 'Item data deleted successfully',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });
+
+                // Remove the deleted item from the state
+                setReturnPhones(prevPhones =>
+                    prevPhones.filter(phone => phone.return_phone_id !== selectedReturnPhone.return_phone_id)
+                );
+
+                setSelectedReturnPhone(null);
+                setCategory('');
+                setName('');
+                setBrand('');
+                setReason('');
+                setContact_number('');
             }
 
         } catch (error) {
@@ -113,7 +124,7 @@ export default function ReturnItem() {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            if (response.data.data != null) {
+            if (response.data.status === 200) {
                 Swal.fire({
                     title: 'Success!',
                     text: 'Item added successfully',
@@ -187,9 +198,16 @@ export default function ReturnItem() {
                 });
 
                 // Update the local state with the updated item
-                setItems(prevItems =>
+                setReturnPhones(prevItems =>
                     prevItems.map(item => item.return_phone_id === selectedReturnPhone.return_phone_id ? updatedPhoneData : item)
                 );
+
+                setSelectedReturnPhone(null);
+                setCategory('');
+                setName('');
+                setBrand('');
+                setReason('');
+                setContact_number('');
             }
 
         } catch (error) {
@@ -249,10 +267,12 @@ export default function ReturnItem() {
                     />
                 </div>
             </div>
-            <div className='flex mt-5 justify-end'>
+
+            {/* buttons */}
+            <div className='flex mt-5 gap-x-[3vw] justify-end'>
                 <Button
-                    onClick={() => handleAddReturnItem()}
-                    className='mr-[6vw] buttons-styles bg-green-button w-[7vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
+                    onClick={handleAddReturnItem}
+                    className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
                     iconSrc={'src/assets/icons/Add Btn.svg'}
                     iconAlt='add icon'
                 >
@@ -276,8 +296,8 @@ export default function ReturnItem() {
                 </Button>
             </div>
 
-            {/* Table to display users */}
-            <div className='mt-5 w-[78vw] overflow-x-auto'>
+           {/* Table to display users */}
+           <div className='mt-5 w-[78vw] overflow-x-auto'>
                 <table className='min-w-full divide-y table-styles'>
                     <thead>
                     <tr>
