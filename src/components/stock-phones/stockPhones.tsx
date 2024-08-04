@@ -116,6 +116,18 @@ export default function StockPhones() {
     };
 
     const handleAddPhone = () => {
+        console.log(model.length)
+        const stockQuantity = parseInt(quantity, 10); // Convert quantity to a number
+
+        // Check if the number of models exceeds the stock quantity
+        if (modelsTable.length >= stockQuantity) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Stock Limit Exceeded',
+                text: 'You cannot add more models than the available stock quantity.',
+            });
+            return;
+        }
         if (!validateForm()) return;
     
         const newPhoneModel: PhoneModel = {
@@ -178,7 +190,9 @@ export default function StockPhones() {
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });
-
+                setTimeout(() => {
+                    window.location.reload();
+                }, 4000);
                 setPhones([...phones, response.data.data]);
                 setStockName('');
                 setDescription('');
@@ -217,12 +231,13 @@ export default function StockPhones() {
                     'Content-Type': 'application/json',
                 },
             });
-    
-            console.log('Response from server:', response); // Debugging line
-    
+        
             if (response.status === 200) {
                 Swal.fire('Success', 'Phone updated successfully', 'success');
-                fetchItems(); // Ensure this updates the state with the latest data
+                fetchItems(); 
+                setTimeout(() => {
+                    window.location.reload();
+                }, 4000);
             } else {
                 Swal.fire('Error', 'Failed to update phone', 'error');
             }
@@ -238,8 +253,6 @@ export default function StockPhones() {
     const handleItemDeleteOnClick = async (phoneId: number) => {
         if (!selectedPhone) return;
     
-
-        console.log(phoneId)
         try {
             const response = await axios.delete(`${backend_url}/api/stock/${phoneId}`, {
                 headers: {
@@ -258,6 +271,9 @@ export default function StockPhones() {
                 icon: 'success',
                 confirmButtonText: 'OK'
             });
+            setTimeout(() => {
+                window.location.reload();
+            }, 4000);
 
             setStockName('');
             setDescription('');
