@@ -42,6 +42,7 @@ interface ImeiNumberPhone {
     batteryHealth: string;
 }
 
+
 export default function StockPhones() {
     const today = new Date();
     const formattedDate = today.toISOString().split('T')[0];
@@ -73,23 +74,141 @@ export default function StockPhones() {
         { value: '1TB', label: '1TB' },
     ];
 
+
+    const validateString = (value:string) => /^[a-zA-Z\s]*$/.test(value);
+    const validateNumber = (value:Number, max:Number) => /^\d+$/.test(value.toString()) && value <= max;
+
+    const handleInputChange = (setter:any, validator:any, value:any, max:any, errorMessage:any) => {
+        setter(value);
+        if (!validator(value, max)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Input',
+            text: errorMessage,
+        });
+        }
+    };
+
+
     useEffect(() => {
         fetchItems();
     }, []);
 
+    const regexPatterns = {
+        stockName: /^[a-zA-Z\s]+$/,  
+        description: /^[a-zA-Z\s]+$/, 
+        quantity: /^\d+$/, 
+        model: /^[a-zA-Z0-9\s]+$/, 
+        imeiNumber: /^\d{15}$/, 
+        storage: /^(64GB|128GB|256GB|512GB|1TB)$/,
+        iosversion:  /^\d+$/,
+        batteryHealth: /^\d+$/,
+        colour: /^(Gold|White)$/ 
+    };
+    
     const validateForm = (): boolean => {
-        if (!stockName || !description || !quantity || !model || !imeiNumber || !storage || !iosversion || !batteryHealth || !colour) {
+        // Validate stockName
+        if (!regexPatterns.stockName.test(stockName)) {
             Swal.fire({
                 title: 'Error!',
-                text: 'Please fill all fields',
+                text: 'Stock name is invalid. Only letters and spaces are allowed.',
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
             return false;
         }
+        
+        // Validate description
+        if (!regexPatterns.description.test(description)) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Description is invalid. Only letters and spaces are allowed.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        // Validate quantity
+        if (!regexPatterns.quantity.test(quantity) || parseInt(quantity, 10) > 500) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Quantity is invalid. It must be a number and cannot exceed 500.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        // Validate model
+        if (!regexPatterns.model.test(model)) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Model is invalid. Only alphanumeric characters and spaces are allowed.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        // Validate imeiNumber
+        if (!regexPatterns.imeiNumber.test(imeiNumber)) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'IMEI Number is invalid. It must be exactly 15 digits.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        // Validate storage
+        if (!regexPatterns.storage.test(storage)) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Storage is invalid. Choose a valid option.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        // Validate iosversion
+        if (!regexPatterns.iosversion.test(iosversion) ) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'iOS Version is invalid. It must be a number.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        // Validate batteryHealth
+        if (!regexPatterns.batteryHealth.test(batteryHealth) || parseInt(batteryHealth, 10) > 100) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Battery Health is invalid. It must be a number and cannot exceed 100.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        // Validate colour
+        if (!regexPatterns.colour.test(colour)) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Colour is invalid. Choose a valid option.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+    
         return true;
     };
-
+    
     const fetchItems = async () => {
         const token = localStorage.getItem('authToken');
         if (token) {
@@ -347,19 +466,19 @@ export default function StockPhones() {
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={stockName}
-                        onChange={(ev) => setStockName(ev.target.value)}
+                        onChange={(ev) => handleInputChange(setStockName, validateString, ev.target.value, null, 'Stock name must be a string')}
                         placeholder='   Stock Name'
                     />
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={description}
-                        onChange={(ev) => setDescription(ev.target.value)}
+                        onChange={(ev) => handleInputChange(setDescription, validateString, ev.target.value, null, 'Description must be a string')}
                         placeholder='   Description'
                     />
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={quantity}
-                        onChange={(ev) => setQuantity(ev.target.value)}
+                        onChange={(ev) => handleInputChange(setQuantity, validateNumber, ev.target.value, 500, 'Quantity cannot exceed 500')}
                         placeholder='   Quantity'
                     />
                 </div>
@@ -389,13 +508,13 @@ export default function StockPhones() {
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={iosversion}
-                        onChange={(ev) => setIosversion(ev.target.value)}
+                        onChange={(ev) => handleInputChange(setIosversion, validateNumber, ev.target.value, 50, 'iOS version must be a number')}
                         placeholder='   IOS Version'
                     />
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                         value={batteryHealth}
-                        onChange={(ev) => setBatteryHealth(ev.target.value)}
+                        onChange={(ev) => handleInputChange(setBatteryHealth, validateNumber, ev.target.value, 100, 'Battery health cannot exceed 100')}
                         placeholder='   Battery Health'
                     />
                     <Combobox
