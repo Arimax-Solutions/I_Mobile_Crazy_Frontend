@@ -14,7 +14,7 @@
     "@emotion/styled": "^11.11.5",
     "@mui/material": "^5.16.0",
     "@mui/x-charts": "^7.9.0",
-    "axios": "^1.7.2",
+    "axios": "^1.7.3",
     "bootstrap": "^5.3.3",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",

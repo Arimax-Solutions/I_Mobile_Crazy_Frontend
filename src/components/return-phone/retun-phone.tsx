@@ -54,9 +54,9 @@ export default function ReturnPhone() {
 
     useEffect(() => {
         // Retrieve token from localStorage
-        const storedToken = localStorage.getItem('token');
-        if (storedToken) {
-            setToken(storedToken);
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            setToken(token);
         }
     }, []);
 
@@ -73,6 +73,7 @@ export default function ReturnPhone() {
                     }
                 });
                 setItems(response.data.data);
+                console.log(response.data.data)
             } catch (error) {
                 Swal.fire({
                     title: 'Error!',
@@ -470,7 +471,7 @@ export default function ReturnPhone() {
                                 <td className='p-2 border'>{item.colour}</td>
                                 <td className='p-2 border'>{item.name}</td>
                                 <td className='p-2 border'>{item.outStanding}</td>
-                                <td className='p-2 border'>{item.date}</td>
+                                <td className='p-2 border'>{new Date(item.date).toLocaleDateString()}</td>
                                 <td className='p-2 border'>{item.contact_number}</td>
                                 <td className='p-2 border'>{item.reason}</td>
                             </tr>
