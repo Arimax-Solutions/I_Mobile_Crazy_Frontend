@@ -52,6 +52,7 @@ export default function RetailOrder(prop: IProp) {
     const [multiplePhones, setMultiplePhones] = useState<Array<typeof phone>>([]);
     const [contactNumber, setContactNumber] = useState<string>("");
     const [customerName, setCustomerName] = useState<string>("");
+    const [customerOutstanding, setCustomerOutstanding] = useState<string>("");
     const [customerId, setCustomerId] = useState<string>("");
 
 
@@ -232,10 +233,9 @@ export default function RetailOrder(prop: IProp) {
     const handleProceedToPayment = (orderType: string) => {
         console.log("ID : " + customerId);
         navigate(`/orderType/${orderType}`, {
-            state: { phones, items, customerName, contactNumber, customerId },
+            state: { phones, items, customerName, contactNumber, customerId , customerOutstanding},
         });
     };
-
 
     const handleContactNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setContactNumber(e.target.value);
@@ -253,9 +253,10 @@ export default function RetailOrder(prop: IProp) {
             if (result.status === 200 && result.data.length > 0) {
                 const customer = result.data[0];
                 setCustomerName(customer.name);
-                setCustomerId(customer.customer_id)
+                setCustomerId(customer.customer_id);
+                setCustomerOutstanding(customer.outstandingAmount); // Note the field name here
+                console.log(customer.outstandingAmount); // Updated log
             } else {
-                //setCustomerName("Customer not found");
                 Swal.fire({
                     title: 'Error!',
                     text: 'Customer not found',
@@ -296,6 +297,11 @@ export default function RetailOrder(prop: IProp) {
                         readOnly
                     />
                 </div>
+                {customerOutstanding > 0 && (
+                    <div className='mt-2 text-red-500'>
+                        Outstanding Amount: {customerOutstanding}
+                    </div>
+                )}
             </div>
 
             <div className='mt-5'>
@@ -559,7 +565,7 @@ export default function RetailOrder(prop: IProp) {
                     </Modal>
 
                 </div>
-                <ProceedPayment phones={phones} itemData={itemData} customerName={customerName} contactNumber={contactNumber} customerId={customerId} />
+                <ProceedPayment phones={phones} itemData={itemData} customerName={customerName} contactNumber={contactNumber} customerId={customerId} customerOutstanding={customerOutstanding} />
         </>
     );
 }

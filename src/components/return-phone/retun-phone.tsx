@@ -33,6 +33,7 @@ interface PhoneData {
     date: string;
     contact_number: string;
     customer_id?: string;
+    shop_id?:string;
 }
 
 export default function ReturnPhone() {
@@ -46,6 +47,7 @@ export default function ReturnPhone() {
     const [date, setDate] = useState<Date | null>(null);
     const [contact_number, setContact_number] = useState<string>('');
     const [customer_id, setCustomer_id] = useState<string>('');
+    const [shop_id, setShop_id] = useState<string>('');
     const [return_phone_id, setReturn_phone_id] = useState<string>('');
     const [token, setToken] = useState<string>('');
     const [items, setItems] = useState<PhoneData[]>([]);
@@ -252,6 +254,7 @@ export default function ReturnPhone() {
         setDate(new Date(item.date));
         setContact_number(item.contact_number);
         setCustomer_id(item.customer_id || '');
+        setShop_id(item.shop_id || '');
         setReturn_phone_id(item.return_phone_id || '');
     };
 

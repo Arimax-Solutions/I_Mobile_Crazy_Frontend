@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import TopNavbar from '../topNavbar';
-import RetailOrder from './reatail-order';
+import RetailOrder from './reatail-order.tsx';
 import WholeSaleOrder from './wholesale-order';
-import { backend_url } from "../../utill/utill.ts";
 
 
 export default function Order() {
-
     const [open, setOpen] = React.useState(false);
     const [openAddItem, setOpenAddItem] = React.useState(false);
     const [openAddPhone, setOpenAddPhone] = React.useState(false);
     const [openAddPhoneWholeSale, setOpenAddPhoneWholeSale] = React.useState(false);
+    const [openAddItemWholeSale, setOpenAddItemWholeSale] = React.useState(false);
     const [orderType, setOrderType] = useState<string>("retail");
 
     const handleOpen = () => setOpen(true);
@@ -19,9 +18,10 @@ export default function Order() {
     const handleAddPhoneCloseModel = () => setOpenAddPhone(false);
     const handleAddItemOpenModel = () => setOpenAddItem(true);
     const handleAddItemCloseModel = () => setOpenAddItem(false);
-    const handleWholesaleAddItemCloseModel = () => setOpenAddPhoneWholeSale(false);
-    const handleWholesaleAddItemOpenModel = () => setOpenAddPhoneWholeSale(true);
-
+    const handleWholesaleAddPhoneCloseModel = () => setOpenAddPhoneWholeSale(false);
+    const handleWholesaleAddPhoneOpenModel = () => setOpenAddPhoneWholeSale(true);
+    const handleWholesaleAddItemCloseModel = () => setOpenAddItemWholeSale(false);
+    const handleWholesaleAddItemOpenModel = () => setOpenAddItemWholeSale(true);
 
     return (
         <div className='m-4 w-full'>
@@ -41,7 +41,10 @@ export default function Order() {
                                     <button onClick={handleAddItemOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3' >Add Item</button>
                                 </>
                             ) : (
-                                <button onClick={handleWholesaleAddItemOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Phone</button>
+                                <>
+                                    <button onClick={handleWholesaleAddPhoneOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Phone</button>
+                                    <button onClick={handleWholesaleAddItemOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Item</button>
+                                </>
                             )
                         }
                     </div>
@@ -67,7 +70,10 @@ export default function Order() {
                         />
                     ) : (
                         orderType === "wholesale" ? (
-                            <WholeSaleOrder isAddNewPhoneModelOpen={openAddPhoneWholeSale} handleAddNewPhoneModelClose={handleWholesaleAddItemCloseModel} />
+                            <WholeSaleOrder
+                                isAddNewPhoneModelOpen={openAddPhoneWholeSale} handleAddNewPhoneModelClose={handleWholesaleAddPhoneCloseModel}
+                                isAddNewItemsModelOpen={openAddItemWholeSale} handleAddNewItemModelClose={handleWholesaleAddItemCloseModel}
+                            />
                         ) : (
                             <p>return</p>
                         )
