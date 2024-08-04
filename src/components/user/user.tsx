@@ -260,21 +260,21 @@ const User: React.FC = () => {
 
             {/* Table to display users */}
             <div className='mt-5 w-[78vw] overflow-x-auto'>
-                <table className='min-w-full divide-y table-styles'>
+                <table className='min-w-full divide-y  table-styles'>
                     <thead>
                         <tr>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Id</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Contact Number</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Email</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Username</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Password</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Role</th>
+                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Id</th>
+                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Name</th>
+                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Contact Number</th>
+                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Email</th>
+                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Username</th>
+                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Password</th>
+                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Role</th>
                         </tr>
                     </thead>
                     <tbody className='divide-y divide-gray-200'>
                         {users.map((user) => (
-                            <tr key={user.user_id} onClick={() => handleTableRowClick(user)} className='hover:bg-gray-200 cursor-pointer'>
+                            <tr key={user.user_id} onClick={() => handleTableRowClick(user)} className=' cursor-pointer '>
                                 <td className='px-6 py-4 whitespace-nowrap'>{user.user_id}</td>
                                 <td className='px-6 py-4 whitespace-nowrap'>{user.name}</td>
                                 <td className='px-6 py-4 whitespace-nowrap'>{user.contact_number}</td>

@@ -446,7 +446,7 @@ export default function ReturnPhone() {
 
             {/* table */}
             <div className='mt-5 overflow-auto max-h-[50vh]'>
-                <table className='w-full text-white'>
+                <table className='w-full text-white table-styles'>
                     <thead>
                         <tr>
                            <th className='p-2 border'>ID</th>

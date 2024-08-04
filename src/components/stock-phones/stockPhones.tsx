@@ -615,7 +615,7 @@ export default function StockPhones() {
                     <div className="mt-5 text-white">
                         <h2 className="text-xl font-semibold mb-4">List of Stocks</h2>
                         <div className="overflow-x-auto">
-                            <table className="min-w-full bg-gray-800 text-white">
+                            <table className="min-w-full bg-gray-800 text-white table-styles">
                                 <thead>
                                     <tr>
                                         <th className="py-2 px-4 border-b border-gray-700">ID</th>
