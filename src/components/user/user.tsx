@@ -28,6 +28,13 @@ const User: React.FC = () => {
     const [password, setPassword] = useState('');
     const [token, setToken] = useState('');
 
+    const [nameError, setNameError] = useState('');
+    const [roleError, setRoleError] = useState('');
+    const [contactNumberError, setContactNumberError] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [usernameError, setUsernameError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+
     useEffect(() => {
         fetchItems();
     }, []);
@@ -37,17 +44,68 @@ const User: React.FC = () => {
         { value: 'USER', label: 'User' },
     ];
 
+    const validateEmail = (email: string): boolean => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validateContactNumber = (contact_number: string): boolean => {
+        const contactNumberRegex = /^[0-9]{10}$/;
+        return contactNumberRegex.test(contact_number);
+    };
+
     const validateForm = (): boolean => {
-        if (!name || !contact_number || !email || !username || !password) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Please fill all fields',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return false;
+        let isValid = true;
+
+        if (!name) {
+            setNameError('Please enter a name');
+            isValid = false;
+        } else {
+            setNameError('');
         }
-        return true;
+
+        if (!role) {
+            setRoleError('Please select a role');
+            isValid = false;
+        } else {
+            setRoleError('');
+        }
+
+        if (!contact_number) {
+            setContactNumberError('Please enter a contact number');
+            isValid = false;
+        } else if (!validateContactNumber(contact_number)) {
+            setContactNumberError('Please enter a valid contact number (10 digits)');
+            isValid = false;
+        } else {
+            setContactNumberError('');
+        }
+
+        if (!email) {
+            setEmailError('Please enter an email');
+            isValid = false;
+        } else if (!validateEmail(email)) {
+            setEmailError('Please enter a valid email address');
+            isValid = false;
+        } else {
+            setEmailError('');
+        }
+
+        if (!username) {
+            setUsernameError('Please enter a username');
+            isValid = false;
+        } else {
+            setUsernameError('');
+        }
+
+        if (!password) {
+            setPasswordError('Please enter a password');
+            isValid = false;
+        } else {
+            setPasswordError('');
+        }
+
+        return isValid;
     };
 
     const fetchItems = async () => {
@@ -74,6 +132,10 @@ const User: React.FC = () => {
     };
 
     const handleAddUser = async () => {
+        if (!validateForm()) {
+            return;
+        }
+
         const newUser = {
             name,
             role,
@@ -82,10 +144,6 @@ const User: React.FC = () => {
             username,
             password,
         };
-
-        if (!validateForm()) {
-            return;
-        }
 
         try {
             const response = await axios.post(`${backend_url}/auth/register`, newUser, {
@@ -103,10 +161,11 @@ const User: React.FC = () => {
                 });
 
                 setName('');
-                setUsername('');
-                setPassword('');
+                setRole('');
                 setContactNumber('');
                 setEmail('');
+                setUsername('');
+                setPassword('');
                 fetchItems();
             }
         } catch (error) {
@@ -121,9 +180,6 @@ const User: React.FC = () => {
     };
 
     const handleItemDeleteOnClick = async (userId: number) => {
-        if (!validateForm()) {
-            return;
-        }
         try {
             await axios.delete(`${backend_url}/api/users/${userId}`, {
                 headers: {
@@ -142,10 +198,11 @@ const User: React.FC = () => {
                 confirmButtonText: 'OK'
             });
             setName('');
-            setUsername('');
-            setPassword('');
+            setRole('');
             setContactNumber('');
             setEmail('');
+            setUsername('');
+            setPassword('');
             fetchItems();
 
         } catch (error) {
@@ -160,7 +217,11 @@ const User: React.FC = () => {
     };
 
     const handleItemUpdateOnClick = async () => {
-        const newUser = {
+        if (!validateForm()) {
+            return;
+        }
+
+        const updatedUser = {
             name,
             role,
             contact_number,
@@ -169,12 +230,8 @@ const User: React.FC = () => {
             password,
         };
 
-        if (!validateForm()) {
-            return;
-        }
-
         try {
-            const response = await axios.put(`${backend_url}/api/users/${selectedUser?.user_id}`, newUser, {
+            const response = await axios.put(`${backend_url}/api/users/${selectedUser?.user_id}`, updatedUser, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -188,10 +245,11 @@ const User: React.FC = () => {
                 confirmButtonText: 'OK'
             });
             setName('');
-            setUsername('');
-            setPassword('');
+            setRole('');
             setContactNumber('');
             setEmail('');
+            setUsername('');
+            setPassword('');
             fetchItems();
 
         } catch (error) {
@@ -220,16 +278,35 @@ const User: React.FC = () => {
             <div className='m-4'>
                 <TopNavbar />
             </div>
-            <div className='flex items-center justify-between mt-5 my-[5vh]'>
-                <InputFields value={name || ''} onChange={(event) => setName(event.target.value)} placeholder="   Name" />
-                <Combobox value={role || ''} onChange={(event) => setRole(event.target.value)} options={roleOptions} placeholder="   Select Role" />
-                <InputFields value={contact_number || ''} onChange={(event) => setContactNumber(event.target.value)} placeholder="   Contact Number" />
+
+            <div className='flex flex-wrap my-[5vh]'>
+                <div className='relative mr-4 flex-grow'>
+                    <InputFields value={name} onChange={(event) => setName(event.target.value)} placeholder="   Name" />
+                    {nameError && <span className='absolute text-red-500 text-xs top-full left-2'>{nameError}</span>}
+                </div>
+                <div className='relative mr-4 flex-grow'>
+                    <Combobox value={role} onChange={(event) => setRole(event.target.value)} options={roleOptions} placeholder="   Select Role" />
+                    {roleError && <span className='absolute text-red-500 text-xs top-full left-2'>{roleError}</span>}
+                </div>
+                <div className='relative mr-4 flex-grow'>
+                    <InputFields value={contact_number} onChange={(event) => setContactNumber(event.target.value)} placeholder="   Contact Number" />
+                    {contactNumberError && <span className='absolute text-red-500 text-xs top-full left-2'>{contactNumberError}</span>}
+                </div>
+                <div className='relative mt-[5vh] mr-4 flex-grow'>
+                    <InputFields value={email} onChange={(event) => setEmail(event.target.value)} placeholder="   Email" />
+                    {emailError && <span className='absolute text-red-500 mt-[2vh] text-xs left-2'>{emailError}</span>}
+                </div>
+                <div className='relative mt-[5vh] mr-4 flex-grow'>
+                    <InputFields value={username} onChange={(event) => setUsername(event.target.value)} placeholder="   Username" />
+                    {usernameError && <span className='absolute text-red-500 mt-[2vh] text-xs left-2'>{usernameError}</span>}
+                </div>
+                <div className='relative mt-[5vh] mr-4 flex-grow'>
+                    <InputFields value={password} onChange={(event) => setPassword(event.target.value)} placeholder="   Password" />
+                    {passwordError && <span className='absolute text-red-500 mt-[2vh] text-xs  left-2'>{passwordError}</span>}
+                </div>
             </div>
-            <div className='flex items-center justify-between'>
-                <InputFields value={email || ''} onChange={(event) => setEmail(event.target.value)} placeholder="   Email" />
-                <InputFields value={username || ''} onChange={(event) => setUsername(event.target.value)} placeholder="   Username" />
-                <InputFields value={password || ''} onChange={(event) => setPassword(event.target.value)} placeholder="   Password" />
-            </div>
+
+
 
             <div className='flex mt-5 justify-end'>
                 <Button
