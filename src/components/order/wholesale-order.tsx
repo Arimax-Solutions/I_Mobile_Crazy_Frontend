@@ -74,7 +74,7 @@ export default function WholeSaleOrder(prop:IProp) {
             } else {
                 Swal.fire({
                     title: 'Error!',
-                    text: 'Customer not found',
+                    text: 'Shop not found',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
@@ -474,6 +474,7 @@ export default function WholeSaleOrder(prop:IProp) {
         </div>
 
         <ProceedPayment wholesalePhones={wholesalePhones} wholesaleItemData={wholesaleItemData} shopName={shopName} shopContactNumber={shopContactNumber} shopId={shopId} outstanding={outstanding} address={address} shopEmail={shopEmail} shopOwnerNic={shopOwnerNic} shopCreditLimit={shopCreditLimit}/>
+
     </>
   );
 }

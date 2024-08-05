@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import TopNavbar from '../topNavbar';
 import RetailOrder from './reatail-order.tsx';
 import WholeSaleOrder from './wholesale-order';
+import ReturnOrder from "./return-order.tsx";
 
 
 export default function Order() {
@@ -41,10 +42,16 @@ export default function Order() {
                                     <button onClick={handleAddItemOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3' >Add Item</button>
                                 </>
                             ) : (
-                                <>
-                                    <button onClick={handleWholesaleAddPhoneOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Phone</button>
-                                    <button onClick={handleWholesaleAddItemOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Item</button>
-                                </>
+                                orderType === "wholesale" ? (
+                                    <>
+                                        <button onClick={handleWholesaleAddPhoneOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Phone</button>
+                                        <button onClick={handleWholesaleAddItemOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Item</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button onClick={handleWholesaleAddPhoneOpenModel} className='border-2 border-[#5386ED] text-white rounded-full py-1 px-3'>Add Phone</button>
+                                    </>
+                                )
                             )
                         }
                     </div>
@@ -71,11 +78,18 @@ export default function Order() {
                     ) : (
                         orderType === "wholesale" ? (
                             <WholeSaleOrder
-                                isAddNewPhoneModelOpen={openAddPhoneWholeSale} handleAddNewPhoneModelClose={handleWholesaleAddPhoneCloseModel}
-                                isAddNewItemsModelOpen={openAddItemWholeSale} handleAddNewItemModelClose={handleWholesaleAddItemCloseModel}
+                                isAddNewPhoneModelOpen={openAddPhoneWholeSale}
+                                handleAddNewPhoneModelClose={handleWholesaleAddPhoneCloseModel}
+                                isAddNewItemsModelOpen={openAddItemWholeSale}
+                                handleAddNewItemModelClose={handleWholesaleAddItemCloseModel}
                             />
                         ) : (
-                            <p>return</p>
+                            orderType === "return" ? (
+                                <ReturnOrder
+                                    isAddNewPhoneModelOpen={openAddPhoneWholeSale}
+                                    handleAddNewPhoneModelClose={handleWholesaleAddPhoneCloseModel}
+                                />
+                            ) : null
                         )
                     )
                 }

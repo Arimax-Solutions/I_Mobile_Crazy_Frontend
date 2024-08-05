@@ -12,6 +12,7 @@ export default function ProceedPayment() {
   const { phones, items , customerName, contactNumber, customerId ,customerOutstanding} = location.state || { phones: [], items: [], customerName: '', contactNumber: '' ,customerId: '',customerOutstanding: ''};
   const { wholesalePhones, wholesaleItems , shopName, shopId ,shopContactNumber, outstanding,address,shopEmail,shopOwnerNic,shopCreditLimit} = location.state || { wholesalePhones: [], wholesaleItems: [], shopName: '',shopContactNumber: '',shopId: '',outstanding: '',address: '',shopEmail: '',shopOwnerNic: '',shopCreditLimit: ''};
 
+  const {returnPhones,shopNameReturn,shopIdReturn,shopContactNumberReturn,outstandingReturn,addressReturn,shopEmailReturn,shopOwnerNicReturn,shopCreditLimitReturn} = location.state || { returnPhones: [], shopNameReturn: '',shopIdReturn: '',shopContactNumberReturn: '',outstandingReturn: '',addressReturn: '',shopEmailReturn: '',shopOwnerNicReturn: '',shopCreditLimitReturn: ''};
   console.log("Outstanding shop : "+outstanding);
 
   switch (orderType) {
@@ -729,7 +730,260 @@ export default function ProceedPayment() {
       </div>;
 
     case "return-order":
-      return <div>Return Order Content</div>;
+      const discountRefReturn = useRef(null);
+      const [discountReturn, setDiscountReturn] = useState(0);
+      const [subtotalReturn, setSubtotalReturn] = useState(0);
+      const [totalAfterDiscountReturn, setTotalAfterDiscountReturn] = useState(0);
+      const [balanceReturn, setBalanceReturn] = useState(0);
+      const [customerAmountReturn, setCustomerAmountReturn] = useState(0);
+
+      useEffect(() => {
+        calculateTotalsReturn(discountReturn, customerAmountReturn);
+      }, [discountReturn, customerAmountReturn, returnPhones, outstandingReturn]);
+
+      const handleDiscountChangeReturn = (e) => {
+        const value = parseFloat(e.target.value) || 0;
+        setDiscountReturn(value);
+      };
+
+      const handleCustomerAmountChangeReturn = (e) => {
+        const value = parseFloat(e.target.value) || 0;
+        setCustomerAmountReturn(value);
+      };
+
+      const calculateTotalsReturn = (discountValueReturn, customerAmountValueReturn) => {
+        const totalPhonePriceReturn = returnPhones.reduce((sum, returnPhone) => sum + (parseFloat(returnPhone.price) || 0), 0);
+        const subtotalValueReturn = totalPhonePriceReturn  - (parseFloat(outstanding) || 0);
+        const totalAfterDiscountValueReturn = subtotalValueReturn - discountValueReturn;
+        const balanceValueReturn = customerAmountValueReturn - totalAfterDiscountValueReturn;
+
+        setSubtotalReturn(subtotalValueReturn);
+        setTotalAfterDiscountReturn(totalAfterDiscountValueReturn);
+        setBalanceReturn(balanceValueReturn);
+
+        return {
+          subtotalReturn: subtotalValueReturn,
+          totalAfterDiscountReturn: totalAfterDiscountValueReturn,
+        };
+      };
+
+      const saveOrderReturn = async () => {
+        console.log("Saving order...");
+        const { subtotalReturn, totalAfterDiscountReturn } = calculateTotalsReturn(discountReturn, customerAmountReturn);
+
+        const returnOrder = {
+          discount: discountReturn,
+          actual_price: subtotalReturn,
+          total_amount: totalAfterDiscountReturn,
+          date: new Date().toISOString(),
+          is_deleted: false,
+          shop: {
+            shop_id: shopIdReturn,
+            shop_name: shopNameReturn,
+            contact_number: shopContactNumberReturn,
+          },
+          imeis: returnPhones.map(returnPhone => ({
+            id: returnPhone.id,
+            imei: returnPhone.imei,
+            storage: returnPhone.storage,
+            colour: returnPhone.colour,
+            price: returnPhone.price
+          }))
+        };
+
+        try {
+          const response = await axios.post(`${backend_url}/api/returnOrder`, returnOrder);
+          await Swal.fire({
+            title: 'Success!',
+            text: 'Return order saved successfully',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          });
+
+          // Update the UI after successful save
+          console.log('Return order saved successfully:', response.data);
+        } catch (error) {
+          // SweetAlert error message
+          await Swal.fire({
+            title: 'Error!',
+            text: 'Error saving return order',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+
+          console.error('Error saving wholesale order:', error);
+        }
+      };
+
+      return <div className='m-4 w-full'>
+        <div className="m-4">
+          <TopNavbar />
+        </div>
+        <div className='bg-[#14141E] rounded-md p-3 text-white'>
+          <div className='flex justify-between'>
+            <div>
+              <button className='mr-4'>Cash Payment</button>
+              <button>Card Payment</button>
+            </div>
+            <div>
+              <p className='text-3xl text-[#5386ED]'>#00000253</p>
+            </div>
+          </div>
+          <hr className='my-3' />
+          <div className='flex'>
+            <div className='flex-1 p-4'>
+              <table className='w-full '>
+                <thead>
+                <tr>
+                  <th className="font-bold px-6 py-2 ">Shop Name</th>
+                  <th className="font-bold px-6 py-2 ">Shop Number</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td className="px-6 py-2 ">{shopNameReturn}</td>
+                  <td className="px-6 py-2 ">{shopContactNumberReturn}</td>
+                </tr>
+                </tbody>
+              </table>
+
+              <div className="space-y-4">
+                <table className="w-full border-collapse">
+                  <thead>
+                  <tr>
+                    <th className="font-bold px-6 py-4 text-left">Model Name</th>
+                    <th className="font-bold px-6 py-4 text-left">Imei Number</th>
+                    <th className="font-bold px-6 py-4 text-left">Price</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {returnPhones.map((returnPhone, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-2">{returnPhone.modelName}</td>
+                        <td className="px-6 py-2">{returnPhone.imei}</td>
+                        <td className="px-6 py-2">{returnPhone.price}</td>
+                      </tr>
+                  ))}
+                  </tbody>
+                </table>
+
+                <hr className='my-3' />
+
+              </div>
+            </div>
+
+            <div>
+              <div className='h-full w-1 bg-[#717171] mx-5'></div>
+            </div>
+            <div className='flex-1'>
+              <table className='w-full'>
+                <thead>
+                <tr>
+                  <th className='text-[#5386ED] text-xl py-2 px-4'>Make Payment</th>
+                  <th className='py-2 px-4'></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td className='py-2 px-4'>
+                    <div className='mt-2'>
+                      <p>Subtotal</p>
+                    </div>
+                  </td>
+                  <td className='py-2 px-4'>
+                    <div className='mt-1'>
+                      <p>{subtotalReturn.toFixed(2)}</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className='py-2 px-4'>
+                    <div className='mt-2'>
+                      <p className='text-red-500'>OutStanding</p>
+                    </div>
+                  </td>
+                  <td className='py-2 px-4'>
+                    <div className='mt-1'>
+                      <p className='text-red-500'>{outstandingReturn.toFixed(2)}</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className='py-2 px-4'>
+                    <div className='mt-2'>
+                      <p>Discount</p>
+                    </div>
+                  </td>
+                  <td className='py-2 px-4'>
+                    <div className='mt-1'>
+                      <input
+                          type='number'
+                          ref={discountRefReturn}
+                          onChange={handleDiscountChangeReturn}
+                          className='bg-[#1E1E1E] text-white px-2 py-1 rounded-md'
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className='py-2 px-4'>
+                    <div className='mt-2'>
+                      <p>Total Amount</p>
+                    </div>
+                  </td>
+                  <td className='py-2 px-4'>
+                    <div className='mt-1'>
+                      <p>{totalAfterDiscountReturn.toFixed(2)}</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className='py-2 px-4'>
+                    <div className='mt-2'>
+                      <p>Customer Amount</p>
+                    </div>
+                  </td>
+                  <td className='py-2 px-4'>
+                    <div className='mt-1'>
+                      <input
+                          type='number'
+                          value={customerAmountReturn}
+                          onChange={(e) => setCustomerAmountReturn(parseFloat(e.target.value) || 0)}
+                          className='bg-[#1E1E1E] text-white px-2 py-1 rounded-md'
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className='py-2 px-4'>
+                    <div className='mt-2'>
+                      <p>Balance</p>
+                    </div>
+                  </td>
+                  <td className='py-2 px-4'>
+                    <div className='mt-1'>
+                      <p>{balanceReturn.toFixed(2)}</p>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+
+              <div className='flex flex-col gap-2 mt-3'>
+                <button
+                    className='bg-[#5356EC] p-2'
+                    onClick={saveOrderReturn}
+                >
+                  Confirm Payment
+                </button>
+                <button className='border-2 border-[#5356EC] p-2 bg-[#343434]'>
+                  Cancel Payment
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>;
     default:
       return <p className='text-white'>404 Not Found</p>;
   }
