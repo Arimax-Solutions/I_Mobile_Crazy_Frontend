@@ -30,6 +30,7 @@ const Item = () => {
     const [token, setToken] = useState('');
     const [items, setItems] = useState<TableItemData[]>([]);
     const [selectedItem, setSelectedItem] = useState<TableItemData | null>(null); 
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     // Function to fetch items from backend
     const fetchItems = async () => {
@@ -54,7 +55,6 @@ const Item = () => {
             console.log('No token found');
         }
     };
-
 
     useEffect(() => {
         fetchItems();
@@ -242,39 +242,39 @@ const Item = () => {
     };
 
     const validateForm = (): boolean => {
-        if (!category || !name || !brand || !colour || !price || !warranty_period || !qty) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Please fill all fields',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return false;
-        }
+        const newErrors: { [key: string]: string } = {};
+
+        if (!category) newErrors.category = 'Category is required';
+        if (!name) newErrors.name = 'Name is required';
+        if (!brand) newErrors.brand = 'Brand is required';
+        if (!colour) newErrors.colour = 'Colour is required';
+        if (!price) newErrors.price = 'Price is required';
+        if (!warranty_period) newErrors.warranty_period = 'Warranty period is required';
+        if (!qty) newErrors.qty = 'Quantity is required';
     
         // Validate numeric price
-        if (isNaN(parseFloat(price))) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Price must be a number',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return false;
+        if (price && isNaN(parseFloat(price))) {
+            newErrors.price = 'Price must be a number';
         }
     
         // Validate numeric quantity
-        if (isNaN(parseFloat(qty))) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Quantity must be a number',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return false;
+        if (qty && isNaN(parseFloat(qty))) {
+            newErrors.qty = 'Quantity must be a number';
         }
     
-        return true;
+        setErrors(newErrors);
+    
+        // Return true if no errors
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, field: string) => (ev: React.ChangeEvent<HTMLInputElement>) => {
+        setter(ev.target.value);
+        if (errors[field]) {
+            const newErrors = { ...errors };
+            delete newErrors[field];
+            setErrors(newErrors);
+        }
     };
     
 
@@ -285,32 +285,46 @@ const Item = () => {
                 <TopNavbar />
             </div>
 
-            {/* Buttons row */}
-            {/* <div className='m-4 flex mt-5 justify-start'>
-                <button className='mr-[8vw] buttons-styles'>ADD TO ITEM STOCK</button>
-                <button className='buttons-styles'>VIEW ALL ITEMS</button>
-            </div> */}
-
             {/* Inputs row */}
             <div className='text-white font-semibold'>
                 <div className='mt-5 flex justify-between'>
-                    <input className='text-feild' value={category} onChange={(ev) => setCategory(ev.target.value)} placeholder='   category' />
-                    <input className='text-feild' value={name} onChange={(ev) => setName(ev.target.value)} placeholder='   name' />
-                    <input className='text-feild' value={brand} onChange={(ev) => setBrand(ev.target.value)} placeholder='   brand' />
+                     <div className='flex flex-col'>
+                        <input className='text-feild' value={category} onChange={handleInputChange(setCategory, 'category')} placeholder='   category' />
+                        {errors.category && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.category}</span>}
+                    </div>
+                    <div className='flex flex-col'>
+                        <input className='text-feild' value={name} onChange={handleInputChange(setName, 'name')} placeholder='   name' />
+                        {errors.name && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.name}</span>}
+                    </div>
+                    <div className='flex flex-col'>
+                        <input className='text-feild' value={brand} onChange={handleInputChange(setBrand, 'brand')} placeholder='   brand' />
+                        {errors.brand && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.brand}</span>}
+                    </div>
                 </div>
                 <div className='mt-4 flex justify-between'>
-                    <input className='text-feild' value={colour} onChange={(ev) => setColour(ev.target.value)} placeholder='   colour' />
-                    <input className='text-feild' value={price} onChange={(ev) => setPrice(ev.target.value)} placeholder='   price' />
-                    <input className='text-feild' value={warranty_period} onChange={(ev) => setWarrantyPeriod(ev.target.value)} placeholder='   warranty' />
+                    <div className='flex flex-col'>
+                            <input className='text-feild' value={colour} onChange={handleInputChange(setColour, 'colour')} placeholder='   colour' />
+                            {errors.colour && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.colour}</span>}
+                        </div>
+                        <div className='flex flex-col'>
+                            <input className='text-feild' value={price} onChange={handleInputChange(setPrice, 'price')} placeholder='   price' />
+                            {errors.price && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.price}</span>}
+                        </div>
+                        <div className='flex flex-col'>
+                            <input className='text-feild' value={warranty_period} onChange={handleInputChange(setWarrantyPeriod, 'warranty_period')} placeholder='   warranty period' />
+                            {errors.warranty_period && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.warranty_period}</span>}
+                        </div>
+
                 </div>
                
             </div>
 
             {/* Buttons for add, delete, update */}
             <div className='flex justify-between items-end'>
-                <div>
-                    <input className='text-feild text-white font-semibold' value={qty} onChange={(ev) => setQty(ev.target.value)} placeholder='   Qty' />
-                </div>
+                <div className='flex flex-col'>
+                        <input className='text-feild' value={qty} onChange={handleInputChange(setQty, 'qty')} placeholder='   qty' />
+                        {errors.qty && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.qty}</span>}
+                    </div>
 
                 <div className='flex  mt-5'>
                 <button onClick={handleItemAddOnClick} className='mr-[6vw] buttons-styles bg-green-button w-[7vw] h-[5vh] text-center rounded-xl flex justify-center items-center'>
