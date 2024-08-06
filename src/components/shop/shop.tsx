@@ -5,10 +5,6 @@ import axios from "axios";
 import { backend_url } from "../../utill/utill";
 
 
-interface Ishops {
-
-}
-
 function Shop() {
 
     const [shops, setShops] = useState([]);
@@ -222,7 +218,6 @@ function Shop() {
             </div>
 
             <div className="m-4">
-                <p>aaa</p>
                 {/* Inputs row */}
                 <div className='text-white font-semibold'>
                     <div className='mt-5 flex justify-between'>

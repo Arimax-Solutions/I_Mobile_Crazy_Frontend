@@ -286,7 +286,7 @@ const Item = () => {
             </div>
 
             {/* Inputs row */}
-            <div className='text-white font-semibold'>
+            <div className='m-4 text-white font-semibold'>
                 <div className='mt-5 flex justify-between'>
                      <div className='flex flex-col'>
                         <input className='text-feild' value={category} onChange={handleInputChange(setCategory, 'category')} placeholder='   category' />
@@ -320,7 +320,7 @@ const Item = () => {
             </div>
 
             {/* Buttons for add, delete, update */}
-            <div className='flex justify-between items-end'>
+            <div className='m-4 flex justify-between items-end'>
                 <div className='flex flex-col'>
                         <input className='text-feild' value={qty} onChange={handleInputChange(setQty, 'qty')} placeholder='   qty' />
                         {errors.qty && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.qty}</span>}
@@ -338,7 +338,7 @@ const Item = () => {
             
 
             {/* Table to display items */}
-            <div className='mt-5'>
+            <div className='mt-5 m-4'>
                 <table className='min-w-full divide-y table-styles'>
                     <thead>
                         <tr className=''>

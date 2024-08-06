@@ -227,7 +227,7 @@ export default function ReturnItem() {
             </div>
 
             {/* inputs */}
-            <div className='text-white font-semibold'>
+            <div className='m-4 text-white font-semibold'>
                 <div className='mt-5 flex flex-col sm:flex-row justify-between '>
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
@@ -249,27 +249,24 @@ export default function ReturnItem() {
                     />
                 </div>
 
-                <div className='mt-3 flex flex-col sm:flex-row justify-between'>
-                    <div>
+                <div className='mt-5 flex flex-col sm:flex-row justify-between'>
                         <input
                             className='text-feild mb-4 md:mb-0 md:w-[45%] lg:mx-2 md:mx-2 sm:mx-1'
                             value={reason}
                             onChange={(ev) => setReason(ev.target.value)}
                             placeholder='Reason'
                         />
-                    </div>
-
-                    <input
-                        className='text-feild mb-4 md:mb-0 md:w-[45%] lg:mx-2 md:mx-2 sm:mx-1'
-                        value={contact_number}
-                        onChange={(ev) => setContact_number(ev.target.value)}
-                        placeholder='Contact'
-                    />
+                        <input
+                            className='text-feild mb-4 md:mb-0 md:w-[45%] lg:mx-2 md:mx-2 sm:mx-1'
+                            value={contact_number}
+                            onChange={(ev) => setContact_number(ev.target.value)}
+                            placeholder='Contact'
+                        />
                 </div>
             </div>
 
             {/* buttons */}
-            <div className='flex mt-5 gap-x-[3vw] justify-end'>
+            <div className='m-4 flex mt-5 gap-x-[3vw] justify-end'>
                 <Button
                     onClick={handleAddReturnItem}
                     className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
@@ -297,7 +294,7 @@ export default function ReturnItem() {
             </div>
 
            {/* Table to display users */}
-           <div className='mt-5 w-[78vw] overflow-x-auto'>
+           <div className='m-4 mt-5 overflow-x-auto'>
                 <table className='min-w-full divide-y table-styles'>
                     <thead>
                     <tr>

@@ -153,7 +153,7 @@ export default function ReturnOrder(prop:IProp) {
 
     return (
         <>
-            <div className='mt-4'>
+            <div className='mt-4 m-4'>
                 <div className={`flex justify-between items-end`}>
                     <input
                         type="text"
@@ -178,7 +178,7 @@ export default function ReturnOrder(prop:IProp) {
                 )}
             </div>
 
-            <div className='mt-5'>
+            <div className='mt-5 m-4'>
                 <table className='min-w-full divide-y table-styles border-2'>
                     <thead>
                     <tr className='bg-gray-800 text-gray-400 text-xs'>
@@ -203,7 +203,7 @@ export default function ReturnOrder(prop:IProp) {
                 </table>
             </div>
 
-            <div className='w-full flex gap-2 mt-5 justify-end'>
+            <div className='m-4 flex gap-2 mt-5 justify-end'>
                 <button
                     className='bg-[#00900F] p-1 rounded-md text-white font-bold'
                     onClick={() => handleProceedToPaymentReturn('return-order')}

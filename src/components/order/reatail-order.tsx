@@ -279,7 +279,7 @@ export default function RetailOrder(prop: IProp) {
     return (
         <>
             {/* ... Existing code ... */}
-            <div className='mt-4'>
+            <div className='mt-4 m-4'>
                 <div className={`flex justify-between items-end`}>
                     <input
                         type="text"
@@ -304,7 +304,7 @@ export default function RetailOrder(prop: IProp) {
                 )}
             </div>
 
-            <div className='mt-5'>
+            <div className='mt-5 m-4'>
                 <table className='min-w-full divide-y table-styles border-2'>
                     <thead>
                     <tr className='bg-gray-800 text-gray-400 text-xs'>
@@ -334,7 +334,7 @@ export default function RetailOrder(prop: IProp) {
             </div>
 
                 {items.length > 0 && (
-                    <div className='mt-5'>
+                    <div className='mt-5 m-4'>
                         <table className='min-w-full divide-y table-styles border-2'>
                             <thead>
                             <tr className='bg-gray-800 text-gray-400 text-xs'>
@@ -363,7 +363,7 @@ export default function RetailOrder(prop: IProp) {
                         </table>
                     </div>
                 )}
-                <div className='w-full flex gap-2 mt-5 justify-end'>
+                <div className='m-4 flex gap-2 mt-5 justify-end'>
                     <button
                         className='bg-[#00900F] p-1 rounded-md text-white font-bold'
                         onClick={() => handleProceedToPayment('retail-order')}
@@ -565,7 +565,7 @@ export default function RetailOrder(prop: IProp) {
                     </Modal>
 
                 </div>
-                <ProceedPayment phones={phones} itemData={itemData} customerName={customerName} contactNumber={contactNumber} customerId={customerId} customerOutstanding={customerOutstanding} />
+            <ProceedPayment phones={phones} itemData={itemData} customerName={customerName} contactNumber={contactNumber} customerId={customerId} customerOutstanding={customerOutstanding} />
         </>
     );
 }

@@ -91,7 +91,6 @@ export default function ProceedPayment() {
 
         try {
           const response = await axios.post(`${backend_url}/api/retailOrder`, order);
-       /*
           // Create a new jsPDF instance
                 const doc = new jsPDF();
           // Constants for layout
@@ -220,7 +219,6 @@ export default function ProceedPayment() {
 
                 doc.save(`${order.customer.name}.bill.pdf`);
 
-*/
           await Swal.fire({
             title: 'Success!',
             text: 'Order saved successfully',
