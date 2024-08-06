@@ -14,6 +14,7 @@ function Layout({ children }: any) {
                 <div className="w-full max-w-full overflow-x-hidden">
                     <Outlet />
                 </div>
+
             </main>
         </div>
     );
