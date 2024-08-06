@@ -13,7 +13,6 @@ function Shop() {
     const [contact_number, setContactNumber] = useState("");
     const [email, setEmail] = useState("");
     const [owner_nic, setOwnerNic] = useState("");
-    const [outstanding, setOutstanding] = useState("");
     const [credit_limit, setCreditLimit] = useState("");
     const [shopId, setShopId] = useState(null);
 
@@ -44,9 +43,10 @@ function Shop() {
     async function handleItemUpdateOnClick() {
         try {
             const data = formValidation()
-            await axios.put(`${backend_url}/api/shop`, {
-                ...data, shop_id: shopId
+            const response = await axios.put(`${backend_url}/api/shop/${shopId}`, {
+                ...data
             });
+            console.log(response.data)
             await Swal.fire({
                 title: 'Success!',
                 text: 'Shop update successfully',
@@ -96,7 +96,6 @@ function Shop() {
         setContactNumber("");
         setEmail("");
         setOwnerNic("");
-        setOutstanding("");
         setCreditLimit("");
         setShopId(null)
         fetchAllShopData();
@@ -108,14 +107,13 @@ function Shop() {
         setContactNumber(0 + value.contact_number.toString());
         setEmail(value.email);
         setOwnerNic(value.owner_nic);
-        setOutstanding(value.outStanding);
         setCreditLimit(value.credit_limit)
         setShopId(value.shop_id)
         // fetchAllShopData();
     }
 
     function formValidation() {
-        if (!shop_name && !address && !contact_number && !email && !owner_nic && !outstanding && !credit_limit) {
+        if (!shop_name && !address && !contact_number && !email && !owner_nic && !credit_limit) {
             Swal.fire({
                 title: 'Error!',
                 text: 'Please fill all fields',
@@ -128,14 +126,12 @@ function Shop() {
         isValidEmail(email);
         isValidNIC(owner_nic)
         const contactNumber = isValidPhoneNumber(contact_number);
-        const outStanding = isValidNumber(outstanding);
         const creditLimit = isValidNumber(credit_limit);
         return {
             "shop_name": shop_name,
             "address": address,
             "email": email,
             "contact_number": contactNumber,
-            "outStanding": outStanding,
             "owner_nic": owner_nic,
             "credit_limit": creditLimit,
             "is_deleted": false
@@ -228,21 +224,16 @@ function Shop() {
                     <div className='mt-4 flex justify-between'>
                         <input className='text-feild' value={email} onChange={(ev) => setEmail(ev.target.value)} placeholder='email' />
                         <input className='text-feild' value={owner_nic} onChange={(ev) => setOwnerNic(ev.target.value)} placeholder='owner nic' />
-                        <input className='text-feild' value={outstanding} onChange={(ev) => setOutstanding(ev.target.value)} placeholder='outstanding' />
-                    </div>
-                    <div className='mt-4 flex justify-between items-center'>
                         <input className='text-feild' value={credit_limit} onChange={(ev) => setCreditLimit(ev.target.value)} placeholder='credit limit' />
-                        {/* Buttons for add, delete, update */}
-                        <div className='flex justify-between items-end'>
-
-                            <div className='flex'>
+                    </div>
+                    <div className='mt-[8vh]'>
+                        <div className='flex justify-end'>
                                 <button onClick={handleItemAddOnClick} className='mr-[6vw] buttons-styles bg-green-button w-[7vw] h-[5vh] text-center rounded-xl flex justify-center items-center'>
                                     <img src={'src/assets/icons/Add Btn.svg'} className='mr-[0.3vw]' alt='add icon' />ADD</button>
                                 <button onClick={handleItemDeleteOnClick} className='mr-[6vw] buttons-styles bg-red-button w-[8vw] h-[5vh] text-center rounded-xl flex justify-center items-center'>
                                     <img src={'src/assets/icons/Delete Btn.svg'} className='mr-[0.3vw]' alt='delete icon' />DELETE</button>
                                 <button onClick={handleItemUpdateOnClick} className='buttons-styles bg-blue-button w-[8vw] h-[5vh] text-center rounded-xl flex justify-center items-center'>
                                     <img src={'src/assets/icons/Update Btn.svg'} className='mr-[0.3vw]' alt='update icon' />UPDATE</button>
-                            </div>
                         </div>
                     </div>
 
@@ -260,7 +251,6 @@ function Shop() {
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Contact Number</th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Email</th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Owner NIC</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Outstandin</th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Credit Limit</th>
                         </tr>
                     </thead>
@@ -277,7 +267,6 @@ function Shop() {
                                 <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.contact_number}</td>
                                 <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.email}</td>
                                 <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.owner_nic}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.outStanding}</td>
                                 <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.credit_limit}</td>
                             </tr>
                         ))}
