@@ -176,6 +176,9 @@ export default function ReturnPhone() {
                 });
                 setItems([...items, response.data]);
                 clearForm();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 4000);
             }
         } catch (error) {
             Swal.fire({
@@ -283,8 +286,8 @@ export default function ReturnPhone() {
                 }
             });
 
-            const phoneData = response.data;
-
+            const phoneData = response.data;    console.log(1111111111)
+            console.log(phoneData)
             if (phoneData) {
                 setSelectedItem(phoneData);
                 setModel(phoneData.modelId.name);
@@ -292,11 +295,11 @@ export default function ReturnPhone() {
                 setColour(phoneData.colour);
                 setReason(phoneData.reason);
 
-                if (phoneData.customer) {
+                if (phoneData.customer!=null) {
                     setName(phoneData.customer.name);
                     setContact_number(phoneData.customer.contact_phone);
                     setCustomer_id(phoneData.customer.customer_id || '');
-                } else if (phoneData.shop) {
+                } else if (phoneData.shop!=null) {
                     setName(phoneData.shop.shop_name);
                     setContact_number(phoneData.shop.contact_number);
                 }
@@ -304,6 +307,7 @@ export default function ReturnPhone() {
                 setOutStanding(phoneData.price);
                 // setDate(new Date(phoneData.date));
                 setReturn_phone_id(phoneData.return_phone_id || '');
+
             } else {
                 Swal.fire({
                     title: 'Error!',
@@ -312,6 +316,7 @@ export default function ReturnPhone() {
                     confirmButtonText: 'OK'
                 });
                 clearForm();
+
             }
         } catch (error) {
             Swal.fire({
