@@ -314,7 +314,6 @@ const Item = () => {
                             <input className='text-feild' value={warranty_period} onChange={handleInputChange(setWarrantyPeriod, 'warranty_period')} placeholder='   warranty period' />
                             {errors.warranty_period && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.warranty_period}</span>}
                         </div>
-
                 </div>
                
             </div>

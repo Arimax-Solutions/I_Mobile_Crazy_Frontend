@@ -275,38 +275,73 @@ const User: React.FC = () => {
 
     return (
         <div className='m-4 w-full'>
-            <div className='m-4'>
+            <div className="m-4">
                 <TopNavbar />
             </div>
 
-            <div className='m-4 w-full flex flex-wrap my-[5vh]'>
-                <div className='relative mr-4 flex-grow'>
-                    <InputFields value={name} onChange={(event) => setName(event.target.value)} placeholder="   Name" />
-                    {nameError && <span className='absolute text-red-500 text-xs top-full left-2'>{nameError}</span>}
+            <div className='m-4 text-white font-semibold'>
+                <div className='mt-5 flex justify-between'>
+                    <div className='flex flex-col'>
+                        <input
+                            className='text-feild'
+                            value={name}
+                            onChange={(event) => setName(event.target.value)}
+                            placeholder='   Name'
+                        />
+                        {nameError && <span className='text-red-500 text-xs ml-[0.5vw]'>{nameError}</span>}
+                    </div>
+                    <div className='flex flex-col'>
+                        <select
+                            className='text-feild'
+                            value={role}
+                            onChange={(event) => setRole(event.target.value)}
+                        >
+                            <option value="">Role</option>
+                            <option value="user">User</option>
+                        </select>
+                        {roleError && <span className='text-red-500 text-xs ml-[0.5vw]'>{roleError}</span>}
+                    </div>
+                    <div className='flex flex-col'>
+                        <input
+                            className='text-feild'
+                            value={contact_number}
+                            onChange={(event) => setContactNumber(event.target.value)}
+                            placeholder='   Contact Number'
+                        />
+                        {contactNumberError && <span className='text-red-500 text-xs ml-[0.5vw]'>{contactNumberError}</span>}
+                    </div>
                 </div>
-                <div className='relative mr-4 flex-grow'>
-                    <Combobox value={role} onChange={(event) => setRole(event.target.value)} options={roleOptions} placeholder="   Select Role" />
-                    {roleError && <span className='absolute text-red-500 text-xs top-full left-2'>{roleError}</span>}
-                </div>
-                <div className='relative mr-4 flex-grow'>
-                    <InputFields value={contact_number} onChange={(event) => setContactNumber(event.target.value)} placeholder="   Contact Number" />
-                    {contactNumberError && <span className='absolute text-red-500 text-xs top-full left-2'>{contactNumberError}</span>}
-                </div>
-                <div className='relative mt-[5vh] mr-4 flex-grow'>
-                    <InputFields value={email} onChange={(event) => setEmail(event.target.value)} placeholder="   Email" />
-                    {emailError && <span className='absolute text-red-500 mt-[2vh] text-xs left-2'>{emailError}</span>}
-                </div>
-                <div className='relative mt-[5vh] mr-4 flex-grow'>
-                    <InputFields value={username} onChange={(event) => setUsername(event.target.value)} placeholder="   Username" />
-                    {usernameError && <span className='absolute text-red-500 mt-[2vh] text-xs left-2'>{usernameError}</span>}
-                </div>
-                <div className='relative mt-[5vh] mr-4 flex-grow'>
-                    <InputFields value={password} onChange={(event) => setPassword(event.target.value)} placeholder="   Password" />
-                    {passwordError && <span className='absolute text-red-500 mt-[2vh] text-xs  left-2'>{passwordError}</span>}
+
+                <div className='mt-4 flex justify-between'>
+                    <div className='flex flex-col'>
+                        <input
+                            className='text-feild'
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                            placeholder='   Email'
+                        />
+                        {emailError && <span className='text-red-500 text-xs ml-[0.5vw]'>{emailError}</span>}
+                    </div>
+                    <div className='flex flex-col'>
+                        <input
+                            className='text-feild'
+                            value={username}
+                            onChange={(event) => setUsername(event.target.value)}
+                            placeholder='   Username'
+                        />
+                        {usernameError && <span className='text-red-500 text-xs ml-[0.5vw]'>{usernameError}</span>}
+                    </div>
+                    <div className='flex flex-col'>
+                        <input
+                            className='text-feild'
+                            value={password}
+                            onChange={(event) => setPassword(event.target.value)}
+                            placeholder='   Password'
+                        />
+                        {passwordError && <span className='text-red-500 text-xs ml-[0.5vw]'>{passwordError}</span>}
+                    </div>
                 </div>
             </div>
-
-
 
             <div className='m-4 flex mt-5 justify-end'>
                 <Button
@@ -336,34 +371,35 @@ const User: React.FC = () => {
             </div>
 
             {/* Table to display users */}
-            <div className=' m-4 mt-5 overflow-x-auto'>
+            <div className='mt-5 m-4'>
                 <table className='min-w-full divide-y table-styles'>
                     <thead>
-                        <tr>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Id</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Contact Number</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Email</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Username</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Password</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Role</th>
-                        </tr>
+                    <tr>
+                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Id</th>
+                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
+                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Contact Number</th>
+                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Email</th>
+                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Username</th>
+                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Password</th>
+                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Role</th>
+                    </tr>
                     </thead>
                     <tbody className='divide-y divide-gray-200'>
-                        {users.map((user) => (
-                            <tr key={user.user_id} onClick={() => handleTableRowClick(user)} className='hover:bg-gray-200 cursor-pointer'>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.user_id}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.name}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.contact_number}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.email}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.username}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.password}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.role}</td>
-                            </tr>
-                        ))}
+                    {users.map((user) => (
+                        <tr key={user.user_id} onClick={() => handleTableRowClick(user)} className='text-white font-semibold hover:bg-gray-50 cursor-pointer'>
+                            <td className='px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-500'>{user.user_id}</td>
+                            <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.name}</td>
+                            <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.contact_number}</td>
+                            <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.email}</td>
+                            <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.username}</td>
+                            <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.password}</td>
+                            <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{user.role}</td>
+                        </tr>
+                    ))}
                     </tbody>
                 </table>
             </div>
+
         </div>
     );
 };

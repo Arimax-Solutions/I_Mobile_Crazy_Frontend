@@ -1,8 +1,12 @@
 // @ts-ignore
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line } from 'recharts';
 import TopNavbar from '../topNavbar.tsx';
+import axios from "axios";
+import html2canvas from "html2canvas";
+import {jsPDF} from "jspdf";
+import logo from '../../assets/images/logo.png';
 
 const data = [
   { name: 'Label 1', value: 36638465.14 },
@@ -49,18 +53,161 @@ const weeklyOrderIncrementData = [
 
 
 export default function Dashboard() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [totalIncome, setTotalIncome] = useState(0);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const retailResponse = await axios.get('http://localhost:8080/api/retailOrder/today');
+        const wholesaleResponse = await axios.get('http://localhost:8080/api/retailOrder/wholesale/today');
+        const returnResponse = await axios.get('http://localhost:8080/api/retailOrder/return/today');
+        const combinedOrders = [...retailResponse.data, ...wholesaleResponse.data, ...returnResponse.data];
+        setOrders(combinedOrders);
+        calculateTotalIncome(combinedOrders);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  const calculateTotalIncome = (orders) => {
+    const total = orders.reduce((sum, order) => sum + order.total_amount, 0);
+    setTotalIncome(total);
+  };
+
+  const today = new Date().toLocaleDateString();
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+  const saveToPDF = () => {
+    const input = document.getElementById('pdf-content');
+
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 295; // A4 height in mm
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      // Add header
+      pdf.setFontSize(12);
+      pdf.setTextColor(40);
+      pdf.addImage(logo, 'PNG', 10, 10, 30, 30);
+      pdf.text('I Mobile Crazy', 50, 20);
+      pdf.text('Income Report', 50, 30);
+      pdf.text(`Date: ${new Date().toLocaleDateString()}`, 50, 40);
+      pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
+
+      pdf.addImage(imgData, 'PNG', 0, 60, imgWidth, imgHeight);
+      heightLeft -= (pageHeight - 60);
+
+      while (heightLeft >= 0) {
+        pdf.addPage();
+        pdf.addImage(logo, 'PNG', 10, 10, 30, 30);
+        pdf.text('Shop Name', 50, 20);
+        pdf.text('Income Report', 50, 30);
+        pdf.text(`Date: ${new Date().toLocaleDateString()}`, 50, 40);
+        pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
+
+        position = heightLeft - imgHeight;
+        pdf.addImage(imgData, 'PNG', 0, position + 60, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
+      pdf.save('income-report.pdf');
+    });
+  };
+
+
   return (
     <div className='m-4 w-full'>
       <div className='m-4'>
         <TopNavbar />
   
         {/* Buttons */}
-        <div className='flex flex-wrap justify-around mt-5 gap-2'>
-          <button className='buttons-styles w-full sm:w-auto'>Income Report</button>
-          <button className='buttons-styles w-full sm:w-auto'>Stock Update</button>
-          <button className='buttons-styles w-full sm:w-auto'>Income Report</button>
-          <button className='buttons-styles w-full sm:w-auto'>Selling Update</button>
-          <button className='buttons-styles w-full sm:w-auto'>Return Update</button>
+        <div className='flex flex-wrap justify-around mt-5 gap-5'>
+          {/*Income Report*/}
+          <div>
+            <button className='buttons-styles w-full sm:w-auto' onClick={toggleModal}>
+              Income Report
+            </button>
+
+            {isModalOpen && (
+                <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50'>
+                  <div className='bg-white p-8 rounded shadow-lg w-full max-w-full max-h-full z-60'>
+                    <h2 className='text-xl mb-4'>Income Report</h2>
+                    <div id='pdf-content'>
+                      <table className='min-w-full bg-white'>
+                        <thead>
+                        <tr>
+                          <th className='py-2 px-4 border'>OrderId</th>
+                          <th className='py-2 px-4 border'>Brand</th>
+                          <th className='py-2 px-4 border'>Name</th>
+                          <th className='py-2 px-4 border'>Customer/Shop Name</th>
+                          <th className='py-2 px-4 border'>Date</th>
+                          <th className='py-2 px-4 border'>Total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {orders.map((order) => (
+                            <>
+                              {/* Display items */}
+                              {order.items?.map((item) => (
+                                  <tr key={`${order.retail_order_id || order.wholesale_order_id || order.return_order_id}-item-${item.item_id}`}>
+                                    <td className='py-2 px-4 border'>{order.retail_order_id || order.wholesale_order_id || order.return_order_id}</td>
+                                    <td className='py-2 px-4 border'>{item.brand}</td>
+                                    <td className='py-2 px-4 border'>{item.name}</td>
+                                    <td className='py-2 px-4 border'>{order.customer ? order.customer.name : order.shop.shop_name}</td>
+                                    <td className='py-2 px-4 border'>{new Date(order.date).toLocaleDateString()}</td>
+                                    <td className='py-2 px-4 border'>{order.total_amount}</td>
+                                  </tr>
+                              ))}
+
+                              {/* Display imeis */}
+                              {order.imeis?.map((imei) => (
+                                  <tr key={`${order.retail_order_id || order.wholesale_order_id || order.return_order_id}-imei-${imei.id}`}>
+                                    <td className='py-2 px-4 border'>{order.retail_order_id || order.wholesale_order_id || order.return_order_id}</td>
+                                    <td className='py-2 px-4 border'>{imei.modelId?.name || 'N/A'}</td>
+                                    <td className='py-2 px-4 border'>{imei.imei}</td>
+                                    <td className='py-2 px-4 border'>{order.customer ? order.customer.name : order.shop.shop_name}</td>
+                                    <td className='py-2 px-4 border'>{new Date(order.date).toLocaleDateString()}</td>
+                                    <td className='py-2 px-4 border'>{order.total_amount}</td>
+                                  </tr>
+                              ))}
+                            </>
+                        ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className='mt-4'>
+                      <h3 className='text-lg font-semibold'>Total Income of {today}</h3>
+                      <p className='text-xl'>{totalIncome.toFixed(2)}</p>
+                    </div>
+                    <div className="flex justify-end mt-4">
+                      <button className="buttons-styles bg-danger text-white rounded px-4 py-2" onClick={toggleModal}>
+                        Close
+                      </button>
+                      <button className="buttons-styles bg-primary text-white rounded px-4 py-2 ml-4" onClick={saveToPDF}>
+                        Save as PDF
+                      </button>
+                    </div>
+
+
+                  </div>
+                </div>
+            )}
+          </div>
+
+          <button className='buttons-styles w-full sm:w-auto'>Expense Report</button>
           <button className='daily_cost-buttons-styles p-1 rounded-xl w-full sm:w-auto flex items-center'>
             Daily Cost<img src={'src/assets/icons/daily cost.svg'} className='ml-2' alt='icon' />
           </button>
