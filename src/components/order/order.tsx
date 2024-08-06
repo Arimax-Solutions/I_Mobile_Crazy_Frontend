@@ -30,7 +30,7 @@ export default function Order() {
                 <TopNavbar />
             </div>
 
-            <div className='mt-4'>
+            <div className='mt-4 m-4'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-10'>
                         <p className='font-bold text-[#5386ED] text-3xl'>#00000253</p>

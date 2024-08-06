@@ -352,7 +352,7 @@ export default function ReturnPhone() {
             </div>
 
             {/* inputs */}
-            <div className='text-white font-semibold'>
+            <div className='m-4 text-white font-semibold'>
                 <div className='mt-5 flex flex-col sm:flex-row justify-between '>
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
@@ -425,7 +425,7 @@ export default function ReturnPhone() {
                 </div>
             </div>
 
-            <div className='flex mt-5 gap-x-[3vw] justify-end'>
+            <div className='m-4 flex mt-5 gap-x-[3vw] justify-end'>
                 <Button
                     onClick={handleSave}
                     className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
@@ -453,7 +453,7 @@ export default function ReturnPhone() {
             </div>
 
             {/* table */}
-            <div className='mt-5 overflow-auto max-h-[50vh]'>
+            <div className='m-4 mt-5 overflow-auto max-h-[50vh]'>
                 <table className='w-full text-white table-styles'>
                     <thead>
                         <tr>

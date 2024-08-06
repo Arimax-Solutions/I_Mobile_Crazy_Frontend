@@ -455,13 +455,13 @@ export default function StockPhones() {
 
 
     return (
-        <div className='m-4 w-full text-white font-semibold xl:max-w-[80vw] lg:max-w-[72vw] md:max-w-[65vw] sm:max-w-[65vw]'>
+        <div className='m-4 w-full'>
             <div className="m-4">
                 <TopNavbar />
             </div>
 
             {/* Inputs row */}
-            <div className='text-white font-semibold'>
+            <div className='m-4 text-white font-semibold'>
                 <div className='mt-5 flex flex-col sm:flex-row justify-between'>
                     <input
                         className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
@@ -529,7 +529,7 @@ export default function StockPhones() {
 
 
           {/* Second table (list of phone models) */}
-                <div className="mt-5 text-white" style={{ height: '35vh', overflowY: 'auto' }}>
+                <div className="m-4 mt-5 text-white" style={{ height: '35vh', overflowY: 'auto' }}>
                     <h2 className="text-xl font-semibold mb-4">Phone Models</h2>
                     <div className="overflow-x-auto">
                         <table className="min-w-full bg-gray-800 text-white">
@@ -574,7 +574,7 @@ export default function StockPhones() {
          </div>
 
 
-         <div className='flex mt-5 gap-x-[3vw] justify-end'>
+         <div className='m-4 flex mt-5 gap-x-[3vw] justify-end'>
             <Button
                 onClick={handleAddPhone}
                 className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
@@ -609,10 +609,8 @@ export default function StockPhones() {
             </Button>
 
         </div>
-
-
                     {/* First table (list of phones) */}
-                    <div className="mt-5 text-white">
+                    <div className="m-4 mt-5 text-white">
                         <h2 className="text-xl font-semibold mb-4">List of Stocks</h2>
                         <div className="overflow-x-auto">
                             <table className="min-w-full bg-gray-800 text-white table-styles">
