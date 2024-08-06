@@ -12,7 +12,7 @@ const InputFields: React.FC<InputFieldsProps> = ({ value, onChange, placeholder 
     return (
         <div className=" inputs-container">
             <input 
-                className="text-feild" 
+                className="text-feild m-4"
                 value={value} 
                 onChange={onChange} 
                 placeholder={placeholder} 

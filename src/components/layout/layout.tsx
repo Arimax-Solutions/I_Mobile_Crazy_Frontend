@@ -5,25 +5,19 @@ import { Outlet } from 'react-router-dom';
 function Layout({ children }: any) {
     return (
         <div className="flex min-h-screen bg-[#14141E]">
-            <NavigationMenu />
+            <div className="w-[10%]">
+                <NavigationMenu />
+            </div>
             <main
-                style={{
-                    flex: 1,
-                    padding: '20px 300px',
-                    overflow: 'auto',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-start',
-                }}
-                className="flex-1 overflow-auto"
+                className="w-[90%] flex-1 p-8 overflow-y-auto flex flex-col justify-start"
             >
-                <div style={{ width: '1750px', maxWidth: '1750px' }}>
+                <div className="w-full max-w-full overflow-x-hidden">
                     <Outlet />
                 </div>
+
             </main>
         </div>
-
-    )
+    );
 }
 
 export default Layout;

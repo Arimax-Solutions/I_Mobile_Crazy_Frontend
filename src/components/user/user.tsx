@@ -279,7 +279,7 @@ const User: React.FC = () => {
                 <TopNavbar />
             </div>
 
-            <div className='flex flex-wrap my-[5vh]'>
+            <div className='m-4 w-full flex flex-wrap my-[5vh]'>
                 <div className='relative mr-4 flex-grow'>
                     <InputFields value={name} onChange={(event) => setName(event.target.value)} placeholder="   Name" />
                     {nameError && <span className='absolute text-red-500 text-xs top-full left-2'>{nameError}</span>}
@@ -308,7 +308,7 @@ const User: React.FC = () => {
 
 
 
-            <div className='flex mt-5 justify-end'>
+            <div className='m-4 flex mt-5 justify-end'>
                 <Button
                     onClick={() => handleAddUser()}
                     className='mr-[6vw] buttons-styles bg-green-button w-[7vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
@@ -336,22 +336,22 @@ const User: React.FC = () => {
             </div>
 
             {/* Table to display users */}
-            <div className='mt-5 w-[78vw] overflow-x-auto'>
-                <table className='min-w-full divide-y  table-styles'>
+            <div className=' m-4 mt-5 overflow-x-auto'>
+                <table className='min-w-full divide-y table-styles'>
                     <thead>
                         <tr>
-                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Id</th>
-                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Name</th>
-                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Contact Number</th>
-                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Email</th>
-                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Username</th>
-                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Password</th>
-                            <th className='px-6 py-3 text-left text-xs font-bold  uppercase tracking-wider'>Role</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Id</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Contact Number</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Email</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Username</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Password</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Role</th>
                         </tr>
                     </thead>
                     <tbody className='divide-y divide-gray-200'>
                         {users.map((user) => (
-                            <tr key={user.user_id} onClick={() => handleTableRowClick(user)} className=' cursor-pointer '>
+                            <tr key={user.user_id} onClick={() => handleTableRowClick(user)} className='hover:bg-gray-200 cursor-pointer'>
                                 <td className='px-6 py-4 whitespace-nowrap'>{user.user_id}</td>
                                 <td className='px-6 py-4 whitespace-nowrap'>{user.name}</td>
                                 <td className='px-6 py-4 whitespace-nowrap'>{user.contact_number}</td>
