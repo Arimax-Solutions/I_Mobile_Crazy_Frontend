@@ -156,7 +156,8 @@ export default function ReturnPhone() {
             outStanding,
             date: date?.toISOString() || '',
             contact_number,
-            customer_id 
+            customer_id,
+            shop_id
         };
 
         try {
@@ -286,8 +287,8 @@ export default function ReturnPhone() {
                 }
             });
 
-            const phoneData = response.data;    console.log(1111111111)
-            console.log(phoneData)
+            const phoneData = response.data; 
+            console.log(phoneData.shop.shop_id)  
             if (phoneData) {
                 setSelectedItem(phoneData);
                 setModel(phoneData.modelId.name);
@@ -302,6 +303,7 @@ export default function ReturnPhone() {
                 } else if (phoneData.shop!=null) {
                     setName(phoneData.shop.shop_name);
                     setContact_number(phoneData.shop.contact_number);
+                    setShop_id(phoneData.shop.shop_id);
                 }
 
                 setOutStanding(phoneData.price);
