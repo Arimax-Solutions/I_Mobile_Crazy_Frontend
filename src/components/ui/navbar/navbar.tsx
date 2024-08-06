@@ -7,11 +7,11 @@ function NavigationMenu() {
 
     return (
         <nav className="fixed top-10 left-0 pt-3 flex flex-col min-w-[270px] w-[270px] h-[90%] bg-[#1D1D27] rounded-r-[40px] items-center overflow-hidden">
-            <div className='mt-2 align-self-md-start pl-8'>
+            <div className='mt-2 self-start pl-8'>
                 <img width={"120px"} src="src/assets/images/logo.png" alt="company logo" />
             </div>
             <div className="w-full h-full flex flex-col">
-                <div className="w-full flex-1 overflow-y-auto">
+                <div className="w-full flex-1">
                     <ul className='mt-10 w-full pl-8 flex flex-col gap-10 mb-2'>
                         <NavItems logo='src/assets/images/navbar/layer1.svg' name='Reports' location='/dashboard' selected={setSelect} isSelected={select} />
                         <NavItems logo='src/assets/images/navbar/Stock Phones.svg' name='Stock Phones' location='/StockPhones' selected={setSelect} isSelected={select} />
@@ -31,7 +31,6 @@ function NavigationMenu() {
                     </NavLink>
                 </div>
             </div>
-
         </nav>
     );
 }
@@ -48,7 +47,7 @@ interface INavItems {
 
 function NavItems({ name, selected, isSelected, location, logo }: INavItems) {
     return (
-        <li className={clsx(isSelected === name.replace(" ", "-") ? "text-[#5356EC]" : "text-[#959595]")} onClick={() => selected(name.replace(" ", "-"))}>
+        <li className={clsx(isSelected === name ? "text-[#5356EC]" : "text-[#959595]")} onClick={() => selected(name)}>
             <Link to={location} className='gap-4 flex items-center'>
                 <img width={"30px"} src={logo} alt="" />
                 <p className='text-[19px] font-medium'>{name}</p>
