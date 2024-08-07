@@ -5,6 +5,7 @@ import axios from "axios";
 import {backend_url} from "../../utill/utill.ts";
 import Swal from "sweetalert2";
 import { jsPDF } from 'jspdf';
+import html2canvas from "html2canvas";
 
 export default function ProceedPayment() {
   const { orderType } = useParams();
@@ -98,7 +99,7 @@ export default function ProceedPayment() {
 
         try {
           const response = await axios.post(`${backend_url}/api/retailOrder`, order);
-          // Create a new jsPDF instance
+          /*// Create a new jsPDF instance
                 const doc = new jsPDF();
           // Constants for layout
                 const topMargin = 20;
@@ -224,7 +225,7 @@ export default function ProceedPayment() {
 
                 doc.roundedRect(leftMargin, notesY - 10, pageWidth - 2 * leftMargin, 60, 5, 5); // x, y, width, height, rx, ry
 
-                doc.save(`${order.customer.name}.bill.pdf`);
+                doc.save(`${order.customer.name}.bill.pdf`);*/
 
           await Swal.fire({
             title: 'Success!',

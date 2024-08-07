@@ -54,8 +54,14 @@ const weeklyOrderIncrementData = [
 
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen1, setIsModalOpen1] = useState(false);
   const [orders, setOrders] = useState([]);
   const [totalIncome, setTotalIncome] = useState(0);
+  const [stockData, setStockData] = useState({});
+  const [totalIncomeMonth, setTotalIncomeMonth] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
+  const [soldCount, setSoldCount] = useState(0);
+  const [orderCountWholesale, setOrderCountWholesale] = useState(0);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -84,6 +90,11 @@ export default function Dashboard() {
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
+
+  const toggleModal1 = () => {
+    setIsModalOpen1(!isModalOpen1);
+  };
+
   const saveToPDF = () => {
     const input = document.getElementById('pdf-content');
 
@@ -127,6 +138,134 @@ export default function Dashboard() {
     });
   };
 
+  useEffect(() => {
+    if (isModalOpen1) {
+      const fetchData = async () => {
+        try {
+          const response = await axios.get('http://localhost:8080/api/imei/count/sale');
+          console.log('Fetched stock data:', response.data); // Log the fetched data
+          setStockData(response.data);
+        } catch (error) {
+          console.error('Error fetching stock data:', error);
+        }
+      };
+
+      fetchData();
+    }
+  }, [isModalOpen1]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/imei/count/sale');
+        console.log('Fetched stock data:', response.data); // Log the fetched data
+        setStockData(response.data);
+      } catch (error) {
+        console.error('Error fetching stock data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const saveToPDFStock = () => {
+    const input = document.getElementById('pdf-content');
+
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 295; // A4 height in mm
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      // Add header
+      pdf.setFontSize(12);
+      pdf.setTextColor(40);
+      pdf.text('Stock Report', 14, 20);
+      pdf.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+
+      pdf.addImage(imgData, 'PNG', 0, 40, imgWidth, imgHeight);
+      heightLeft -= (pageHeight - 40);
+
+      while (heightLeft >= 0) {
+        pdf.addPage();
+        pdf.text('Stock Report', 14, 20);
+        pdf.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+
+        position = heightLeft - imgHeight;
+        pdf.addImage(imgData, 'PNG', 0, position + 40, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save('stock-report.pdf');
+    });
+  };
+  useEffect(() => {
+  const fetchTotalIncome = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/retailOrder/monthly');
+        const income = response.data; // Assuming the response is a number
+        setTotalIncomeMonth(income);
+      } catch (error) {
+        console.error('Error fetching total income:', error);
+      }
+    };
+
+  fetchTotalIncome();
+  }, []);
+
+  useEffect(() => {
+    const fetchOrderCount = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/retailOrder/order/count');
+        setOrderCount(Math.floor(response.data)); // Convert the float to an integer
+      } catch (error) {
+        console.error('Error fetching order count:', error);
+      }
+    };
+
+    fetchOrderCount();
+  }, []);
+
+  useEffect(() => {
+    const fetchSoldCount = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/imei/sold-count-this-month');
+        setSoldCount(response.data);
+      } catch (error) {
+        console.error('Error fetching sold count:', error);
+      }
+    };
+
+    fetchSoldCount();
+  }, []);
+
+  useEffect(() => {
+    // Function to fetch wholesale order count from API
+    const fetchOrderCountWholesale = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/wholesale-orders/count-this-month');
+
+        // Directly set the state with the response data, assuming it is a plain number
+        setOrderCountWholesale(response.data);
+      } catch (error) {
+        console.error('Error fetching the wholesale order count:', error);
+      }
+    };
+
+    fetchOrderCountWholesale(); // Call the fetch function on component mount
+  }, []);
+
+  const productData = Object.keys(stockData).map(key => ({
+    name: key,
+    popularity: stockData[key].saleCount,
+    color: stockData[key].color
+  }));
+
+  console.log('Product data:', productData);
 
   return (
     <div className='m-4 w-full'>
@@ -207,7 +346,55 @@ export default function Dashboard() {
             )}
           </div>
 
-          <button className='buttons-styles w-full sm:w-auto'>Expense Report</button>
+          {/*Stock Report*/}
+          <div>
+            <button className='buttons-styles w-full sm:w-auto' onClick={toggleModal1}>
+              Stock Report
+            </button>
+
+            {isModalOpen1 && (
+                <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50'>
+                  <div className='bg-white p-8 rounded shadow-lg w-full max-w-md z-60'>
+                    <h2 className='text-xl mb-4'>Stock Report</h2>
+                    <div id='pdf-content'>
+                      <table className='w-full border-collapse'>
+                        <thead>
+                        <tr className='bg-gray-200'>
+                          <th className='border px-4 py-2 text-left'>Model Name</th>
+                          <th className='border px-4 py-2 text-left'>Count</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {Object.entries(stockData).map(([model, count]) => (
+                            <tr key={model}>
+                              <td className='border px-4 py-2'>{model}</td>
+                              <td className='border px-4 py-2'>{count}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className='flex justify-end mt-4'>
+                      <button
+                          className='bg-red-500 text-white py-2 px-4 rounded'
+                          onClick={toggleModal1}
+                      >
+                        Close
+                      </button>
+                      <button
+                          className='bg-blue-500 text-white py-2 px-4 rounded mr-2'
+                          onClick={saveToPDFStock}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+            )}
+          </div>
+
+
+
           <button className='daily_cost-buttons-styles p-1 rounded-xl w-full sm:w-auto flex items-center'>
             Daily Cost<img src={'src/assets/icons/daily cost.svg'} className='ml-2' alt='icon' />
           </button>
@@ -221,40 +408,50 @@ export default function Dashboard() {
             <span className='text-xs text-gray-400'>Sales Summary</span>
           </div>
           <div className='flex justify-between w-full text-white mt-2'>
+
             <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
               <div className='mb-2'>
                 <img src={'src/assets/icons/Icon 1.svg'} alt='icon' className='mx-auto' />
               </div>
-              <div className='text-2xl'>$5k</div>
+              <div className='text-2xl'>{totalIncomeMonth}</div>
               <div className='text-sm'>Total Sales</div>
-              <div className='text-xs text-orange-500'>+10% from yesterday</div>
+              <div className='text-xs text-yellow-500'>This month</div>
             </div>
+
+
             <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
               <div className='mb-2'>
                 <img src={'src/assets/icons/Icon 2.svg'} alt='icon' className='mx-auto' />
               </div>
-              <div className='text-2xl'>500</div>
-              <div className='text-sm'>Total Orders</div>
-              <div className='text-xs text-green-500'>+8% from yesterday</div>
+              <div className='text-2xl'>{orderCount}</div>
+              <div className='text-sm'>Retail Orders</div>
+              <div className='text-xs text-green-500'>This month</div>
             </div>
+
+
+
             <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
               <div className='mb-2'>
                 <img src={'src/assets/icons/Icon 3.svg'} alt='icon' className='mx-auto' />
               </div>
-              <div className='text-2xl'>12</div>
-              <div className='text-sm'>Product Sold</div>
-              <div className='text-xs text-purple-500'>+20% from yesterday</div>
+              <div className='text-2xl'>{orderCountWholesale}</div> {/* Display the number */}
+              <div className='text-sm'>Wholesale Orders</div>
+              <div className='text-xs text-purple-500'>This month</div>
             </div>
+
             <div className='custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center'>
               <div className='mb-2'>
                 <img src={'src/assets/icons/Icon 4.svg'} alt='icon' className='w-fit mx-auto' />
               </div>
-              <div className='text-2xl'>12</div>
-              <div className='text-sm'>New Customers</div>
-              <div className='text-xs text-blue-500'>+3% from yesterday</div>
+              <div className='text-2xl'>{soldCount}</div>
+              <div className='text-sm'>Phone Sold</div>
+              <div className='text-xs text-blue-500'>This month</div>
             </div>
+
           </div>
         </div>
+
+
   
           {/* 1st Row Right Side Chart */}
           <div className="background-colour-today-sales-div text-white flex-1 p-3 rounded-lg">
@@ -281,7 +478,8 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-  
+
+
         {/* Second Row */}
         <div className='flex flex-col lg:flex-row lg:justify-between mt-5 gap-4'>
           <div className='background-colour-today-sales-div p-3 rounded-lg flex-1'>
@@ -289,25 +487,34 @@ export default function Dashboard() {
               <span className='text-white text-lg font-bold'>Top Products</span><br />
             </div>
             <div className='flex justify-center'>
-              <BarChart
-                width={600}
-                height={300}
-                data={productData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="popularity" fill="#8884d8">
-                  {productData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
+              {productData.length > 0 ? (
+                  <BarChart
+                      width={600}
+                      height={300}
+                      data={productData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="popularity" fill="#8884d8">
+                      {productData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+              ) : (
+                  <p>No data available</p>
+              )}
             </div>
           </div>
-  
+
+
+
+
+
+
           {/* Pie Chart */}
           <div className="background-colour-today-sales-div text-white flex-1 p-3 rounded-lg">
             <div className="ml-2 mt-1">
