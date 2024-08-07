@@ -330,7 +330,6 @@ export default function ReturnPhone() {
         }
     };
 
-
     const clearForm = () => {
         setImei('');
         setModel('');

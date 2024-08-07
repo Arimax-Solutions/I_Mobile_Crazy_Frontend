@@ -6,7 +6,7 @@ function NavigationMenu() {
     const [select, setSelect] = useState<string>("Reports");
 
     return (
-        <nav className="fixed top-10 left-0 pt-3 flex flex-col min-w-[270px] w-[270px] h-[90%] bg-[#1D1D27] rounded-r-[40px] items-center overflow-hidden">
+        <nav className="fixed top-8 left-0 pt-3 flex flex-col min-w-[270px] w-[270px] h-[95%] bg-[#1D1D27] rounded-r-[40px] items-center overflow-hidden">
             <div className='mt-2 self-start pl-8'>
                 <img width={"120px"} src="src/assets/images/logo.png" alt="company logo" />
             </div>
