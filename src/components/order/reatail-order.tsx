@@ -32,8 +32,20 @@ const style = {
     p: 4,
     borderRadius: "10px"
 };
+interface Item {
+    item_id: string;
+    category: string;
+    brand: string;
+    name: string;
+    colour: string;
+    warranty_period: string;
+    qty: string;
+    price: string;
+}
+
 
 export default function RetailOrder(prop: IProp) {
+
     const [customerEmail, setCustomerEmail] = useState("");
     const [customerContactNumber, setCustomerContactNumber] = useState("");
     const [customerNic, setCustomerNic] = useState("");
@@ -49,7 +61,7 @@ export default function RetailOrder(prop: IProp) {
     });
 
     const [phones, setPhones] = useState<Array<typeof phone>>([]);
-    const [multiplePhones, setMultiplePhones] = useState<Array<typeof phone>>([]);
+    /*const [multiplePhones, setMultiplePhones] = useState<Array<typeof phone>>([]);*/
     const [contactNumber, setContactNumber] = useState<string>("");
     const [customerName, setCustomerName] = useState<string>("");
     const [customerOutstanding, setCustomerOutstanding] = useState<string>("");
@@ -105,9 +117,9 @@ export default function RetailOrder(prop: IProp) {
                 nic: customerNic,
             });
 
-            //const { id } = response.data; // Adjust this to match the actual response structure
+            const { id } = response.data; // Adjust this to match the actual response structure
 
-            //setCustomerId(id);
+            setCustomerId(id);
             prop.handleAddNewCustomerModelClose();
             await Swal.fire({
                 title: 'Success!',
@@ -128,11 +140,11 @@ export default function RetailOrder(prop: IProp) {
     }
 
 
-    function handleAddPhone() {
+    /*function handleAddPhone() {
         setPhones([...phones, ...multiplePhones]);
         setMultiplePhones([]);
         prop.handleAddNewPhoneModelClose();
-    }
+    }*/
 
     function handleAddMultiplePhones() {
         if (phone.imei) { // Ensure IMEI is not empty
@@ -159,7 +171,7 @@ export default function RetailOrder(prop: IProp) {
     }
 
 
-    const [itemData, setItemData] = useState({
+    const [itemData, setItemData] = React.useState<Item>({
         item_id: '',
         category: '',
         brand: '',
@@ -170,7 +182,7 @@ export default function RetailOrder(prop: IProp) {
         price: ''
     });
 
-    const [items, setItems] = useState([]);
+    const [items, setItems] = React.useState<Item[]>([]);
 
     const handleFetchItemData = async () => {
         try {
@@ -205,7 +217,7 @@ export default function RetailOrder(prop: IProp) {
         }
     };
 
-    const handleKeyPress = (event) => {
+    const handleKeyPress = (event:any) => {
         if (event.key === 'Enter') {
             handleFetchItemData();
         }
@@ -241,9 +253,9 @@ export default function RetailOrder(prop: IProp) {
         setContactNumber(e.target.value);
     };
 
-    const handleCustomerIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    /*const handleCustomerIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setcustomerId(e.target.value);
-    };
+    };*/
 
     const fetchCustomerName = async () => {
         try {
@@ -297,7 +309,7 @@ export default function RetailOrder(prop: IProp) {
                         readOnly
                     />
                 </div>
-                {customerOutstanding > 0 && (
+                {+customerOutstanding > 0 && (
                     <div className='mt-2 text-red-500'>
                         Outstanding Amount: {customerOutstanding}
                     </div>
@@ -348,7 +360,7 @@ export default function RetailOrder(prop: IProp) {
                             </tr>
                             </thead>
                             <tbody className='overflow-y-auto max-h-80'>
-                            {items.map((item, index) => (
+                            {items.map((item:any, index:number) => (
                                 <tr key={index} className='text-white font-semibold hover:bg-gray-700 text-xs'>
                                     <td className='px-2 py-1 truncate'>{item.brand}</td>
                                     <td className='px-2 py-1 truncate'>{item.category}</td>

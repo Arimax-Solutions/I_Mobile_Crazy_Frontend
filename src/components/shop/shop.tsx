@@ -75,7 +75,7 @@ function Shop() {
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
+        }).then((result:any) => {
             axios.delete(`${backend_url}/api/shop/${shopId}`).then(() => {
                 Swal.fire({
                     title: "Deleted!",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import TopNavbar from "../topNavbar.tsx";
 import Combobox from "../combobox/combobox.tsx";
 import Button from "../crudbuttons/buttons.tsx";
@@ -30,7 +30,6 @@ export default function ReturnItem() {
     const [reason, setReason] = useState<string>('');
     const [contact_number, setContact_number] = useState<string>('');
     const [token, setToken] = useState<string>('');
-    const [items, setItems] = useState<ReturnPhones[]>([]);
 
     useEffect(() => {
         fetchReturnItem();

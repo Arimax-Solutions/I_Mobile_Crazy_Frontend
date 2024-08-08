@@ -48,11 +48,11 @@ export default function ReturnPhone() {
     const [contact_number, setContact_number] = useState<string>('');
     const [customer_id, setCustomer_id] = useState<string>('');
     const [shop_id, setShop_id] = useState<string>('');
-    const [return_phone_id, setReturn_phone_id] = useState<string>('');
+    const [ setReturn_phone_id] = useState<string>('');
     const [token, setToken] = useState<string>('');
     const [items, setItems] = useState<PhoneData[]>([]);
     const [selectedItem, setSelectedItem] = useState<PhoneData | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [ setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
         // Retrieve token from localStorage
