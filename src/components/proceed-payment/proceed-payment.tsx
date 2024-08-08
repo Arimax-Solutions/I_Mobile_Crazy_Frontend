@@ -82,6 +82,7 @@ const ProceedPayment: React.FC = () => {
 
   const {returnPhones,shopNameReturn,shopIdReturn,shopContactNumberReturn,outstandingReturn}:any = location.state || { returnPhones: [], shopNameReturn: '',shopIdReturn: '',shopContactNumberReturn: '',outstandingReturn: ''};
 
+
   switch (orderType) {
     case "retail-order":
         const discountRef = useRef(null);

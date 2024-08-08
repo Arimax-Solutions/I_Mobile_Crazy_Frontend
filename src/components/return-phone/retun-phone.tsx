@@ -48,11 +48,14 @@ export default function ReturnPhone() {
     const [contact_number, setContact_number] = useState<string>('');
     const [customer_id, setCustomer_id] = useState<string>('');
     const [shop_id, setShop_id] = useState<string>('');
-    const [ setReturn_phone_id] = useState<string>('');
+    const [return_phone_id, setReturn_phone_id] = useState<string>('');
     const [token, setToken] = useState<string>('');
     const [items, setItems] = useState<PhoneData[]>([]);
     const [selectedItem, setSelectedItem] = useState<PhoneData | null>(null);
-    const [ setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    console.log(return_phone_id);
+    console.log(isLoading);
 
     useEffect(() => {
         // Retrieve token from localStorage
@@ -75,7 +78,7 @@ export default function ReturnPhone() {
                     }
                 });
                 setItems(response.data.data);
-                console.log(response.data.data)
+                console.log(response.data.data);
             } catch (error) {
                 Swal.fire({
                     title: 'Error!',

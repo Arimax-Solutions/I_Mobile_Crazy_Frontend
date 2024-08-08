@@ -99,6 +99,7 @@ const Item = () => {
                 }
             );
 
+            console.log(response);
             // Show success alert
             Swal.fire({
                 title: 'Success!',
@@ -148,6 +149,8 @@ const Item = () => {
                 }
             );
 
+            console.log(response)
+
             // Show success alert
             Swal.fire({
                 title: 'Success!',
@@ -183,7 +186,7 @@ const Item = () => {
 
     // Function to handle updating an item
     const handleItemUpdateOnClick = async () => {
-        if (!validateForm()) {
+        if (!validateForm() || !selectedItem) {
             return;
         }
 
@@ -194,12 +197,13 @@ const Item = () => {
             colour,
             price: parseFloat(price),
             warranty_period,
-            qty
+            qty,
         };
 
         try {
             const response = await axios.put(
-                `${backend_url}/api/items/${selectedItem.item_id}`, updatedItemData,
+                `${backend_url}/api/items/${selectedItem.item_id}`,
+                updatedItemData,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -207,13 +211,14 @@ const Item = () => {
                     },
                 }
             );
+            console.log(response);
 
             // Show success alert
             Swal.fire({
                 title: 'Success!',
                 text: 'Item updated successfully',
                 icon: 'success',
-                confirmButtonText: 'OK'
+                confirmButtonText: 'OK',
             });
 
             // Clear selected item and input fields after update
@@ -236,10 +241,11 @@ const Item = () => {
                 title: 'Error!',
                 text: 'Failed to update item',
                 icon: 'error',
-                confirmButtonText: 'OK'
+                confirmButtonText: 'OK',
             });
         }
     };
+
 
     const validateForm = (): boolean => {
         const newErrors: { [key: string]: string } = {};

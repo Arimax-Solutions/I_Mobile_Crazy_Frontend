@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TopNavbar from "../topNavbar";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -84,9 +84,9 @@ function Shop() {
                 });
                 fetchAllShopData();
             });
-            // if (result.isConfirmed) {
-
-            // }
+            if (result.isConfirmed) {
+                console.log(result)
+            }
         });
     }
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginForm from './components/loginForm';
 import Dashboard from './components/dashboard/dashboard.tsx';

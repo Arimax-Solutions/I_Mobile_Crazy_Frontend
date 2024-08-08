@@ -1,5 +1,4 @@
-// @ts-ignore
-import React, {useEffect, useState} from 'react';
+import  { useEffect, useState } from 'react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line } from 'recharts';
 import TopNavbar from '../topNavbar.tsx';
@@ -7,6 +6,11 @@ import axios from "axios";
 import html2canvas from "html2canvas";
 import {jsPDF} from "jspdf";
 import logo from '../../assets/images/logo.png';
+
+interface StockData {
+  [model: string]: number;
+}
+
 
 const data = [
   { name: 'Label 1', value: 36638465.14 },
@@ -16,12 +20,12 @@ const data = [
   { name: 'Label 5', value: 12212821.83 }
 ];
 
-const productData = [
+/*const productData = [
   { name: 'iPhone 13 Pro', popularity: 46, color: '#FFBB28' },
   { name: 'iPhone 12 Pro', popularity: 17, color: '#00C49F' },
   { name: 'iPhone 8+', popularity: 19, color: '#0088FE' },
   { name: 'iPhone X', popularity: 29, color: '#FF8042' }
-];
+];*/
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF4848'];
 
@@ -51,13 +55,12 @@ const weeklyOrderIncrementData = [
   { day: 'Sunday', orders: 40 }
 ];
 
-
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpen1, setIsModalOpen1] = useState(false);
   const [orders, setOrders] = useState([]);
   const [totalIncome, setTotalIncome] = useState(0);
-  const [stockData, setStockData] = useState({});
+  const [stockData, setStockData] = useState<StockData>({});
   const [totalIncomeMonth, setTotalIncomeMonth] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
   const [soldCount, setSoldCount] = useState(0);
@@ -69,7 +72,7 @@ export default function Dashboard() {
         const retailResponse = await axios.get('http://localhost:8080/api/retailOrder/today');
         const wholesaleResponse = await axios.get('http://localhost:8080/api/retailOrder/wholesale/today');
         const returnResponse = await axios.get('http://localhost:8080/api/retailOrder/return/today');
-        const combinedOrders = [...retailResponse.data, ...wholesaleResponse.data, ...returnResponse.data];
+        const combinedOrders:any = [...retailResponse.data, ...wholesaleResponse.data, ...returnResponse.data];
         setOrders(combinedOrders);
         calculateTotalIncome(combinedOrders);
       } catch (error) {
@@ -80,8 +83,8 @@ export default function Dashboard() {
     fetchOrders();
   }, []);
 
-  const calculateTotalIncome = (orders) => {
-    const total = orders.reduce((sum, order) => sum + order.total_amount, 0);
+  const calculateTotalIncome = (orders:any) => {
+    const total = orders.reduce((sum:any, order:any) => sum + order.total_amount, 0);
     setTotalIncome(total);
   };
 
@@ -97,45 +100,48 @@ export default function Dashboard() {
 
   const saveToPDF = () => {
     const input = document.getElementById('pdf-content');
+    if (input) {
+      html2canvas(input, { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 295; // A4 height in mm
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
 
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 295; // A4 height in mm
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      let heightLeft = imgHeight;
+        let position = 0;
 
-      let position = 0;
-
-      // Add header
-      pdf.setFontSize(12);
-      pdf.setTextColor(40);
-      pdf.addImage(logo, 'PNG', 10, 10, 30, 30);
-      pdf.text('I Mobile Crazy', 50, 20);
-      pdf.text('Income Report', 50, 30);
-      pdf.text(`Date: ${new Date().toLocaleDateString()}`, 50, 40);
-      pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
-
-      pdf.addImage(imgData, 'PNG', 0, 60, imgWidth, imgHeight);
-      heightLeft -= (pageHeight - 60);
-
-      while (heightLeft >= 0) {
-        pdf.addPage();
+        // Add header
+        pdf.setFontSize(12);
+        pdf.setTextColor(40);
         pdf.addImage(logo, 'PNG', 10, 10, 30, 30);
-        pdf.text('Shop Name', 50, 20);
+        pdf.text('I Mobile Crazy', 50, 20);
         pdf.text('Income Report', 50, 30);
         pdf.text(`Date: ${new Date().toLocaleDateString()}`, 50, 40);
         pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
 
-        position = heightLeft - imgHeight;
-        pdf.addImage(imgData, 'PNG', 0, position + 60, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+        pdf.addImage(imgData, 'PNG', 0, 60, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - 60);
 
-      pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
-      pdf.save('income-report.pdf');
-    });
+        while (heightLeft >= 0) {
+          pdf.addPage();
+          pdf.addImage(logo, 'PNG', 10, 10, 30, 30);
+          pdf.text('Shop Name', 50, 20);
+          pdf.text('Income Report', 50, 30);
+          pdf.text(`Date: ${new Date().toLocaleDateString()}`, 50, 40);
+          pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
+
+          position = heightLeft - imgHeight;
+          pdf.addImage(imgData, 'PNG', 0, position + 60, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
+        pdf.save('income-report.pdf');
+      });
+    } else {
+      console.error('The element with the specified ID was not found.');
+    }
   };
 
   useEffect(() => {
@@ -170,38 +176,39 @@ export default function Dashboard() {
 
   const saveToPDFStock = () => {
     const input = document.getElementById('pdf-content');
+    if(input){
+      html2canvas(input, { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 295; // A4 height in mm
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
 
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 295; // A4 height in mm
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      let heightLeft = imgHeight;
+        let position = 0;
 
-      let position = 0;
-
-      // Add header
-      pdf.setFontSize(12);
-      pdf.setTextColor(40);
-      pdf.text('Stock Report', 14, 20);
-      pdf.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
-
-      pdf.addImage(imgData, 'PNG', 0, 40, imgWidth, imgHeight);
-      heightLeft -= (pageHeight - 40);
-
-      while (heightLeft >= 0) {
-        pdf.addPage();
+        // Add header
+        pdf.setFontSize(12);
+        pdf.setTextColor(40);
         pdf.text('Stock Report', 14, 20);
         pdf.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
 
-        position = heightLeft - imgHeight;
-        pdf.addImage(imgData, 'PNG', 0, position + 40, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+        pdf.addImage(imgData, 'PNG', 0, 40, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - 40);
 
-      pdf.save('stock-report.pdf');
-    });
+        while (heightLeft >= 0) {
+          pdf.addPage();
+          pdf.text('Stock Report', 14, 20);
+          pdf.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+
+          position = heightLeft - imgHeight;
+          pdf.addImage(imgData, 'PNG', 0, position + 40, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        pdf.save('stock-report.pdf');
+      });
+    }
   };
   useEffect(() => {
   const fetchTotalIncome = async () => {
@@ -261,9 +268,10 @@ export default function Dashboard() {
 
   const productData = Object.keys(stockData).map(key => ({
     name: key,
-    popularity: stockData[key].saleCount,
-    color: stockData[key].color
+    popularity: stockData[key],
+    color: stockData[key]
   }));
+
 
   console.log('Product data:', productData);
 
@@ -271,7 +279,7 @@ export default function Dashboard() {
     <div className='m-4 w-full'>
       <div className='m-4'>
         <TopNavbar />
-  
+
         {/* Buttons */}
         <div className='flex flex-wrap justify-around mt-5 gap-5'>
           {/*Income Report*/}
@@ -297,10 +305,10 @@ export default function Dashboard() {
                         </tr>
                         </thead>
                         <tbody>
-                        {orders.map((order) => (
+                        {orders.map((order:any) => (
                             <>
                               {/* Display items */}
-                              {order.items?.map((item) => (
+                              {order.items?.map((item:any) => (
                                   <tr key={`${order.retail_order_id || order.wholesale_order_id || order.return_order_id}-item-${item.item_id}`}>
                                     <td className='py-2 px-4 border'>{order.retail_order_id || order.wholesale_order_id || order.return_order_id}</td>
                                     <td className='py-2 px-4 border'>{item.brand}</td>
@@ -312,7 +320,7 @@ export default function Dashboard() {
                               ))}
 
                               {/* Display imeis */}
-                              {order.imeis?.map((imei) => (
+                              {order.imeis?.map((imei:any) => (
                                   <tr key={`${order.retail_order_id || order.wholesale_order_id || order.return_order_id}-imei-${imei.id}`}>
                                     <td className='py-2 px-4 border'>{order.retail_order_id || order.wholesale_order_id || order.return_order_id}</td>
                                     <td className='py-2 px-4 border'>{imei.modelId?.name || 'N/A'}</td>
@@ -399,7 +407,7 @@ export default function Dashboard() {
             Daily Cost<img src={'src/assets/icons/daily cost.svg'} className='ml-2' alt='icon' />
           </button>
         </div>
-  
+
          {/* 1st row */}
       <div className='flex justify-between mt-5'>
         <div className='background-colour-today-sales-div p-3 rounded-lg flex-1 mr-4'>
@@ -452,7 +460,7 @@ export default function Dashboard() {
         </div>
 
 
-  
+
           {/* 1st Row Right Side Chart */}
           <div className="background-colour-today-sales-div text-white flex-1 p-3 rounded-lg">
             <div className="ml-2 mt-1">
@@ -499,7 +507,7 @@ export default function Dashboard() {
                     <YAxis />
                     <Tooltip />
                     <Bar dataKey="popularity" fill="#8884d8">
-                      {productData.map((entry, index) => (
+                      {productData.map((entry:any, index:number) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Bar>
@@ -533,7 +541,11 @@ export default function Dashboard() {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>)}
+                    {data.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>
+                    ))}
+
+
                   </Pie>
                   <Tooltip />
                   <Legend />
@@ -542,7 +554,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-  
+
         {/* 3rd Row */}
         <div className='flex flex-col lg:flex-row mt-2 gap-4'>
           {/* 3rd Row 1st Div */}
@@ -560,7 +572,7 @@ export default function Dashboard() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-  
+
           {/* 3rd Row 2nd Div */}
           <div className='background-colour-today-sales-div flex-1 rounded-lg'>
             <div className="ml-2 p-3">
@@ -580,4 +592,4 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}  
+}
