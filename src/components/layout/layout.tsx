@@ -1,8 +1,7 @@
-import React from 'react';
 import NavigationMenu from "../ui/navbar/navbar";
 import { Outlet } from 'react-router-dom';
 
-function Layout({ children }: any) {
+function Layout() {
     return (
         <div className="flex min-h-screen bg-[#14141E]">
             <div className="w-full md:w-[25vw] lg:w-[20vw] xl:w-[15vw] p-4">

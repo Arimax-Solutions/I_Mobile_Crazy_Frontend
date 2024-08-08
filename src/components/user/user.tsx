@@ -231,6 +231,7 @@ const User: React.FC = () => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
+            console.log(response);
 
             Swal.fire({
                 title: 'Success!',
