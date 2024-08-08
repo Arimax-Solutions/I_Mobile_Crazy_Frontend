@@ -73,7 +73,8 @@ interface ReturnPhone {
 }
 
 
-const ProceedPayment: React.FC = () => {
+const ProceedPayment: React.FC<any> = (props:any) => {
+  console.log(props)
   const { orderType } = useParams<{ orderType: string }>();
   const location = useLocation() as unknown as { state: ProceedPaymentProps };
   const { wholesalePhones, wholesaleItems, shopName, shopId, shopContactNumber, outstanding, address, shopEmail, shopOwnerNic, shopCreditLimit }:any = location.state || { wholesalePhones: [], wholesaleItems: [], shopName: '', shopContactNumber: '', shopId: '', outstanding: 0, address: '', shopEmail: '', shopOwnerNic: '', shopCreditLimit: 0 };
