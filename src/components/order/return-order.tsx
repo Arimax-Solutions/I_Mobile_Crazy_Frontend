@@ -35,10 +35,10 @@ export default function ReturnOrder(prop:IProp) {
     const [shopNameReturn, setShopNameReturn] = useState<string>("");
     const [shopContactNumberReturn, setshopContactNumberReturn] = useState<string>("");
     const [outstandingReturn, setOutstandingReturn] = useState<string>("");
-    const [addressReturn, setAddressReturn] = useState<string>("");
-    const [shopEmailReturn, setShopEmailReturn] = useState<string>("");
-    const [shopOwnerNicReturn, setShopOwnerNiReturnc] = useState<string>("");
-    const [shopCreditLimitReturn, setShopCreditLimitReturn] = useState<string>("");
+    const [addressReturn] = useState<string>("");
+    const [shopEmailReturn] = useState<string>("");
+    const [shopOwnerNicReturn] = useState<string>("");
+    const [shopCreditLimitReturn] = useState<string>("");
     const [returnPhone, setreturnPhone] = useState({
         imei: "",
         modelName: "",  // Include modelName field
@@ -48,7 +48,7 @@ export default function ReturnOrder(prop:IProp) {
     });
 
     const [returnPhones, setreturnPhones] = useState<Array<typeof returnPhone>>([]);
-    const [multiplereturnPhones, setMultiplereturnPhones] = useState<Array<typeof returnPhone>>([]);
+    /*const [multiplereturnPhones, setMultiplereturnPhones] = useState<Array<typeof returnPhone>>([]);*/
 
     const handleshopContactNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setshopContactNumberReturn(e.target.value);
@@ -86,11 +86,11 @@ export default function ReturnOrder(prop:IProp) {
         }
     };
 
-    function handleAddreturnPhones() {
+    /*function handleAddreturnPhones() {
         setreturnPhones([...returnPhone, ...multiplereturnPhones]);
         setMultiplereturnPhones([]);
         prop.handleAddNewPhoneModelClose();
-    }
+    }*/
 
     function handleAddMultiplereturnPhones() {
         console.log("Works")
@@ -171,7 +171,7 @@ export default function ReturnOrder(prop:IProp) {
                         readOnly
                     />
                 </div>
-                {outstandingReturn > 0 && (
+                {+outstandingReturn > 0 && (
                     <div className='mt-2 text-red-500'>
                         Outstanding Amount: {outstandingReturn}
                     </div>

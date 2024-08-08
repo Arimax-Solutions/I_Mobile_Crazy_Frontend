@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import TopNavbar from '../topNavbar';
 import Combobox from '../combobox/combobox';
 import Button from '../crudbuttons/buttons';

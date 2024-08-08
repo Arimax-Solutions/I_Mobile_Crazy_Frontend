@@ -29,6 +29,16 @@ const style = {
     p: 4,
     borderRadius: "10px"
 };
+interface WholesaleItem {
+    item_id: string;
+    category: string;
+    brand: string;
+    name: string;
+    colour: string;
+    warranty_period: string;
+    qty: string;
+    price: string;
+}
 
 export default function WholeSaleOrder(prop:IProp) {
     const navigate = useNavigate();
@@ -36,10 +46,10 @@ export default function WholeSaleOrder(prop:IProp) {
     const [shopName, setShopName] = useState<string>("");
     const [shopContactNumber, setshopContactNumber] = useState<string>("");
     const [outstanding, setOutstanding] = useState<string>("");
-    const [address, setAddress] = useState<string>("");
-    const [shopEmail, setShopEmail] = useState<string>("");
-    const [shopOwnerNic, setShopOwnerNic] = useState<string>("");
-    const [shopCreditLimit, setShopCreditLimit] = useState<string>("");
+    const [address] = useState<string>("");
+    const [shopEmail] = useState<string>("");
+    const [shopOwnerNic] = useState<string>("");
+    const [shopCreditLimit] = useState<string>("");
     const [wholesalePhone, setwholesalePhone] = useState({
         imei: "",
         modelId: "",
@@ -52,9 +62,7 @@ export default function WholeSaleOrder(prop:IProp) {
     });
 
     const [wholesalePhones, setwholesalePhones] = useState<Array<typeof wholesalePhone>>([]);
-    const [multiplewholesalePhones, setMultiplewholesalePhones] = useState<Array<typeof wholesalePhone>>([]);
-
-    console.log("Wholesale : "+outstanding);
+    /*const [multiplewholesalePhones, setMultiplewholesalePhones] = useState<Array<typeof wholesalePhone>>([]);*/
 
     const handleshopContactNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setshopContactNumber(e.target.value);
@@ -91,11 +99,11 @@ export default function WholeSaleOrder(prop:IProp) {
         }
     };
 
-    function handleAddwholesalePhones() {
+    /*function handleAddwholesalePhones() {
         setwholesalePhones([...wholesalePhone, ...multiplewholesalePhones]);
         setMultiplewholesalePhones([]);
         prop.handleAddNewPhoneModelClose();
-    }
+    }*/
 
     function handleAddMultiplewholesalePhones() {
         if (wholesalePhone.imei) { // Ensure IMEI is not empty
@@ -122,7 +130,7 @@ export default function WholeSaleOrder(prop:IProp) {
     }
 
 
-    const [wholesaleItemData, setwholesaleItemData] = useState({
+    const [wholesaleItemData, setwholesaleItemData] = useState<WholesaleItem>({
         item_id: '',
         category: '',
         brand: '',
@@ -133,7 +141,7 @@ export default function WholeSaleOrder(prop:IProp) {
         price: ''
     });
 
-    const [wholesaleItems, setwholesaleItems] = useState([]);
+    const [wholesaleItems] = useState([]);
 
     const handleFetchwholesaleItemData = async () => {
         try {
@@ -151,7 +159,7 @@ export default function WholeSaleOrder(prop:IProp) {
                     price: item.price
                 });
             } else {
-                setIwholesaleItemData({
+                setwholesaleItemData({
                     item_id: '',
                     category: '',
                     brand: '',
@@ -168,7 +176,7 @@ export default function WholeSaleOrder(prop:IProp) {
         }
     };
 
-    const handleKeyPress = (event) => {
+    const handleKeyPress = (event:any) => {
         if (event.key === 'Enter') {
             handleFetchwholesaleItemData();
         }
@@ -176,7 +184,6 @@ export default function WholeSaleOrder(prop:IProp) {
 
     const handleAddItem = () => {
         if (wholesaleItemData.name) {
-            setwholesaleItems([...wholesaleItems, wholesaleItemData]); // Add the new item to the list
             setwholesaleItemData({
                 item_id: '',
                 category: '',
@@ -226,6 +233,7 @@ export default function WholeSaleOrder(prop:IProp) {
             fetchPhoneDetails(wholesalePhone.imei);
         }
     }
+
     const handleProceedToPaymentWholesale = (orderType: string) => {
         console.log("ID : " + shopId);
         navigate(`/orderType/${orderType}`, {
@@ -253,7 +261,7 @@ export default function WholeSaleOrder(prop:IProp) {
                     readOnly
                 />
             </div>
-            {outstanding > 0 && (
+            {+outstanding > 0 && (
                 <div className='mt-2 text-red-500'>
                     Outstanding Amount: {outstanding}
                 </div>
@@ -304,7 +312,7 @@ export default function WholeSaleOrder(prop:IProp) {
                     </tr>
                     </thead>
                     <tbody className='overflow-y-auto max-h-80'>
-                    {wholesaleItems.map((wholesaleItem, index) => (
+                    {wholesaleItems.map((wholesaleItem:any, index:number) => (
                         <tr key={index} className='text-white font-semibold hover:bg-gray-700 text-xs'>
                             <td className='px-2 py-1 truncate'>{wholesaleItem.brand}</td>
                             <td className='px-2 py-1 truncate'>{wholesaleItem.category}</td>

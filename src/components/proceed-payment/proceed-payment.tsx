@@ -1,471 +1,532 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React,{useEffect, useRef, useState} from 'react';
 import TopNavbar from '../topNavbar';
 import {useLocation, useParams} from 'react-router-dom';
 import axios from "axios";
 import {backend_url} from "../../utill/utill.ts";
 import Swal from "sweetalert2";
-import { jsPDF } from 'jspdf';
-import html2canvas from "html2canvas";
 
-export default function ProceedPayment() {
-  const { orderType } = useParams();
-  const location = useLocation();
-  const { phones, items , customerName, contactNumber, customerId ,customerOutstanding} = location.state || { phones: [], items: [], customerName: '', contactNumber: '' ,customerId: '',customerOutstanding: ''};
-  const { wholesalePhones, wholesaleItems , shopName, shopId ,shopContactNumber, outstanding,address,shopEmail,shopOwnerNic,shopCreditLimit} = location.state || { wholesalePhones: [], wholesaleItems: [], shopName: '',shopContactNumber: '',shopId: '',outstanding: '',address: '',shopEmail: '',shopOwnerNic: '',shopCreditLimit: ''};
+export interface WholesalePhone {
+  id: string;
+  imei: string;
+  storage: string;
+  colour: string;
+  ios_version: string;
+  battery_health: string;
+  price: number;
+  status: string;
+  isDeleted: boolean;
+}
 
-  const {returnPhones,shopNameReturn,shopIdReturn,shopContactNumberReturn,outstandingReturn,addressReturn,shopEmailReturn,shopOwnerNicReturn,shopCreditLimitReturn} = location.state || { returnPhones: [], shopNameReturn: '',shopIdReturn: '',shopContactNumberReturn: '',outstandingReturn: '',addressReturn: '',shopEmailReturn: '',shopOwnerNicReturn: '',shopCreditLimitReturn: ''};
-  console.log("Outstanding shop : "+outstanding);
+export interface WholesaleItem {
+  item_id: string;
+  category: string;
+  brand: string;
+  name: string;
+  colour: string;
+  warranty_period: string;
+  qty: number;
+  price: number;
+}
+
+export interface ProceedPaymentProps {
+  wholesalePhones: WholesalePhone[];
+  wholesaleItems: WholesaleItem[];
+  shopName: string;
+  shopContactNumber: string;
+  shopId: string;
+  outstanding: number;
+  address: string;
+  shopEmail: string;
+  shopOwnerNic: string;
+  shopCreditLimit: number;
+}
+
+interface Item {
+  item_id: number;
+  category: string;
+  brand: string;
+  name: string;
+  colour: string;
+  warranty_period: string;
+  qty: number;
+  price: number;
+}
+
+interface Phone {
+  id: number;
+  modelName: string;
+  imei: string;
+  storage: string;
+  colour: string;
+  ios_version: string;
+  battery_health: string;
+  price: number;
+  warranty: string;
+}
+
+interface ReturnPhone {
+  id: string;
+  imei: string;
+  storage: string;
+  colour: string;
+  price: number;
+}
+
+
+const ProceedPayment: React.FC = () => {
+  const { orderType } = useParams<{ orderType: string }>();
+  const location = useLocation() as unknown as { state: ProceedPaymentProps };
+  const { wholesalePhones, wholesaleItems, shopName, shopId, shopContactNumber, outstanding, address, shopEmail, shopOwnerNic, shopCreditLimit }:any = location.state || { wholesalePhones: [], wholesaleItems: [], shopName: '', shopContactNumber: '', shopId: '', outstanding: 0, address: '', shopEmail: '', shopOwnerNic: '', shopCreditLimit: 0 };
+
+  const { phones, items , customerName, contactNumber, customerId ,customerOutstanding}:any = location.state || { phones: [], items: [], customerName: '', contactNumber: '' ,customerId: '',customerOutstanding: ''};
+
+  const {returnPhones,shopNameReturn,shopIdReturn,shopContactNumberReturn,outstandingReturn}:any = location.state || { returnPhones: [], shopNameReturn: '',shopIdReturn: '',shopContactNumberReturn: '',outstandingReturn: ''};
 
   switch (orderType) {
     case "retail-order":
-      const discountRef = useRef(null);
-      const [discount, setDiscount] = useState(0);
-      const [subtotal, setSubtotal] = useState(0);
-      const [totalAfterDiscount, setTotalAfterDiscount] = useState(0);
-      const [balance, setBalance] = useState(0);
-      const [customerAmount, setCustomerAmount] = useState(0);
+        const discountRef = useRef(null);
+        const [discount, setDiscount] = useState(0);
+        const [subtotal, setSubtotal] = useState(0);
+        const [totalAfterDiscount,setTotalAfterDiscount] = useState(0);
+        const [balance, setBalance] = useState(0);
+        const [customerAmount, setCustomerAmount] = useState(0);
 
-      useEffect(() => {
-        calculateTotals(discount, customerAmount);
-      }, [discount, customerAmount, phones, items, customerOutstanding]);
+        useEffect(() => {
+          calculateTotals(discount, customerAmount);
+        }, [discount, customerAmount, phones, items, customerOutstanding]);
 
-      const handleDiscountChange = (e) => {
-        const value = parseFloat(e.target.value) || 0;
-        setDiscount(value);
-      };
-
-      const handleCustomerAmountChange = (e) => {
-        const value = parseFloat(e.target.value) || 0;
-        setCustomerAmount(value);
-      };
-
-      const calculateTotals = (discountValue, customerAmountValue) => {
-        const totalPhonePrice = phones.reduce((sum, phone) => sum + (parseFloat(phone.price) || 0), 0);
-        const totalItemPrice = items.reduce((sum, item) => sum + (parseFloat(item.price * item.qty) || 0), 0);
-        const subtotalValue = totalPhonePrice + totalItemPrice - customerOutstanding;
-        const totalAfterDiscountValue = subtotalValue - discountValue;
-        const balanceValue = customerAmountValue-totalAfterDiscountValue;
-
-        setSubtotal(subtotalValue);
-        //setTotalAfterDiscount(totalAfterDiscountValue);
-        setBalance(balanceValue);
-
-        return {
-          subtotal: subtotalValue,
-          //totalAfterDiscount: totalAfterDiscountValue
-        };
-      };
-
-      const saveOrder = async () => {
-        console.log(`Saving order with discount`);
-        const { subtotal } = calculateTotals(discount, customerAmount);
-
-        console.log("SubTotal : "+subtotal+"  Discount : "+discount+"  Customer Amount : "+customerAmount+"  Total After Discount : "+(subtotal-discount));
-        const order = {
-          retail_order_id: 1, // This would typically be generated by your backend
-          discount: discount,
-          actual_price: subtotal,
-          total_amount: (subtotal-discount),
-          date: new Date().toISOString(), // Or any date you want to set
-          is_deleted: false,
-          customer: {
-            customer_id: customerId,
-            name: customerName,
-            contact_phone: contactNumber,
-            outstanding_balance: customerOutstanding
-          },
-          items: items.map(item => ({
-            item_id: item.item_id,
-            category: item.category,
-            brand: item.brand,
-            name: item.name,
-            colour: item.colour,
-            warranty_period: item.warranty_period,
-            qty: item.qty,
-            price: item.price
-          })),
-          imeis: phones.map(phone => ({
-            id: phone.id, // This needs to be included if you're tracking phones by id
-            model: phone.modelName,
-            imei: phone.imei,
-            storage: phone.storage,
-            colour: phone.colour,
-            ios_version: phone.ios_version,
-            battery_health: phone.battery_health,
-            price: phone.price,
-            warranty: phone.warranty
-          }))
+        const handleDiscountChange = (e:any) => {
+          const value = parseFloat(e.target.value) || 0;
+          setDiscount(value);
         };
 
-        try {
-          const response = await axios.post(`${backend_url}/api/retailOrder`, order);
-          /*// Create a new jsPDF instance
-                const doc = new jsPDF();
-          // Constants for layout
-                const topMargin = 20;
-                const sectionMargin = 10; // Margin between sections
-                const rowHeight = 10; // Height of each row
-                const pageWidth = 210; // A4 page width in mm
-                const pageHeight = 297; // A4 page height in mm
-                const leftMargin = 10; // Increased margin for content to fit within page
-                const rigthMargin = 140; // Increased margin for content to fit within page
-                const leftInsideMargin = 20;
-                const marginTop = 20;
+        /*const handleCustomerAmountChange = (e) => {
+          const value = parseFloat(e.target.value) || 0;
+          setCustomerAmount(value);
+        };*/
+
+        const calculateTotals = (discountValue:number, customerAmountValue:number) => {
+          const totalPhonePrice = phones.reduce((sum:any, phone:any) => sum + (parseFloat(phone.price) || 0), 0);
+          const totalItemPrice = items.reduce((sum: number, item: Item) => sum + (item.price * item.qty), 0);
+          const subtotalValue = totalPhonePrice + totalItemPrice - customerOutstanding;
+          const totalAfterDiscountValue = subtotalValue - discountValue;
+          const balanceValue = customerAmountValue - totalAfterDiscountValue;
+
+          setSubtotal(subtotalValue);
+          setTotalAfterDiscount(totalAfterDiscountValue);
+          setBalance(balanceValue);
+
+          return {
+            subtotal: subtotalValue,
+            totalAfterDiscount: totalAfterDiscountValue,
+          };
+        };
+
+        const saveOrder = async () => {
+          console.log(`Saving order with discount`);
+          const { subtotal } = calculateTotals(discount, customerAmount);
+
+          console.log("SubTotal : "+subtotal+"  Discount : "+discount+"  Customer Amount : "+customerAmount+"  Total After Discount : "+(subtotal-discount));
+          const order = {
+            retail_order_id: 1, // This would typically be generated by your backend
+            discount: discount,
+            actual_price: subtotal,
+            total_amount: (subtotal-discount),
+            date: new Date().toISOString(), // Or any date you want to set
+            is_deleted: false,
+            customer: {
+              customer_id: customerId,
+              name: customerName,
+              contact_phone: contactNumber,
+              outstanding_balance: customerOutstanding
+            },
+            items: items.map((item: Item) => ({
+              item_id: item.item_id,
+              category: item.category,
+              brand: item.brand,
+              name: item.name,
+              colour: item.colour,
+              warranty_period: item.warranty_period,
+              qty: item.qty,
+              price: item.price,
+            })),
+            imeis: phones.map((phone: Phone) => ({
+              id: phone.id, // This needs to be included if you're tracking phones by id
+              model: phone.modelName,
+              imei: phone.imei,
+              storage: phone.storage,
+              colour: phone.colour,
+              ios_version: phone.ios_version,
+              battery_health: phone.battery_health,
+              price: phone.price,
+              warranty: phone.warranty,
+            })),
+          };
+
+          try {
+            const response = await axios.post(`${backend_url}/api/retailOrder`, order);
+            /*!// Create a new jsPDF instance
+                  const doc = new jsPDF();
+            // Constants for layout
+                  const topMargin = 20;
+                  const sectionMargin = 10; // Margin between sections
+                  const rowHeight = 10; // Height of each row
+                  const pageWidth = 210; // A4 page width in mm
+                  const pageHeight = 297; // A4 page height in mm
+                  const leftMargin = 10; // Increased margin for content to fit within page
+                  const rigthMargin = 140; // Increased margin for content to fit within page
+                  const leftInsideMargin = 20;
+                  const marginTop = 20;
 
 
-                doc.setDrawColor(0, 0, 0); // Black color for border
-                doc.rect(leftMargin, topMargin, pageWidth - 2 * leftMargin, pageHeight - 2 * topMargin);
+                  doc.setDrawColor(0, 0, 0); // Black color for border
+                  doc.rect(leftMargin, topMargin, pageWidth - 2 * leftMargin, pageHeight - 2 * topMargin);
 
 
-                const headerY = topMargin + 10;
-                doc.setFontSize(18);
-                doc.setTextColor(0, 0, 255); // Blue color for header text
-                doc.text('INVOICE', pageWidth / 2, headerY, null, null, 'center');
-                doc.setFontSize(12);
-                doc.setTextColor(0, 0, 0); // Black color for other text
-                doc.text('I MOBILE CRAZY', pageWidth / 2, headerY + 10, null, null, 'center');
-                doc.text('NO.22, Kaluthara road', pageWidth / 2, headerY + 15, null, null, 'center');
-                doc.text('Bandaragama, Western 12530, Sri Lanka', pageWidth / 2, headerY + 20, null, null, 'center');
-                doc.text('Phone: 0777-234075', pageWidth / 2, headerY + 25, null, null, 'center');
-                doc.text('Fax: uldkrg@gmail.com', pageWidth / 2, headerY + 30, null, null, 'center');
+                  const headerY = topMargin + 10;
+                  doc.setFontSize(18);
+                  doc.setTextColor(0, 0, 255); // Blue color for header text
+                  doc.text('INVOICE', pageWidth / 2, headerY, null, null, 'center');
+                  doc.setFontSize(12);
+                  doc.setTextColor(0, 0, 0); // Black color for other text
+                  doc.text('I MOBILE CRAZY', pageWidth / 2, headerY + 10, null, null, 'center');
+                  doc.text('NO.22, Kaluthara road', pageWidth / 2, headerY + 15, null, null, 'center');
+                  doc.text('Bandaragama, Western 12530, Sri Lanka', pageWidth / 2, headerY + 20, null, null, 'center');
+                  doc.text('Phone: 0777-234075', pageWidth / 2, headerY + 25, null, null, 'center');
+                  doc.text('Fax: uldkrg@gmail.com', pageWidth / 2, headerY + 30, null, null, 'center');
 
-          // Draw header border with rounded corners
-                doc.setDrawColor(0, 0, 0); // Black color for border
-                //doc.roundedRect(leftMargin, headerY - 10, pageWidth - 2 * leftMargin, 50, 5, 5); // x, y, width, height, rx, ry
+            // Draw header border with rounded corners
+                  doc.setDrawColor(0, 0, 0); // Black color for border
+                  //doc.roundedRect(leftMargin, headerY - 10, pageWidth - 2 * leftMargin, 50, 5, 5); // x, y, width, height, rx, ry
 
-          // Customer and Invoice Details
-                const customerY = headerY + 50;
-                doc.setFontSize(12);
-                doc.setTextColor(0, 0, 0); // Black color for text
-                doc.text('BILL TO:', leftInsideMargin, customerY);
-                doc.text(order.customer.name, leftInsideMargin, customerY + 5);
-                doc.text(order.customer.contact_phone, leftInsideMargin, customerY + 10);
+            // Customer and Invoice Details
+                  const customerY = headerY + 50;
+                  doc.setFontSize(12);
+                  doc.setTextColor(0, 0, 0); // Black color for text
+                  doc.text('BILL TO:', leftInsideMargin, customerY);
+                  doc.text(order.customer.name, leftInsideMargin, customerY + 5);
+                  doc.text(order.customer.contact_phone, leftInsideMargin, customerY + 10);
 
-                doc.text(`Invoice Number: ${order.retail_order_id}`, rigthMargin, customerY);
-                doc.text(`Invoice Date: ${new Date(order.date).toLocaleDateString()}`, rigthMargin, customerY + 5);
-                doc.text(`Payment Due: ${new Date(order.date).toLocaleDateString()}`, rigthMargin, customerY + 10);
+                  doc.text(`Invoice Number: ${order.retail_order_id}`, rigthMargin, customerY);
+                  doc.text(`Invoice Date: ${new Date(order.date).toLocaleDateString()}`, rigthMargin, customerY + 5);
+                  doc.text(`Payment Due: ${new Date(order.date).toLocaleDateString()}`, rigthMargin, customerY + 10);
 
 
-          // Table headers
-                const tableHeaderY = customerY +20 + marginTop;
-                const headers = ['Items', 'Quantity', 'Price', 'Amount'];
-                const headerWidths = [60, 40, 40, 50]; // Widths of each column
-                const headerStartX = [leftInsideMargin, leftMargin + 80, leftMargin + 120, leftMargin + 150]; // X positions for each column
+            // Table headers
+                  const tableHeaderY = customerY +20 + marginTop;
+                  const headers = ['Items', 'Quantity', 'Price', 'Amount'];
+                  const headerWidths = [60, 40, 40, 50]; // Widths of each column
+                  const headerStartX = [leftInsideMargin, leftMargin + 80, leftMargin + 120, leftMargin + 150]; // X positions for each column
 
-                doc.setFillColor(0, 0, 128);
-                doc.setTextColor(255, 255, 255);
+                  doc.setFillColor(0, 0, 128);
+                  doc.setTextColor(255, 255, 255);
 
-                doc.rect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, rowHeight, 'F');
+                  doc.rect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, rowHeight, 'F');
 
-                doc.setFontSize(12);
+                  doc.setFontSize(12);
 
-          // Center text in the header row
-                headers.forEach((header, index) => {
-                  const x = headerStartX[index] + 2; // Apply the left margin
-                  const y = tableHeaderY - (rowHeight / 2) + 4; // Adjust y to center text
-                  doc.text(header, x, y, null, null, 'left');
-                });
-
-          // Reset text color for table content
-                doc.setTextColor(0, 0, 0); // Black text
-
-          // Draw table header border
-                doc.rect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, rowHeight); // x, y, width, height
-
-          // Start Y for items
-                let startY = tableHeaderY + rowHeight;
-
-          // Include item data only if available
-                if (order.items.length > 0) {
-                  order.items.forEach((item, index) => {
-                    doc.text(`${item.name} - ${item.warranty_period} WARRANTY`, leftInsideMargin, startY + index * 10);
-                    doc.text(`${item.qty}`, leftMargin + 80, startY + index * 10);
-                    doc.text(`₨${item.price.toFixed(2)}`, leftMargin + 120, startY + index * 10);
-                    doc.text(`₨${(item.qty * item.price).toFixed(2)}`, leftMargin + 150, startY + index * 10);
+            // Center text in the header row
+                  headers.forEach((header, index) => {
+                    const x = headerStartX[index] + 2; // Apply the left margin
+                    const y = tableHeaderY - (rowHeight / 2) + 4; // Adjust y to center text
+                    doc.text(header, x, y, null, null, 'left');
                   });
 
-                  // Draw items border with rounded corners
-                  doc.roundedRect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, startY - tableHeaderY + order.items.length * 10, 5, 5); // x, y, width, height, rx, ry
+            // Reset text color for table content
+                  doc.setTextColor(0, 0, 0); // Black text
 
-                  // Update Y for IMEIs
-                  startY = startY + order.items.length * 10 + sectionMargin;
-                }
+            // Draw table header border
+                  doc.rect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, rowHeight); // x, y, width, height
 
-          // Include IMEI data only if available
-                if (order.imeis.length > 0) {
-                  doc.text('Phones', leftMargin, startY);
-                  order.imeis.forEach((imei, index) => {
-                    doc.text(`${imei.model} - ${imei.imei} - ${imei.warranty}`, leftMargin, startY + (index + 1) * 10);
-                  });
+            // Start Y for items
+                  let startY = tableHeaderY + rowHeight;
 
-                  // Draw IMEIs border with rounded corners
-                  doc.roundedRect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, startY - tableHeaderY + order.imeis.length * 10 + 10, 5, 5); // x, y, width, height, rx, ry
+            // Include item data only if available
+                  if (order.items.length > 0) {
+                    order.items.forEach((item, index) => {
+                      doc.text(`${item.name} - ${item.warranty_period} WARRANTY`, leftInsideMargin, startY + index * 10);
+                      doc.text(`${item.qty}`, leftMargin + 80, startY + index * 10);
+                      doc.text(`₨${item.price.toFixed(2)}`, leftMargin + 120, startY + index * 10);
+                      doc.text(`₨${(item.qty * item.price).toFixed(2)}`, leftMargin + 150, startY + index * 10);
+                    });
 
-                  // Update Y for totals
-                  startY = startY + order.imeis.length * 10 + 10 + sectionMargin;
-                }
+                    // Draw items border with rounded corners
+                    doc.roundedRect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, startY - tableHeaderY + order.items.length * 10, 5, 5); // x, y, width, height, rx, ry
 
-          // Total
-                doc.text(`Subtotal: ₨${order.actual_price.toFixed(2)}`, leftMargin + 130, startY);
-                doc.text(`Discount: ₨${order.discount.toFixed(2)}`, leftMargin + 130, startY + 10);
-                doc.text(`Total: ₨${order.total_amount.toFixed(2)}`, leftMargin + 130, startY + 20);
+                    // Update Y for IMEIs
+                    startY = startY + order.items.length * 10 + sectionMargin;
+                  }
 
+            // Include IMEI data only if available
+                  if (order.imeis.length > 0) {
+                    doc.text('Phones', leftMargin, startY);
+                    order.imeis.forEach((imei, index) => {
+                      doc.text(`${imei.model} - ${imei.imei} - ${imei.warranty}`, leftMargin, startY + (index + 1) * 10);
+                    });
 
+                    // Draw IMEIs border with rounded corners
+                    doc.roundedRect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, startY - tableHeaderY + order.imeis.length * 10 + 10, 5, 5); // x, y, width, height, rx, ry
 
-                doc.roundedRect(leftMargin, startY - 10, pageWidth - 2 * leftMargin, 40, 5, 5); // x, y, width, height, rx, ry
+                    // Update Y for totals
+                    startY = startY + order.imeis.length * 10 + 10 + sectionMargin;
+                  }
 
-                const notesY = startY + 50 + sectionMargin;
-                doc.text('Notes / Terms', leftMargin, notesY);
-                doc.setFontSize(10);
-                doc.text('* Warranty covers only manufacturer\'s defects. Damages or defects due to negligence, misuse, improper operation,', leftMargin, notesY + 10);
-                doc.text('  power fluctuation, lightning, natural disasters, sabotage, or accidents are EXCLUDED from this warranty.', leftMargin, notesY + 15);
-                doc.text('* Repairs or replacements necessitated by such causes are not covered by the warranty and are subject to charges.', leftMargin, notesY + 20);
-                doc.text('* PLEASE SUBMIT THE INVOICE FOR WARRANTY CLAIMS.', leftMargin, notesY + 25);
-                doc.text('* All communication after sales will be based on the prevailing market.', leftMargin, notesY + 30);
-
-                doc.roundedRect(leftMargin, notesY - 10, pageWidth - 2 * leftMargin, 60, 5, 5); // x, y, width, height, rx, ry
-
-                doc.save(`${order.customer.name}.bill.pdf`);*/
-
-          await Swal.fire({
-            title: 'Success!',
-            text: 'Order saved successfully',
-            icon: 'success',
-            confirmButtonText: 'OK'
-          });
-
-          // Update the UI after successful save
-          console.log('Order saved successfully:', response.data);
-        } catch (error) {
-          // SweetAlert error message
-          await Swal.fire({
-            title: 'Error!',
-            text: 'Error saving order',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-
-          console.error('Error saving order:', error);
-        }
-      };
+            // Total
+                  doc.text(`Subtotal: ₨${order.actual_price.toFixed(2)}`, leftMargin + 130, startY);
+                  doc.text(`Discount: ₨${order.discount.toFixed(2)}`, leftMargin + 130, startY + 10);
+                  doc.text(`Total: ₨${order.total_amount.toFixed(2)}`, leftMargin + 130, startY + 20);
 
 
-      return <div className='m-4 w-full'>
-        <div className="m-4">
-          <TopNavbar />
-        </div>
-        <div className='bg-[#14141E] rounded-md p-3 text-white'>
-          <div className='flex justify-between'>
-            <div>
-              <button className='mr-4'>Cash Payment</button>
-              <button>Card Payment</button>
-            </div>
-            <div>
-              <p className='text-3xl text-[#5386ED]'>#00000253</p>
-            </div>
+
+                  doc.roundedRect(leftMargin, startY - 10, pageWidth - 2 * leftMargin, 40, 5, 5); // x, y, width, height, rx, ry
+
+                  const notesY = startY + 50 + sectionMargin;
+                  doc.text('Notes / Terms', leftMargin, notesY);
+                  doc.setFontSize(10);
+                  doc.text('* Warranty covers only manufacturer\'s defects. Damages or defects due to negligence, misuse, improper operation,', leftMargin, notesY + 10);
+                  doc.text('  power fluctuation, lightning, natural disasters, sabotage, or accidents are EXCLUDED from this warranty.', leftMargin, notesY + 15);
+                  doc.text('* Repairs or replacements necessitated by such causes are not covered by the warranty and are subject to charges.', leftMargin, notesY + 20);
+                  doc.text('* PLEASE SUBMIT THE INVOICE FOR WARRANTY CLAIMS.', leftMargin, notesY + 25);
+                  doc.text('* All communication after sales will be based on the prevailing market.', leftMargin, notesY + 30);
+
+                  doc.roundedRect(leftMargin, notesY - 10, pageWidth - 2 * leftMargin, 60, 5, 5); // x, y, width, height, rx, ry
+
+                  doc.save(`${order.customer.name}.bill.pdf`);*/
+
+            await Swal.fire({
+              title: 'Success!',
+              text: 'Order saved successfully',
+              icon: 'success',
+              confirmButtonText: 'OK'
+            });
+
+            // Update the UI after successful save
+            console.log('Order saved successfully:', response.data);
+          } catch (error) {
+            // SweetAlert error message
+            await Swal.fire({
+              title: 'Error!',
+              text: 'Error saving order',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+
+            console.error('Error saving order:', error);
+          }
+        };
+
+
+        return <div className='m-4 w-full'>
+          <div className="m-4">
+            <TopNavbar />
           </div>
-          <hr className='my-3' />
-          <div className='flex'>
-            <div className='flex-1 p-4'>
-              <table className='w-full '>
-                <thead>
-                <tr>
-                  <th className="font-bold px-6 py-2 ">Customer</th>
-                  <th className="font-bold px-6 py-2 ">Contact Number</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                  <td className="px-6 py-2 ">{customerName}</td>
-                  <td className="px-6 py-2 ">{contactNumber}</td>
-                </tr>
-                </tbody>
-              </table>
-
-              <div className="space-y-4">
-                <table className="w-full border-collapse">
+          <div className='bg-[#14141E] rounded-md p-3 text-white'>
+            <div className='flex justify-between'>
+              <div>
+                <button className='mr-4'>Cash Payment</button>
+                <button>Card Payment</button>
+              </div>
+              <div>
+                <p className='text-3xl text-[#5386ED]'>#00000253</p>
+              </div>
+            </div>
+            <hr className='my-3' />
+            <div className='flex'>
+              <div className='flex-1 p-4'>
+                <table className='w-full '>
                   <thead>
                   <tr>
-                    <th className="font-bold px-6 py-4 text-left">Model Name</th>
-                    <th className="font-bold px-6 py-4 text-left">Imei Number</th>
-                    <th className="font-bold px-6 py-4 text-left">Price</th>
+                    <th className="font-bold px-6 py-2 ">Customer</th>
+                    <th className="font-bold px-6 py-2 ">Contact Number</th>
                   </tr>
                   </thead>
                   <tbody>
-                  {phones.map((phone, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-2">{phone.modelName}</td>
-                        <td className="px-6 py-2">{phone.imei}</td>
-                        <td className="px-6 py-2">{phone.price}</td>
-                      </tr>
-                  ))}
+                  <tr>
+                    <td className="px-6 py-2 ">{customerName}</td>
+                    <td className="px-6 py-2 ">{contactNumber}</td>
+                  </tr>
                   </tbody>
                 </table>
 
-                <hr className='my-3' />
+                <div className="space-y-4">
+                  <table className="w-full border-collapse">
+                    <thead>
+                    <tr>
+                      <th className="font-bold px-6 py-4 text-left">Model Name</th>
+                      <th className="font-bold px-6 py-4 text-left">Imei Number</th>
+                      <th className="font-bold px-6 py-4 text-left">Price</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {phones.map((phone:any, index:number) => (
+                        <tr key={index}>
+                          <td className="px-6 py-2">{phone.modelName}</td>
+                          <td className="px-6 py-2">{phone.imei}</td>
+                          <td className="px-6 py-2">{phone.price}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                  </table>
 
-                <table className="w-full border-collapse">
+                  <hr className='my-3' />
+
+                  <table className="w-full border-collapse">
+                    <thead>
+                    <tr>
+                      <th className="font-bold px-6 py-4 text-left">Item Name</th>
+                      <th className="font-bold px-6 py-4 text-left">Quantity</th>
+                      <th className="font-bold px-6 py-4 text-left">Price</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {items.map((item:any, index:number) => (
+                        <tr key={index}>
+                          <td className="px-6 py-2">{item.name}</td>
+                          <td className="px-6 py-2">{item.qty}</td>
+                          <td className="px-6 py-2">{item.price}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+
+              <div>
+                <div className='h-full w-1 bg-[#717171] mx-5'></div>
+              </div>
+              <div className='flex-1'>
+                <table className='w-full'>
                   <thead>
                   <tr>
-                    <th className="font-bold px-6 py-4 text-left">Item Name</th>
-                    <th className="font-bold px-6 py-4 text-left">Quantity</th>
-                    <th className="font-bold px-6 py-4 text-left">Price</th>
+                    <th className='text-[#5386ED] text-xl py-2 px-4'>Make Payment</th>
+                    <th className='py-2 px-4'></th>
                   </tr>
                   </thead>
                   <tbody>
-                  {items.map((item, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-2">{item.name}</td>
-                        <td className="px-6 py-2">{item.qty}</td>
-                        <td className="px-6 py-2">{item.price}</td>
-                      </tr>
-                  ))}
+                  <tr>
+                    <td className='py-2 px-4'>
+                      <div className='mt-2'>
+                        <p>Subtotal</p>
+                      </div>
+                    </td>
+                    <td className='py-2 px-4'>
+                      <div className='mt-1'>
+                        <p>{subtotal.toFixed(2)}</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className='py-2 px-4'>
+                      <div className='mt-2'>
+                        <p className='text-red-500'>OutStanding</p>
+                      </div>
+                    </td>
+                    <td className='py-2 px-4'>
+                      <div className='mt-1'>
+                        <p className='text-red-500'>{customerOutstanding.toFixed(2)}</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className='py-2 px-4'>
+                      <div className='mt-2'>
+                        <p>Discount</p>
+                      </div>
+                    </td>
+                    <td className='py-2 px-4'>
+                      <div className='mt-1'>
+                        <input
+                            type='number'
+                            ref={discountRef}
+                            onChange={handleDiscountChange}
+                            className='bg-[#1E1E1E] text-white px-2 py-1 rounded-md'
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className='py-2 px-4'>
+                      <div className='mt-2'>
+                        <p>Total Amount</p>
+                      </div>
+                    </td>
+                    <td className='py-2 px-4'>
+                      <div className='mt-1'>
+                        <p>{totalAfterDiscount.toFixed(2)}</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className='py-2 px-4'>
+                      <div className='mt-2'>
+                        <p>Customer Amount</p>
+                      </div>
+                    </td>
+                    <td className='py-2 px-4'>
+                      <div className='mt-1'>
+                        <input
+                            type='number'
+                            value={customerAmount}
+                            onChange={(e) => setCustomerAmount(parseFloat(e.target.value) || 0)}
+                            className='bg-[#1E1E1E] text-white px-2 py-1 rounded-md'
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className='py-2 px-4'>
+                      <div className='mt-2'>
+                        <p>Balance</p>
+                      </div>
+                    </td>
+                    <td className='py-2 px-4'>
+                      <div className='mt-1'>
+                        <p>{balance.toFixed(2)}</p>
+                      </div>
+                    </td>
+                  </tr>
                   </tbody>
                 </table>
-              </div>
 
-            </div>
-
-            <div>
-              <div className='h-full w-1 bg-[#717171] mx-5'></div>
-            </div>
-            <div className='flex-1'>
-              <table className='w-full'>
-                <thead>
-                <tr>
-                  <th className='text-[#5386ED] text-xl py-2 px-4'>Make Payment</th>
-                  <th className='py-2 px-4'></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p>Subtotal</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <p>{subtotal.toFixed(2)}</p>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p className='text-red-500'>OutStanding</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <p className='text-red-500'>{customerOutstanding.toFixed(2)}</p>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p>Discount</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <input
-                          type='number'
-                          ref={discountRef}
-                          onChange={handleDiscountChange}
-                          className='bg-[#1E1E1E] text-white px-2 py-1 rounded-md'
-                      />
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p>Total Amount</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <p>{totalAfterDiscount.toFixed(2)}</p>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p>Customer Amount</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <input
-                          type='number'
-                          value={customerAmount}
-                          onChange={(e) => setCustomerAmount(parseFloat(e.target.value) || 0)}
-                          className='bg-[#1E1E1E] text-white px-2 py-1 rounded-md'
-                      />
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p>Balance</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <p>{balance.toFixed(2)}</p>
-                    </div>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-
-              <div className='flex flex-col gap-2 mt-3'>
-                <button
-                    className='bg-[#5356EC] p-2'
-                    onClick={saveOrder}
-                >
-                  Confirm Payment
-                </button>
-                <button className='border-2 border-[#5356EC] p-2 bg-[#343434]'>
-                  Cancel Payment
-                </button>
+                <div className='flex flex-col gap-2 mt-3'>
+                  <button
+                      className='bg-[#5356EC] p-2'
+                      onClick={saveOrder}
+                  >
+                    Confirm Payment
+                  </button>
+                  <button className='border-2 border-[#5356EC] p-2 bg-[#343434]'>
+                    Cancel Payment
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-          ;
+            ;
 
     case "wholesale-order":
-      const discountRefWholesale = useRef(null);
-      const [discountWholesale, setDiscountWholesale] = useState(0);
-      const [subtotalWholesale, setSubtotalWholesale] = useState(0);
-      const [totalAfterDiscountWholesale, setTotalAfterDiscountWholesale] = useState(0);
-      const [balanceWholesale, setBalanceWholesale] = useState(0);
-      const [customerAmountWholesale, setCustomerAmountWholesale] = useState(0);
+      const discountRefWholesale = useRef<HTMLInputElement>(null);
+      const [discountWholesale, setDiscountWholesale] = useState<number>(0);
+      const [subtotalWholesale, setSubtotalWholesale] = useState<number>(0);
+      const [totalAfterDiscountWholesale, setTotalAfterDiscountWholesale] = useState<number>(0);
+      const [balanceWholesale, setBalanceWholesale] = useState<number>(0);
+      const [customerAmountWholesale, setCustomerAmountWholesale] = useState<number>(0);
 
       useEffect(() => {
         calculateTotalsWholesale(discountWholesale, customerAmountWholesale);
       }, [discountWholesale, customerAmountWholesale, wholesalePhones, wholesaleItems, outstanding]);
 
-      const handleDiscountChangeWholesale = (e) => {
+      const handleDiscountChangeWholesale = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseFloat(e.target.value) || 0;
         setDiscountWholesale(value);
       };
 
-      const handleCustomerAmountChangeWholesale = (e) => {
-        const value = parseFloat(e.target.value) || 0;
-        setCustomerAmountWholesale(value);
-      };
-
-      const calculateTotalsWholesale = (discountValueWholesale, customerAmountValueWholesale) => {
-        const totalPhonePriceWholesale = wholesalePhones.reduce((sum, wholesalePhone) => sum + (parseFloat(wholesalePhone.price) || 0), 0);
-        const totalItemPriceWholesale = wholesaleItems.reduce((sum, wholesaleItem) => sum + (parseFloat(wholesaleItem.price * wholesaleItem.qty) || 0), 0);
-        const subtotalValueWholesale = totalPhonePriceWholesale + totalItemPriceWholesale - (parseFloat(outstanding) || 0);
+      const calculateTotalsWholesale = (discountValueWholesale: number, customerAmountValueWholesale: number) => {
+        const totalPhonePriceWholesale = wholesalePhones.reduce((sum:any, wholesalePhone:any) => sum + (wholesalePhone.price || 0), 0);
+        const totalItemPriceWholesale = wholesaleItems.reduce((sum:any, wholesaleItem:any) => sum + ((wholesaleItem.price * wholesaleItem.qty) || 0), 0);
+        const subtotalValueWholesale = totalPhonePriceWholesale + totalItemPriceWholesale - outstanding;
         const totalAfterDiscountValueWholesale = subtotalValueWholesale - discountValueWholesale;
         const balanceValueWholesale = customerAmountValueWholesale - totalAfterDiscountValueWholesale;
 
@@ -499,7 +560,7 @@ export default function ProceedPayment() {
             owner_nic: shopOwnerNic,
             credit_limit: shopCreditLimit
           },
-          items: wholesaleItems.map(wholesaleItem => ({
+          items: wholesaleItems.map((wholesaleItem: WholesaleItem) => ({
             item_id: wholesaleItem.item_id,
             category: wholesaleItem.category,
             brand: wholesaleItem.brand,
@@ -509,7 +570,7 @@ export default function ProceedPayment() {
             qty: wholesaleItem.qty,
             price: wholesaleItem.price
           })),
-          imeis: wholesalePhones.map(wholesalePhone => ({
+          imeis: wholesalePhones.map((wholesalePhone: WholesalePhone) => ({
             id: wholesalePhone.id,
             imei: wholesalePhone.imei,
             storage: wholesalePhone.storage,
@@ -520,6 +581,7 @@ export default function ProceedPayment() {
             status: wholesalePhone.status,
             isDeleted: wholesalePhone.isDeleted
           }))
+
         };
 
         try {
@@ -531,10 +593,8 @@ export default function ProceedPayment() {
             confirmButtonText: 'OK'
           });
 
-          // Update the UI after successful save
           console.log('Wholesale order saved successfully:', response.data);
         } catch (error) {
-          // SweetAlert error message
           await Swal.fire({
             title: 'Error!',
             text: 'Error saving wholesale order',
@@ -546,194 +606,195 @@ export default function ProceedPayment() {
         }
       };
 
-
-      return <div className='m-4 w-full'>
-        <div className="m-4">
-          <TopNavbar />
-        </div>
-        <div className='bg-[#14141E] rounded-md p-3 text-white'>
-          <div className='flex justify-between'>
-            <div>
-              <button className='mr-4'>Cash Payment</button>
-              <button>Card Payment</button>
+      return (
+          <div className='m-4 w-full'>
+            <div className="m-4">
+              <TopNavbar />
             </div>
-            <div>
-              <p className='text-3xl text-[#5386ED]'>#00000253</p>
-            </div>
-          </div>
-          <hr className='my-3' />
-          <div className='flex'>
-            <div className='flex-1 p-4'>
-              <table className='w-full '>
-                <thead>
-                <tr>
-                  <th className="font-bold px-6 py-2 ">Shop Name</th>
-                  <th className="font-bold px-6 py-2 ">Shop Number</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                  <td className="px-6 py-2 ">{shopName}</td>
-                  <td className="px-6 py-2 ">{shopContactNumber}</td>
-                </tr>
-                </tbody>
-              </table>
+            <div className='bg-[#14141E] rounded-md p-3 text-white'>
+              <div className='flex justify-between'>
+                <div>
+                  <button className='mr-4'>Cash Payment</button>
+                  <button>Card Payment</button>
+                </div>
+                <div>
+                  <p className='text-3xl text-[#5386ED]'>#00000253</p>
+                </div>
+              </div>
+              <hr className='my-3' />
+              <div className='flex'>
+                <div className='flex-1 p-4'>
+                  <table className='w-full'>
+                    <thead>
+                    <tr>
+                      <th className="font-bold px-6 py-2">Shop Name</th>
+                      <th className="font-bold px-6 py-2">Shop Number</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                      <td className="px-6 py-2">{shopName}</td>
+                      <td className="px-6 py-2">{shopContactNumber}</td>
+                    </tr>
+                    </tbody>
+                  </table>
 
-              <div className="space-y-4">
-                <table className="w-full border-collapse">
-                  <thead>
-                  <tr>
-                    <th className="font-bold px-6 py-4 text-left">Model Name</th>
-                    <th className="font-bold px-6 py-4 text-left">Imei Number</th>
-                    <th className="font-bold px-6 py-4 text-left">Price</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {wholesalePhones.map((wholesalePhone, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-2">{wholesalePhone.modelName}</td>
-                        <td className="px-6 py-2">{wholesalePhone.imei}</td>
-                        <td className="px-6 py-2">{wholesalePhone.price}</td>
+                  <div className="space-y-4">
+                    <table className="w-full border-collapse">
+                      <thead>
+                      <tr>
+                        <th className="font-bold px-6 py-4 text-left">Model Name</th>
+                        <th className="font-bold px-6 py-4 text-left">Imei Number</th>
+                        <th className="font-bold px-6 py-4 text-left">Price</th>
                       </tr>
-                  ))}
-                  </tbody>
-                </table>
+                      </thead>
+                      <tbody>
+                      {wholesalePhones.map((wholesalePhone:any, index:number) => (
+                          <tr key={index}>
+                            <td className="px-6 py-2">{wholesalePhone.modelName}</td>
+                            <td className="px-6 py-2">{wholesalePhone.imei}</td>
+                            <td className="px-6 py-2">{wholesalePhone.price}</td>
+                          </tr>
+                      ))}
+                      </tbody>
+                    </table>
 
-                <hr className='my-3' />
+                    <hr className='my-3' />
 
-                <table className="w-full border-collapse">
-                  <thead>
-                  <tr>
-                    <th className="font-bold px-6 py-4 text-left">Item Name</th>
-                    <th className="font-bold px-6 py-4 text-left">Quantity</th>
-                    <th className="font-bold px-6 py-4 text-left">Price</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {wholesaleItems.map((wholesaleItem, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-2">{wholesaleItem.name}</td>
-                        <td className="px-6 py-2">{wholesaleItem.qty}</td>
-                        <td className="px-6 py-2">{wholesaleItem.price}</td>
+                    <table className="w-full border-collapse">
+                      <thead>
+                      <tr>
+                        <th className="font-bold px-6 py-4 text-left">Item Name</th>
+                        <th className="font-bold px-6 py-4 text-left">Quantity</th>
+                        <th className="font-bold px-6 py-4 text-left">Price</th>
                       </tr>
-                  ))}
-                  </tbody>
-                </table>
+                      </thead>
+                      <tbody>
+                      {wholesaleItems.map((wholesaleItem:any, index:number) => (
+                          <tr key={index}>
+                            <td className="px-6 py-2">{wholesaleItem.name}</td>
+                            <td className="px-6 py-2">{wholesaleItem.qty}</td>
+                            <td className="px-6 py-2">{wholesaleItem.price}</td>
+                          </tr>
+                      ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div>
+                  <div className='h-full w-1 bg-[#717171] mx-5'></div>
+                </div>
+                <div className='flex-1'>
+                  <table className='w-full'>
+                    <thead>
+                    <tr>
+                      <th className='text-[#5386ED] text-xl py-2 px-4'>Make Payment</th>
+                      <th className='py-2 px-4'></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                      <td className='py-2 px-4'>
+                        <div className='mt-2'>
+                          <p>Subtotal</p>
+                        </div>
+                      </td>
+                      <td className='py-2 px-4'>
+                        <div className='mt-1'>
+                          <p>{subtotalWholesale.toFixed(2)}</p>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className='py-2 px-4'>
+                        <div className='mt-2'>
+                          <p className='text-red-500'>Outstanding</p>
+                        </div>
+                      </td>
+                      <td className='py-2 px-4'>
+                        <div className='mt-1'>
+                          <p className='text-red-500'>-{outstanding.toFixed(2)}</p>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className='py-2 px-4'>
+                        <div className='mt-2'>
+                          <p>Discount</p>
+                        </div>
+                      </td>
+                      <td className='py-2 px-4'>
+                        <div className='mt-1'>
+                          <input
+                              ref={discountRefWholesale}
+                              type="number"
+                              placeholder="0.00"
+                              className="bg-[#14141E] border border-[#3A3A3A] text-[#717171] p-1 rounded-lg"
+                              value={discountWholesale}
+                              onChange={handleDiscountChangeWholesale}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className='py-2 px-4'>
+                        <div className='mt-2'>
+                          <p className='text-[#5386ED]'>Total</p>
+                        </div>
+                      </td>
+                      <td className='py-2 px-4'>
+                        <div className='mt-1'>
+                          <p className='text-[#5386ED]'>{totalAfterDiscountWholesale.toFixed(2)}</p>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className='py-2 px-4'>
+                        <div className='mt-2'>
+                          <p>Customer Amount</p>
+                        </div>
+                      </td>
+                      <td className='py-2 px-4'>
+                        <div className='mt-1'>
+                          <input
+                              type="number"
+                              placeholder="0.00"
+                              className="bg-[#14141E] border border-[#3A3A3A] text-[#717171] p-1 rounded-lg"
+                              value={customerAmountWholesale}
+                              onChange={(e) => setCustomerAmountWholesale(parseFloat(e.target.value))}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className='py-2 px-4'>
+                        <div className='mt-2'>
+                          <p>Balance</p>
+                        </div>
+                      </td>
+                      <td className='py-2 px-4'>
+                        <div className='mt-1'>
+                          <p>{balanceWholesale.toFixed(2)}</p>
+                        </div>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+
+                  <div className='mt-4 flex justify-center'>
+                    <button
+                        onClick={saveOrderWholesale}
+                        className='bg-[#5386ED] rounded-lg text-white px-4 py-2'
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <div>
-              <div className='h-full w-1 bg-[#717171] mx-5'></div>
-            </div>
-            <div className='flex-1'>
-              <table className='w-full'>
-                <thead>
-                <tr>
-                  <th className='text-[#5386ED] text-xl py-2 px-4'>Make Payment</th>
-                  <th className='py-2 px-4'></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p>Subtotal</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <p>{subtotalWholesale.toFixed(2)}</p>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p className='text-red-500'>OutStanding</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <p className='text-red-500'>{outstanding.toFixed(2)}</p>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p>Discount</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <input
-                          type='number'
-                          ref={discountRefWholesale}
-                          onChange={handleDiscountChangeWholesale}
-                          className='bg-[#1E1E1E] text-white px-2 py-1 rounded-md'
-                      />
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p>Total Amount</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <p>{totalAfterDiscountWholesale.toFixed(2)}</p>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p>Customer Amount</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <input
-                          type='number'
-                          value={customerAmountWholesale}
-                          onChange={(e) => setCustomerAmountWholesale(parseFloat(e.target.value) || 0)}
-                          className='bg-[#1E1E1E] text-white px-2 py-1 rounded-md'
-                      />
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='py-2 px-4'>
-                    <div className='mt-2'>
-                      <p>Balance</p>
-                    </div>
-                  </td>
-                  <td className='py-2 px-4'>
-                    <div className='mt-1'>
-                      <p>{balanceWholesale.toFixed(2)}</p>
-                    </div>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-
-              <div className='flex flex-col gap-2 mt-3'>
-                <button
-                    className='bg-[#5356EC] p-2'
-                    onClick={saveOrderWholesale}
-                >
-                  Confirm Payment
-                </button>
-                <button className='border-2 border-[#5356EC] p-2 bg-[#343434]'>
-                  Cancel Payment
-                </button>
-              </div>
-            </div>
           </div>
-        </div>
-      </div>;
+      );
 
     case "return-order":
       const discountRefReturn = useRef(null);
@@ -747,18 +808,18 @@ export default function ProceedPayment() {
         calculateTotalsReturn(discountReturn, customerAmountReturn);
       }, [discountReturn, customerAmountReturn, returnPhones, outstandingReturn]);
 
-      const handleDiscountChangeReturn = (e) => {
+      const handleDiscountChangeReturn = (e:any) => {
         const value = parseFloat(e.target.value) || 0;
         setDiscountReturn(value);
       };
 
-      const handleCustomerAmountChangeReturn = (e) => {
+      /*const handleCustomerAmountChangeReturn = (e) => {
         const value = parseFloat(e.target.value) || 0;
         setCustomerAmountReturn(value);
-      };
+      };*/
 
-      const calculateTotalsReturn = (discountValueReturn, customerAmountValueReturn) => {
-        const totalPhonePriceReturn = returnPhones.reduce((sum, returnPhone) => sum + (parseFloat(returnPhone.price) || 0), 0);
+      const calculateTotalsReturn = (discountValueReturn:number, customerAmountValueReturn:number) => {
+        const totalPhonePriceReturn = returnPhones.reduce((sum:any, returnPhone:any) => sum + (parseFloat(returnPhone.price) || 0), 0);
         const subtotalValueReturn = totalPhonePriceReturn  - (parseFloat(outstanding) || 0);
         const totalAfterDiscountValueReturn = subtotalValueReturn - discountValueReturn;
         const balanceValueReturn = customerAmountValueReturn - totalAfterDiscountValueReturn;
@@ -788,7 +849,7 @@ export default function ProceedPayment() {
             shop_name: shopNameReturn,
             contact_number: shopContactNumberReturn,
           },
-          imeis: returnPhones.map(returnPhone => ({
+          imeis : returnPhones.map((returnPhone: ReturnPhone) => ({
             id: returnPhone.id,
             imei: returnPhone.imei,
             storage: returnPhone.storage,
@@ -863,7 +924,7 @@ export default function ProceedPayment() {
                   </tr>
                   </thead>
                   <tbody>
-                  {returnPhones.map((returnPhone, index) => (
+                  {returnPhones.map((returnPhone:any, index:number) => (
                       <tr key={index}>
                         <td className="px-6 py-2">{returnPhone.modelName}</td>
                         <td className="px-6 py-2">{returnPhone.imei}</td>
@@ -990,7 +1051,9 @@ export default function ProceedPayment() {
           </div>
         </div>
       </div>;
-    default:
-      return <p className='text-white'>404 Not Found</p>;
   }
-}
+
+  return <div>Error: Invalid order type</div>;
+};
+
+export default ProceedPayment;

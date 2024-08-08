@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import InputFields from '../input/inputFeild';
-import Combobox from '../combobox/combobox';
 import TopNavbar from '../topNavbar';
 import Button from '../crudbuttons/buttons';
 import Swal from "sweetalert2";
@@ -39,10 +37,6 @@ const User: React.FC = () => {
         fetchItems();
     }, []);
 
-    const roleOptions = [
-        { value: 'ADMIN', label: 'Admin' },
-        { value: 'USER', label: 'User' },
-    ];
 
     const validateEmail = (email: string): boolean => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
