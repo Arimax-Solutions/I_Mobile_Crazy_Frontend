@@ -1,3 +1,5 @@
+// App.js or App.tsx
+import React from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginForm from './components/loginForm';
 import Dashboard from './components/dashboard/dashboard.tsx';
@@ -11,6 +13,7 @@ import ReturnPhone from './components/return-phone/retun-phone.tsx';
 import Order from './components/order/order.tsx';
 import ProceedPayment from './components/proceed-payment/proceed-payment.tsx';
 import ReturnItem from "./components/return-item/return-item.tsx";
+import Expencess from './components/expencess/expencess.tsx';
 
 function App() {
   return (
@@ -28,6 +31,7 @@ function App() {
           <Route path="returnPhone" element={<ReturnPhone />} />
           <Route path="order" element={<Order />} />
           <Route path='orderType/:orderType' element={<ProceedPayment />}/>
+          <Route path='expencess' element={<Expencess />}/>
         </Route>
       </Routes>
     </BrowserRouter>
