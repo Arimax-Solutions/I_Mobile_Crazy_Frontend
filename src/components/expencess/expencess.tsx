@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import TopNavbar from '../topNavbar';
 import axios from 'axios';
 import { backend_url } from '../../utill/utill';
