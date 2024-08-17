@@ -6,8 +6,6 @@ function Home(){
             <TopNavbar />
             <p className='text-white'>Home page</p>
         </div>
-
-
     );
 }
 
