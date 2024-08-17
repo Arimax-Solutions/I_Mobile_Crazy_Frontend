@@ -1,0 +1,1 @@
+import{j as e}from"./mui-core-8430a145.js";import{T as r}from"./topNavbar-62e82537.js";import"./sweetalert2.all-4a184b36.js";import"./index-e2260fdc.js";function a(){return e.jsxs("div",{className:"m-4",children:[e.jsx(r,{}),e.jsx("p",{className:"text-white",children:"Home page"})]})}export{a as default};
