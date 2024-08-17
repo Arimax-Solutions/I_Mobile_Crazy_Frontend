@@ -6,6 +6,7 @@ import axios from "axios";
 import html2canvas from "html2canvas";
 import {jsPDF} from "jspdf";
 import logo from '../../assets/images/logo.png';
+import { useNavigate } from 'react-router-dom';
 
 interface StockData {
   [model: string]: number;
@@ -273,6 +274,11 @@ export default function Dashboard() {
     popularity: stockData[key],
     color: stockData[key]
   }));
+  const navigation = useNavigate();
+
+const hanldeDailyCostOnClick=()=>{
+  navigation('/expencess')
+}
 
 
   console.log('Product data:', productData);
@@ -405,7 +411,7 @@ export default function Dashboard() {
 
 
 
-          <button className='daily_cost-buttons-styles p-1 rounded-xl w-full sm:w-auto flex items-center'>
+          <button className='daily_cost-buttons-styles p-1 rounded-xl w-full sm:w-auto flex items-center' onClick={hanldeDailyCostOnClick}>
             Daily Cost<img src={'src/assets/icons/daily cost.svg'} className='ml-2' alt='icon' />
           </button>
         </div>
