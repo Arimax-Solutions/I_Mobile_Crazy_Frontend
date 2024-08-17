@@ -1,6 +1,6 @@
 import  { useEffect, useState } from 'react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line } from 'recharts';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import TopNavbar from '../topNavbar.tsx';
 import axios from "axios";
 import html2canvas from "html2canvas";
@@ -29,7 +29,7 @@ const data = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF4848'];
 
-
+/*
 const salesData = [
   { month: 'January', sales: 1000 },
   { month: 'February', sales: 2000 },
@@ -53,7 +53,7 @@ const weeklyOrderIncrementData = [
   { day: 'Friday', orders: 30 },
   { day: 'Saturday', orders: 35 },
   { day: 'Sunday', orders: 40 }
-];
+];*/
 
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -254,7 +254,7 @@ export default function Dashboard() {
     // Function to fetch wholesale order count from API
     const fetchOrderCountWholesale = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/wholesale-orders/count-this-month');
+        const response = await axios.get('http://localhost:8080/api/wholesaleOrder/count-this-month');
 
         // Directly set the state with the response data, assuming it is a plain number
         setOrderCountWholesale(response.data);
@@ -452,7 +452,7 @@ export default function Dashboard() {
                 <img src={'src/assets/icons/Icon 4.svg'} alt='icon' className='w-fit mx-auto' />
               </div>
               <div className='text-2xl'>{soldCount}</div>
-              <div className='text-sm'>Phone Sold</div>
+              <div className='text-sm'>Retail Phone Sold</div>
               <div className='text-xs text-blue-500'>This month</div>
             </div>
 
@@ -556,8 +556,8 @@ export default function Dashboard() {
         </div>
 
         {/* 3rd Row */}
-        <div className='flex flex-col lg:flex-row mt-2 gap-4'>
-          {/* 3rd Row 1st Div */}
+        {/*<div className='flex flex-col lg:flex-row mt-2 gap-4'>
+           3rd Row 1st Div
           <div className='background-colour-today-sales-div flex-1 rounded-lg p-1'>
             <div className="ml-2 p-3">
               <span className="text-white text-lg font-bold">Sales Increment</span><br />
@@ -573,7 +573,7 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </div>
 
-          {/* 3rd Row 2nd Div */}
+           3rd Row 2nd Div
           <div className='background-colour-today-sales-div flex-1 rounded-lg'>
             <div className="ml-2 p-3">
               <span className="text-white text-lg font-bold">Weekly Order Increment</span><br />
@@ -588,7 +588,7 @@ export default function Dashboard() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </div>*/}
       </div>
     </div>
   );

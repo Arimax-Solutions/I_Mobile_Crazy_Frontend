@@ -141,7 +141,7 @@ export default function WholeSaleOrder(prop:IProp) {
         price: ''
     });
 
-    const [wholesaleItems] = useState([]);
+    const [wholesaleItems, setWholesaleItems] = useState<WholesaleItem[]>([]);
 
     const handleFetchwholesaleItemData = async () => {
         try {
@@ -183,21 +183,18 @@ export default function WholeSaleOrder(prop:IProp) {
     };
 
     const handleAddItem = () => {
-        if (wholesaleItemData.name) {
-            setwholesaleItemData({
-                item_id: '',
-                category: '',
-                brand: '',
-                name: '',
-                colour: '',
-                warranty_period: '',
-                qty: '',
-                price: ''
-            });
-            prop.handleAddNewItemModelClose(); // Close the modal
-        } else {
-            alert('Please enter item details before adding.');
-        }
+        setWholesaleItems([...wholesaleItems, wholesaleItemData]);
+        // Reset the form after adding the item (optional)
+        setwholesaleItemData({
+            item_id: '',
+            category: '',
+            brand: '',
+            name: '',
+            colour: '',
+            warranty_period: '',
+            qty: '',
+            price: ''
+        });
     };
 
     async function fetchPhoneDetails(imei: string) {
