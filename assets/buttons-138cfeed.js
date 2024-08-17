@@ -1,0 +1,1 @@
+import{j as t}from"./index-22430338.js";const a=({onClick:s,className:o,iconSrc:r,iconAlt:n,children:m})=>t.jsxs("button",{onClick:s,className:o,children:[t.jsx("img",{src:r,className:"mr-[0.3vw]",alt:n}),m]}),e=a;export{e as B};

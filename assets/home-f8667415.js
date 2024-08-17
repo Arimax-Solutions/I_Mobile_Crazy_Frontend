@@ -1,0 +1,1 @@
+import{j as e}from"./index-22430338.js";import{T as s}from"./topNavbar-8a7575ae.js";import"./sweetalert2.all-bcf0cdbb.js";function m(){return e.jsxs("div",{className:"m-4",children:[e.jsx(s,{}),e.jsx("p",{className:"text-white",children:"Home page"})]})}export{m as default};
