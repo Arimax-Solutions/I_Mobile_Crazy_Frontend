@@ -13,7 +13,7 @@ import Order from './components/order/order.tsx';
 import ProceedPayment from './components/proceed-payment/proceed-payment.tsx';
 import ReturnItem from "./components/return-item/return-item.tsx";
 import Expencess from './components/expencess/expencess.tsx';
-import WholsaleOrderView from "./components/view-orders/wholesale-order-view.tsx";
+import OrderView from "./components/view-orders/OrderView.tsx";
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
           <Route path="order" element={<Order />} />
           <Route path='orderType/:orderType' element={<ProceedPayment />}/>
           <Route path='expencess' element={<Expencess />}/>
-          <Route path='wholsale_orders' element={<WholsaleOrderView />}/>
+          <Route path='orderView' element={<OrderView />}/>
         </Route>
       </Routes>
     </BrowserRouter>
