@@ -309,9 +309,9 @@ export default function StockPhones() {
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });
-                setTimeout(() => {
-                    window.location.reload();
-                }, 4000);
+                // setTimeout(() => {
+                //     window.location.reload();
+                // }, 4000);
                 setPhones([...phones, response.data.data]);
                 setStockName('');
                 setDescription('');
@@ -623,20 +623,30 @@ export default function StockPhones() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {phones.map((phone, index) => (
-                                        <tr key={phone.id || index} onClick={() => handleTableRowClick(phone)} className="cursor-pointer hover:bg-gray-700">
-                                            <td className="py-2 px-4 border-b border-gray-700">{phone.id}</td>
-                                            <td className="py-2 px-4 border-b border-gray-700">{phone.name}</td>
-                                            <td className="py-2 px-4 border-b border-gray-700">{phone.description}</td>
-                                            <td className="py-2 px-4 border-b border-gray-700">{phone.qty}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-
+                        {phones.length > 0 ? (
+                            phones.map((phone, index) => (
+                                phone ? (
+                                    <tr
+                                        key={phone.id || index}
+                                        onClick={() => handleTableRowClick(phone)}
+                                        className="cursor-pointer hover:bg-gray-700"
+                                    >
+                                        <td className="py-2 px-4 border-b border-gray-700">{phone.id}</td>
+                                        <td className="py-2 px-4 border-b border-gray-700">{phone.name}</td>
+                                        <td className="py-2 px-4 border-b border-gray-700">{phone.description}</td>
+                                        <td className="py-2 px-4 border-b border-gray-700">{phone.qty}</td>
+                                    </tr>
+                                ) : null
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={4} className="py-2 px-4 text-center">No stocks available</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+            </div>
 
         </div>
     );
