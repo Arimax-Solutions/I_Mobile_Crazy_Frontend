@@ -90,20 +90,28 @@ const ProceedPayment: React.FC<any> = (props:any) => {
 
   const {returnPhones,shopNameReturn,shopIdReturn,shopContactNumberReturn,outstandingReturn}:any = location.state || { returnPhones: [], shopNameReturn: '',shopIdReturn: '',shopContactNumberReturn: '',outstandingReturn: ''};
 
-  let sequenceNumber = 1;
   function generateRetailOrderId() {
+    // Retrieve the current sequence number from local storage
+    let sequenceNumber = parseInt(localStorage.getItem('sequenceNumber') || '1', 10);
+
     // Format the sequence number with leading zeros (e.g., 001, 002, ...)
     const formattedNumber = sequenceNumber.toString().padStart(3, '0');
 
     // Increment the sequence number for the next call
     sequenceNumber++;
 
+    // Store the updated sequence number in local storage
+    localStorage.setItem('sequenceNumber', sequenceNumber.toString());
+
     // Generate the retail_order_id in the desired format
     return `B00-${formattedNumber}`;
   }
+
+
   useEffect(() => {
-    // Update the order ID when the component mounts
-    setOrderId(generateRetailOrderId());
+    // Generate and set the order ID when the component mounts
+    const id = generateRetailOrderId();
+    setOrderId(id);
   }, []);
 
   switch (orderType) {
@@ -715,16 +723,11 @@ const ProceedPayment: React.FC<any> = (props:any) => {
         console.log("Total items: " + totalItemPriceWholesale);
         console.log("Subtotal 2 : " + subtotalValueWholesale);
 
-
         return {
           subtotalWholesale: subtotalValueWholesale,
           totalAfterDiscountWholesale: totalAfterDiscountValueWholesale,
         };
       };
-
-
-
-
 
       const saveOrderWholesale = async () => {
         console.log("Saving order...");
