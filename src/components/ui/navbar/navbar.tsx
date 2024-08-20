@@ -1,9 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import clsx from 'clsx';
 
 function NavigationMenu() {
     const [select, setSelect] = useState<string>("Reports");
+    const [userRole, setUserRole] = useState<string | null>(null);
+
+    useEffect(() => {
+        const role = localStorage.getItem('userRole');
+        setUserRole(role);
+    }, []);
 
     return (
         <nav className="fixed top-8 left-0 pt-3 flex flex-col min-w-[270px] w-[270px] h-[95%] bg-[#1D1D27] rounded-r-[40px] items-center overflow-hidden">
@@ -13,14 +19,18 @@ function NavigationMenu() {
             <div className="w-full h-full flex flex-col">
                 <div className="w-full flex-1">
                     <ul className='mt-10 w-full pl-8 flex flex-col gap-10 mb-2'>
-                        <NavItems logo='src/assets/images/navbar/layer1.svg' name='Reports' location='/dashboard' selected={setSelect} isSelected={select} />
+                        {userRole === 'ADMIN' && (
+                            <NavItems logo='src/assets/images/navbar/layer1.svg' name='Reports' location='/dashboard' selected={setSelect} isSelected={select} />
+                        )}
+
                         <NavItems logo='src/assets/images/navbar/Stock Phones.svg' name='Stock Phones' location='/StockPhones' selected={setSelect} isSelected={select} />
                         <NavItems logo='src/assets/images/navbar/Return Phones.svg' name='Return Phones' location='/returnPhone' selected={setSelect} isSelected={select} />
                         <NavItems logo='src/assets/images/navbar/Items.svg' name='Items' location='/item' selected={setSelect} isSelected={select} />
                         <NavItems logo='src/assets/images/navbar/Return item.svg' name='Return Items' location='/returnItem' selected={setSelect} isSelected={select} />
-                        <NavItems logo='src/assets/images/navbar/Users.svg' name='Users' location='/user' selected={setSelect} isSelected={select} />
+                        {userRole === 'ADMIN' && (
+                            <NavItems logo='src/assets/images/navbar/Users.svg' name='Users' location='/user' selected={setSelect} isSelected={select} />
+                        )}
                         <NavItems logo='src/assets/images/navbar/Shops.svg' name='Shops' location='/shop' selected={setSelect} isSelected={select} />
-                        {/*<NavItems logo='src/assets/images/navbar/Shops.svg' name='order' location='/order' selected={setSelect} isSelected={select} />*/}
                     </ul>
                 </div>
 
@@ -38,11 +48,11 @@ function NavigationMenu() {
 export default NavigationMenu;
 
 interface INavItems {
-    name: string
-    location: string
-    selected: Function
-    isSelected: string
-    logo?: string
+    name: string;
+    location: string;
+    selected: Function;
+    isSelected: string;
+    logo?: string;
 }
 
 function NavItems({ name, selected, isSelected, location, logo }: INavItems) {
