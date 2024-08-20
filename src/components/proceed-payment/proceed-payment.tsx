@@ -683,21 +683,45 @@ const ProceedPayment: React.FC<any> = (props:any) => {
       };
 
       const calculateTotalsWholesale = (discountValueWholesale: number, customerAmountValueWholesale: number) => {
-        const totalPhonePriceWholesale = wholesalePhones.reduce((sum:any, wholesalePhone:any) => sum + (wholesalePhone.price || 0), 0);
-        const totalItemPriceWholesale = wholesaleItems.reduce((sum:any, wholesaleItem:any) => sum + ((wholesaleItem.price * wholesaleItem.qty) || 0), 0);
-        const subtotalValueWholesale = totalPhonePriceWholesale + totalItemPriceWholesale - outstanding;
-        const totalAfterDiscountValueWholesale = subtotalValueWholesale - discountValueWholesale;
-        const balanceValueWholesale = customerAmountValueWholesale - totalAfterDiscountValueWholesale;
+        const totalPhonePriceWholesale = parseFloat(
+            wholesalePhones.reduce((sum: number, wholesalePhone: any) => sum + parseFloat(wholesalePhone.price || 0), 0).toFixed(2)
+        );
+
+        const totalItemPriceWholesale = parseFloat(
+            wholesaleItems.reduce((sum: number, wholesaleItem: any) =>
+                sum + ((parseFloat(wholesaleItem.price) || 0) * (parseFloat(wholesaleItem.qty) || 0)), 0).toFixed(2)
+        );
+
+
+        const subtotalValueWholesale = parseFloat(
+            (totalPhonePriceWholesale + totalItemPriceWholesale - parseFloat(outstanding || 0)).toFixed(2)
+        );
+        console.log("Subtotal 1: " + subtotalValueWholesale);
+
+
+        const totalAfterDiscountValueWholesale = parseFloat(
+            (subtotalValueWholesale - discountValueWholesale).toFixed(2)
+        );
+
+        const balanceValueWholesale = parseFloat(
+            (customerAmountValueWholesale - totalAfterDiscountValueWholesale).toFixed(2)
+        );
 
         setSubtotalWholesale(subtotalValueWholesale);
         setTotalAfterDiscountWholesale(totalAfterDiscountValueWholesale);
         setBalanceWholesale(balanceValueWholesale);
+
+        console.log("Total phones: " + totalPhonePriceWholesale);
+        console.log("Total items: " + totalItemPriceWholesale);
+        console.log("Subtotal 2 : " + subtotalValueWholesale);
+
 
         return {
           subtotalWholesale: subtotalValueWholesale,
           totalAfterDiscountWholesale: totalAfterDiscountValueWholesale,
         };
       };
+
 
 
 
