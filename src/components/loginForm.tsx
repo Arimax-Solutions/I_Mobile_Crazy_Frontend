@@ -19,7 +19,7 @@ export default function LoginForm() {
   const navigate = useNavigate();
 
 
-  const handleLogin = async () => {
+  /*const handleLogin = async () => {
     const userData: UserData = { username: username, password: password };
     try {
       const response = await axios.post(backend_url+'/auth/login', userData);
@@ -53,7 +53,45 @@ export default function LoginForm() {
   
       setError('Invalid username or password');
     }
+  };*/
+  const handleLogin = async () => {
+    const userData: UserData = { username: username, password: password };
+    try {
+      const response = await axios.post(backend_url+'/auth/login', userData);
+      if (response.data.token) {
+        Swal.fire({
+          title: "Success!",
+          text: "Login successful.",
+          icon: "success"
+        });
+        setUsername("");
+        setPassword("")
+        setError('');
+        localStorage.setItem('authToken', response.data.token);
+        localStorage.setItem('username', response.data.authenticatedUser.name);
+        localStorage.setItem('userRole', response.data.authenticatedUser.role);  // Save the user role
+
+        navigate('/dashboard');
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: response.data.message || "Invalid username or password.",
+          icon: "error"
+        });
+        setError('Invalid username or password');
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Invalid username or password.",
+        icon: "error"
+      });
+
+      setError('Invalid username or password');
+    }
   };
+
+
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gradient-custom">
       <div className="w-full md:w-1/2 flex justify-center items-center">
