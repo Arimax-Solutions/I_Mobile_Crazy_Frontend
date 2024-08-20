@@ -56,6 +56,9 @@ interface RetailOrder {
     actual_price: number;
     total_amount: number;
     date: string;
+    items: string[];
+    imeis: Imei[];
+    customer: Customer
 }
 
 interface ReturnOrder {
@@ -64,6 +67,15 @@ interface ReturnOrder {
     price: number;
     date: string;
 }
+interface Customer {
+    customer_id: number;
+    name: string;
+    email: string;
+    contact_phone: string;
+    nic: string;
+    outstandingAmount: number;
+}
+
 
 // Component
 export default function WholesaleOrderView() {
@@ -180,7 +192,7 @@ export default function WholesaleOrderView() {
                         </thead>
                         <tbody>
                             {visibleTable === 'wholesale' && wholesaleOrders.map((order, index) => (
-                                <tr key={index} className="cursor-pointer hover:bg-gray-600 hover:font-bold ">
+                                <tr key={index} className="cursor-pointer hover:bg-gray-600 ">
                                     <td className="p-2 border">{order.wholesale_order_id}</td>
                                     <td className="p-2 border">{order.discount}</td>
                                     <td className="p-2 border">{order.actual_price}</td>
@@ -268,12 +280,29 @@ export default function WholesaleOrderView() {
                                 </div>
                             )}
                             {visibleTable === 'retail' && (
-                                <div>
+                                  <div>
                                     <p><strong>Order ID:</strong> {(selectedOrder as RetailOrder).retail_order_id}</p>
                                     <p><strong>Discount:</strong> {(selectedOrder as RetailOrder).discount}</p>
                                     <p><strong>Actual Price:</strong> {(selectedOrder as RetailOrder).actual_price}</p>
                                     <p><strong>Total Amount:</strong> {(selectedOrder as RetailOrder).total_amount}</p>
                                     <p><strong>Date:</strong> {(selectedOrder as RetailOrder).date}</p>
+                                    <p><strong>Shop:</strong> {(selectedOrder as RetailOrder).customer.name}</p>
+                                    <p><strong>Items:</strong> {(selectedOrder as RetailOrder).items.join(', ')}</p>
+    
+                                    <ul>
+                                        {(selectedOrder as RetailOrder).imeis.map((imei, index) => (
+                                            <li key={index}>
+                                                <strong> IMEI:</strong> {imei.imei},
+                                                <strong> Storage:</strong> {imei.storage},
+                                                <strong> Colour:</strong> {imei.colour},
+                                                <strong> Warranty:</strong> {imei.warranty || 'N/A'},
+                                                <strong> Battery Health:</strong> {imei.batteryHealth},
+                                                <strong> Price:</strong> {imei.price},
+                                                <strong> Status:</strong> {imei.status},
+                                                <strong> Model Name:</strong> {imei.modelId.name}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             )}
                             {visibleTable === 'return' && (
