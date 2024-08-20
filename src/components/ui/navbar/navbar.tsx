@@ -142,10 +142,13 @@ function NavItems({ name, selected, setSelected, location, logo, onClick }: INav
     return (
         <li 
             className={clsx("flex items-center gap-4 cursor-pointer", {
-                "text-[#5356EC]": isSelected,  // Apply blue color when selected
+                "text-[#5356EC]": isSelected,  // Apply blue color to text and icon when selected
                 "text-[#959595]": !isSelected  // Apply grey color when not selected
             })} 
-            onClick={onClick}
+            onClick={() => {
+                setSelected(name);
+                onClick();
+            }}
         >
             <NavLink to={location} className="flex items-center gap-4">
                 <img 
@@ -153,11 +156,14 @@ function NavItems({ name, selected, setSelected, location, logo, onClick }: INav
                     src={logo} 
                     alt={name} 
                     className={clsx({
-                        "brightness-150": isSelected,  // Apply effect or style for selected icon
-                        "brightness-100": !isSelected  // Default effect or style when not selected
+                        "text-[#5356EC]": isSelected,  // Apply blue color when selected
+                        "text-[#959595]": !isSelected  // Apply grey color when not selected
                     })}
                 />
-                <p className='text-[19px] font-medium'>{name}</p>
+                <p className={clsx('text-[19px] font-medium', {
+                    'text-[#5356EC]': isSelected,  // Apply blue color when selected
+                    'text-[#959595]': !isSelected  // Apply grey color when not selected
+                })}>{name}</p>
             </NavLink>
         </li>
     );
