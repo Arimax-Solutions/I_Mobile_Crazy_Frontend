@@ -150,7 +150,7 @@ export default function WholesaleOrderView() {
                     Return Orders
                 </Button>
             </div>
-
+    
             {/* Conditional rendering of tables */}
             {visibleTable && (
                 <div className="m-4 mt-5 overflow-auto max-h-[50vh]">
@@ -180,7 +180,7 @@ export default function WholesaleOrderView() {
                         </thead>
                         <tbody>
                             {visibleTable === 'wholesale' && wholesaleOrders.map((order, index) => (
-                                <tr key={index} className="cursor-pointer">
+                                <tr key={index} className="cursor-pointer hover:bg-gray-600 hover:font-bold ">
                                     <td className="p-2 border">{order.wholesale_order_id}</td>
                                     <td className="p-2 border">{order.discount}</td>
                                     <td className="p-2 border">{order.actual_price}</td>
@@ -198,7 +198,7 @@ export default function WholesaleOrderView() {
                                 </tr>
                             ))}
                             {visibleTable === 'retail' && retailOrders.map((order, index) => (
-                                <tr key={index} className="cursor-pointer">
+                                <tr key={index} className="cursor-pointer hover:bg-gray-600 hover:font-bold">
                                     <td className="p-2 border">{order.retail_order_id}</td>
                                     <td className="p-2 border">{order.discount}</td>
                                     <td className="p-2 border">{order.actual_price}</td>
@@ -215,7 +215,7 @@ export default function WholesaleOrderView() {
                                 </tr>
                             ))}
                             {visibleTable === 'return' && returnOrders.map((order, index) => (
-                                <tr key={index} className="cursor-pointer">
+                                <tr key={index} className="cursor-pointer hover:bg-gray-600 hover:font-bold">
                                     <td className="p-2 border">{order.return_order_id}</td>
                                     <td className="p-2 border">{order.reason}</td>
                                     <td className="p-2 border">{order.price}</td>
@@ -234,7 +234,7 @@ export default function WholesaleOrderView() {
                     </table>
                 </div>
             )}
-
+    
             {/* Modal for order details */}
             {selectedOrder && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -250,7 +250,7 @@ export default function WholesaleOrderView() {
                                     <p><strong>Date:</strong> {(selectedOrder as WholesaleOrder).date}</p>
                                     <p><strong>Shop:</strong> {(selectedOrder as WholesaleOrder).shop.shop_name}</p>
                                     <p><strong>Items:</strong> {(selectedOrder as WholesaleOrder).items.join(', ')}</p>
-                                    <p><strong>IMEIs:</strong></p>
+    
                                     <ul>
                                         {(selectedOrder as WholesaleOrder).imeis.map((imei, index) => (
                                             <li key={index}>
@@ -296,4 +296,4 @@ export default function WholesaleOrderView() {
             )}
         </div>
     );
-}
+}    

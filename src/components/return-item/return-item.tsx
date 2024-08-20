@@ -336,17 +336,17 @@ export default function ReturnItem() {
                 </Button>
             </div>
 
-         {/* Table to display users */}
+    {/* Table to display users */}
             <div className='m-4 mt-5 overflow-x-auto'>
                 <table className='min-w-full divide-y table-styles'>
                     <thead>
                         <tr>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Id</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Brand</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Category</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Contact Number</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Reason</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider'>Id</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider'>Brand</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider'>Category</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider'>Contact Number</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider'>Name</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider'>Reason</th>
                         </tr>
                     </thead>
                     <tbody className='divide-y divide-gray-200'>
@@ -354,19 +354,20 @@ export default function ReturnItem() {
                             <tr 
                                 key={user.return_phone_id} 
                                 onClick={() => handleTableRowClick(user)} 
-                                className='hover:bg-gray-200 cursor-pointer'
+                                className='hover:bg-gray-600 cursor-pointer'
                             >
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.return_phone_id}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.brand}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.category}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.contact_number}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.name}</td>
-                                <td className='px-6 py-4 whitespace-nowrap'>{user.reason}</td>
+                                <td className='px-6 py-2 whitespace-nowrap transition-colors duration-300 hover:text-black hover:font-bold'>{user.return_phone_id}</td>
+                                <td className='px-6 py-2 whitespace-nowrap transition-colors duration-300 hover:text-black hover:font-bold'>{user.brand}</td>
+                                <td className='px-6 py-2 whitespace-nowrap transition-colors duration-300 hover:text-black hover:font-bold'>{user.category}</td>
+                                <td className='px-6 py-2 whitespace-nowrap transition-colors duration-300 hover:text-black hover:font-bold'>{user.contact_number}</td>
+                                <td className='px-6 py-2 whitespace-nowrap transition-colors duration-300 hover:text-black hover:font-bold'>{user.name}</td>
+                                <td className='px-6 py-2 whitespace-nowrap transition-colors duration-300 hover:text-black hover:font-bold'>{user.reason}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+
 
         </div>
     );

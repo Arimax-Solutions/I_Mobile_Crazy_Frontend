@@ -343,35 +343,35 @@ const Item = () => {
             
 
             {/* Table to display items */}
-            <div className='mt-5 m-4'>
+            <div className='mt-5 m-4 text-white'>
                 <table className='min-w-full divide-y table-styles'>
                     <thead>
                         <tr className=''>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Id</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Category</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Brand</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Color</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Price</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Warranty Period</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Qty</th>
+                            <th className='px-6 py-3 text-left text-xs text-white font-medium text-gray-500 uppercase tracking-wider'>Id</th>
+                            <th className='px-6 py-3 text-left text-xs text-white font-medium text-gray-500 uppercase tracking-wider'>Category</th>
+                            <th className='px-6 py-3 text-left text-xs text-white font-medium text-gray-500 uppercase tracking-wider'>Name</th>
+                            <th className='px-6 py-3 text-left text-xs text-white font-medium text-gray-500 uppercase tracking-wider'>Brand</th>
+                            <th className='px-6 py-3 text-left text-xs text-white font-medium text-gray-500 uppercase tracking-wider'>Color</th>
+                            <th className='px-6 py-3 text-left text-xs text-white font-medium text-gray-500 uppercase tracking-wider'>Price</th>
+                            <th className='px-6 py-3 text-left text-xs text-white font-medium text-gray-500 uppercase tracking-wider'>Warranty Period</th>
+                            <th className='px-6 py-3 text-left text-xs text-white font-medium text-gray-500 uppercase tracking-wider'>Qty</th>
                         </tr>
                     </thead>
                     <tbody>
                         {items.map((item) => (
                             <tr
                                 key={item.item_id}
-                                className=' text-white font-semibold hover:bg-gray-50'
+                                className=' text-white font-semibold hover:cursor-pointer'
                                 onClick={() => handleTableRowClick(item)}
                             >
-                                <td className='px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-500'>{item.item_id}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.category}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.name}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.brand}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.colour}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.price}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.warranty_period}</td>
-                                <td className='px-6 py-2 whitespace-nowrap text-sm text-gray-500'>{item.qty}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-white text-sm font-medium text-gray-500'>{item.item_id}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-white text-sm text-gray-500'>{item.category}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-white text-sm text-gray-500'>{item.name}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-white text-sm text-gray-500'>{item.brand}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-white text-sm text-gray-500'>{item.colour}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-white text-sm text-gray-500'>{item.price}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-white text-sm text-gray-500'>{item.warranty_period}</td>
+                                <td className='px-6 py-2 whitespace-nowrap text-white text-sm text-gray-500'>{item.qty}</td>
                             </tr>
                         ))}
                     </tbody>
