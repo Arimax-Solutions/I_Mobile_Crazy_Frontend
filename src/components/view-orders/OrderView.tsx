@@ -247,82 +247,106 @@ export default function WholesaleOrderView() {
                 </div>
             )}
     
-            {/* Modal for order details */}
-            {selectedOrder && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-8 rounded-lg max-w-md w-full">
-                        <h2 className="text-2xl font-bold mb-4">Order Details</h2>
-                        <div>
-                            {visibleTable === 'wholesale' && (
-                                <div>
-                                    <p><strong>Order ID:</strong> {(selectedOrder as WholesaleOrder).wholesale_order_id}</p>
-                                    <p><strong>Discount:</strong> {(selectedOrder as WholesaleOrder).discount}</p>
-                                    <p><strong>Actual Price:</strong> {(selectedOrder as WholesaleOrder).actual_price}</p>
-                                    <p><strong>Total Amount:</strong> {(selectedOrder as WholesaleOrder).total_amount}</p>
-                                    <p><strong>Date:</strong> {(selectedOrder as WholesaleOrder).date}</p>
-                                    <p><strong>Shop:</strong> {(selectedOrder as WholesaleOrder).shop.shop_name}</p>
-                                    <p><strong>Items:</strong> {(selectedOrder as WholesaleOrder).items.join(', ')}</p>
-    
-                                    <ul>
-                                        {(selectedOrder as WholesaleOrder).imeis.map((imei, index) => (
-                                            <li key={index}>
-                                                <strong>IMEI:</strong> {imei.imei},
-                                                <strong> Storage:</strong> {imei.storage},
-                                                <strong> Colour:</strong> {imei.colour},
-                                                <strong> Warranty:</strong> {imei.warranty || 'N/A'},
-                                                <strong> Battery Health:</strong> {imei.batteryHealth},
-                                                <strong> Price:</strong> {imei.price},
-                                                <strong> Status:</strong> {imei.status},
-                                                <strong> Model Name:</strong> {imei.modelId.name}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                            {visibleTable === 'retail' && (
-                                  <div>
-                                    <p><strong>Order ID:</strong> {(selectedOrder as RetailOrder).retail_order_id}</p>
-                                    <p><strong>Discount:</strong> {(selectedOrder as RetailOrder).discount}</p>
-                                    <p><strong>Actual Price:</strong> {(selectedOrder as RetailOrder).actual_price}</p>
-                                    <p><strong>Total Amount:</strong> {(selectedOrder as RetailOrder).total_amount}</p>
-                                    <p><strong>Date:</strong> {(selectedOrder as RetailOrder).date}</p>
-                                    <p><strong>Shop:</strong> {(selectedOrder as RetailOrder).customer.name}</p>
-                                    <p><strong>Items:</strong> {(selectedOrder as RetailOrder).items.join(', ')}</p>
-    
-                                    <ul>
-                                        {(selectedOrder as RetailOrder).imeis.map((imei, index) => (
-                                            <li key={index}>
-                                                <strong> IMEI:</strong> {imei.imei},
-                                                <strong> Storage:</strong> {imei.storage},
-                                                <strong> Colour:</strong> {imei.colour},
-                                                <strong> Warranty:</strong> {imei.warranty || 'N/A'},
-                                                <strong> Battery Health:</strong> {imei.batteryHealth},
-                                                <strong> Price:</strong> {imei.price},
-                                                <strong> Status:</strong> {imei.status},
-                                                <strong> Model Name:</strong> {imei.modelId.name}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                            {visibleTable === 'return' && (
-                                <div>
-                                    <p><strong>Order ID:</strong> {(selectedOrder as ReturnOrder).return_order_id}</p>
-                                    <p><strong>Reason:</strong> {(selectedOrder as ReturnOrder).reason}</p>
-                                    <p><strong>Price:</strong> {(selectedOrder as ReturnOrder).price}</p>
-                                    <p><strong>Date:</strong> {(selectedOrder as ReturnOrder).date}</p>
-                                </div>
-                            )}
-                        </div>
-                        <button
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4"
-                            onClick={handleCloseModal}
-                        >
-                            Close
-                        </button>
+           {/* Modal for order details */}
+        {selectedOrder && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                <div className="bg-white p-8 rounded-lg max-w-md w-full shadow-lg overflow-y-auto max-h-[80vh]">
+                    <h2 className="text-3xl font-bold mb-4 text-purple-600">Order Details</h2>
+                    <div>
+                        {visibleTable === 'wholesale' && (
+                            <div>
+                                <p><strong>Order ID:</strong> {(selectedOrder as WholesaleOrder).wholesale_order_id || 'N/A'}</p>
+                                <p><strong>Discount:</strong> {(selectedOrder as WholesaleOrder).discount || 'N/A'}</p>
+                                <p><strong>Actual Price:</strong> {(selectedOrder as WholesaleOrder).actual_price || 'N/A'}</p>
+                                <p><strong>Total Amount:</strong> {(selectedOrder as WholesaleOrder).total_amount || 'N/A'}</p>
+                                <p><strong>Date:</strong> {(selectedOrder as WholesaleOrder).date || 'N/A'}</p>
+                                <br/>
+                                <h2 className="text-2xl font-bold mb-4 text-blue-500">Shop Details</h2>
+                                <p><strong>Shop Name :</strong> {(selectedOrder as WholesaleOrder).shop?.shop_name || 'N/A'}</p>
+                                <p><strong>Address :</strong> {(selectedOrder as WholesaleOrder).shop?.address || 'N/A'}</p>
+                                <p><strong>Email :</strong> {(selectedOrder as WholesaleOrder).shop?.email || 'N/A'}</p>
+                                <p><strong>Contact:</strong> {(selectedOrder as WholesaleOrder).shop?.contact_number || 'N/A'}</p>
+                                <p><strong>Owner nic:</strong> {(selectedOrder as WholesaleOrder).shop?.owner_nic || 'N/A'}</p>
+                                <p><strong>Credit limit :</strong> {(selectedOrder as WholesaleOrder).shop?.credit_limit || 'N/A'}</p>
+                                <p><strong>Outstanding :</strong> {(selectedOrder as WholesaleOrder).shop?.outstanding || 'N/A'}</p>
+
+                                <br/>
+                                <h2 className="text-2xl font-bold mb-4 text-green-500">Item Details</h2>
+                                <p><strong>Items:</strong> {(selectedOrder as WholesaleOrder).items?.join(', ') || 'N/A'}</p>
+
+                                <br/>
+                                <h2 className="text-2xl font-bold mb-4 text-red-500">Phones Details</h2>
+                                <ul className="mt-4 space-y-2">
+                                    {(selectedOrder as WholesaleOrder).imeis.map((imei, index) => (
+                                        <li key={index} className="p-2 border-2 border-black rounded-lg">
+                                            <p><strong>IMEI:</strong> {imei.imei || 'N/A'}</p>
+                                            <p><strong>Storage:</strong> {imei.storage || 'N/A'}</p>
+                                            <p><strong>Colour:</strong> {imei.colour || 'N/A'}</p>
+                                            <p><strong>Warranty:</strong> {imei.warranty || 'N/A'}</p>
+                                            <p><strong>Battery Health:</strong> {imei.batteryHealth || 'N/A'}</p>
+                                            <p><strong>Price:</strong> {imei.price || 'N/A'}</p>
+                                            <p><strong>Status:</strong> {imei.status || 'N/A'}</p>
+                                            <p><strong>Model Name:</strong> {imei.modelId?.name || 'N/A'}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {visibleTable === 'retail' && (
+                            <div>
+                                <p><strong>Order ID:</strong> {(selectedOrder as RetailOrder).retail_order_id || 'N/A'}</p>
+                                <p><strong>Discount:</strong> {(selectedOrder as RetailOrder).discount || 'N/A'}</p>
+                                <p><strong>Actual Price:</strong> {(selectedOrder as RetailOrder).actual_price || 'N/A'}</p>
+                                <p><strong>Total Amount:</strong> {(selectedOrder as RetailOrder).total_amount || 'N/A'}</p>
+                                <br />
+                                <h2 className="text-2xl font-bold mb-4 text-blue-500">Customer Details</h2>
+                                <p><strong>Customer Name:</strong> {(selectedOrder as RetailOrder).customer?.name || 'N/A'}</p>
+                                <p><strong>Email:</strong> {(selectedOrder as RetailOrder).customer?.email || 'N/A'}</p>
+                                <p><strong>Contact:</strong> {(selectedOrder as RetailOrder).customer?.contact_phone || 'N/A'}</p>
+                                <p><strong>NIC:</strong> {(selectedOrder as RetailOrder).customer?.nic || 'N/A'}</p>
+                                <p><strong>Outstanding Amount:</strong> {(selectedOrder as RetailOrder).customer?.outstandingAmount || 'N/A'}</p>
+
+                                <br />
+                                <h2 className="text-2xl font-bold mb-4 text-green-500">Item Details</h2>
+                                <p><strong>Items:</strong> {(selectedOrder as RetailOrder).items?.join(', ') || 'N/A'}</p>
+
+                                <br />
+                                <h2 className="text-2xl font-bold mb-4 text-red-500">Phones Details</h2>
+                                <ul className="mt-4 space-y-2">
+                                    {(selectedOrder as RetailOrder).imeis.map((imei, index) => (
+                                        <li key={index} className="p-2 border-2 border-black rounded-lg">
+                                            <p><strong>IMEI:</strong> {imei.imei || 'N/A'}</p>
+                                            <p><strong>Model Name:</strong> {imei.modelId?.name || 'N/A'}</p>
+                                            <p><strong>Storage:</strong> {imei.storage || 'N/A'}</p>
+                                            <p><strong>Colour:</strong> {imei.colour || 'N/A'}</p>
+                                            <p><strong>Warranty:</strong> {imei.warranty || 'N/A'}</p>
+                                            <p><strong>Battery Health:</strong> {imei.batteryHealth || 'N/A'}</p>
+                                            <p><strong>Price:</strong> {imei.price || 'N/A'}</p>
+                                            <p><strong>Status:</strong> {imei.status || 'N/A'}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {visibleTable === 'return' && (
+                            <div>
+                                <p><strong>Order ID:</strong> {(selectedOrder as ReturnOrder).return_order_id || 'N/A'}</p>
+                                <p><strong>Reason:</strong> {(selectedOrder as ReturnOrder).reason || 'N/A'}</p>
+                                <p><strong>Price:</strong> {(selectedOrder as ReturnOrder).price || 'N/A'}</p>
+                                <p><strong>Date:</strong> {(selectedOrder as ReturnOrder).date || 'N/A'}</p>
+                            </div>
+                        )}
                     </div>
+                    <button
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
+                        onClick={handleCloseModal}
+                    >
+                        Close
+                    </button>
                 </div>
-            )}
+            </div>
+        )}
+
         </div>
     );
 }    

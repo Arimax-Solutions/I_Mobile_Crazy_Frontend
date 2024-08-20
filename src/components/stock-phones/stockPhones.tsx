@@ -75,7 +75,7 @@ export default function StockPhones() {
     ];
 
 
-    const validateString = (value:string) => /^[a-zA-Z\s]*$/.test(value);
+    const validateString = (value:string) => /^[a-zA-Z0-9\s]+$/.test(value);
     const validateNumber = (value:Number, max:Number) => /^\d+$/.test(value.toString()) && value <= max;
 
     const handleInputChange = (setter:any, validator:any, value:any, max:any, errorMessage:any) => {
@@ -95,40 +95,39 @@ export default function StockPhones() {
     }, []);
 
     const regexPatterns = {
-        stockName: /^[a-zA-Z\s]+$/,  
-        description: /^[a-zA-Z\s]+$/, 
+        stockName: /^[a-zA-Z0-9\s]+$/,  
+        description: /^[a-zA-Z0-9\s]+$/,
         quantity: /^\d+$/, 
         model: /^[a-zA-Z0-9\s]+$/, 
         imeiNumber: /^\d{15}$/, 
         storage: /^(64GB|128GB|256GB|512GB|1TB)$/,
-        iosversion:  /^\d+$/,
+        iosversion: /^\d+$/,
         batteryHealth: /^\d+$/,
-        colour: /^(Gold|White)$/ 
+        colour: /^(Gold|White)$/
     };
-    
     const validateForm = (): boolean => {
         // Validate stockName
         if (!regexPatterns.stockName.test(stockName)) {
             Swal.fire({
                 title: 'Error!',
-                text: 'Stock name is invalid. Only letters and spaces are allowed.',
+                text: 'Stock name is invalid. Only letters, numbers, and spaces are allowed.',
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
             return false;
         }
-        
+    
         // Validate description
         if (!regexPatterns.description.test(description)) {
             Swal.fire({
                 title: 'Error!',
-                text: 'Description is invalid. Only letters and spaces are allowed.',
+                text: 'Description is invalid. Only letters, numbers, and spaces are allowed.',
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
             return false;
         }
-        
+    
         // Validate quantity
         if (!regexPatterns.quantity.test(quantity) || parseInt(quantity, 10) > 500) {
             Swal.fire({
@@ -139,7 +138,7 @@ export default function StockPhones() {
             });
             return false;
         }
-        
+    
         // Validate model
         if (!regexPatterns.model.test(model)) {
             Swal.fire({
@@ -150,7 +149,7 @@ export default function StockPhones() {
             });
             return false;
         }
-        
+    
         // Validate imeiNumber
         if (!regexPatterns.imeiNumber.test(imeiNumber)) {
             Swal.fire({
@@ -161,7 +160,7 @@ export default function StockPhones() {
             });
             return false;
         }
-        
+    
         // Validate storage
         if (!regexPatterns.storage.test(storage)) {
             Swal.fire({
@@ -172,9 +171,9 @@ export default function StockPhones() {
             });
             return false;
         }
-        
+    
         // Validate iosversion
-        if (!regexPatterns.iosversion.test(iosversion) ) {
+        if (!regexPatterns.iosversion.test(iosversion)) {
             Swal.fire({
                 title: 'Error!',
                 text: 'iOS Version is invalid. It must be a number.',
@@ -183,7 +182,7 @@ export default function StockPhones() {
             });
             return false;
         }
-        
+    
         // Validate batteryHealth
         if (!regexPatterns.batteryHealth.test(batteryHealth) || parseInt(batteryHealth, 10) > 100) {
             Swal.fire({
@@ -194,7 +193,7 @@ export default function StockPhones() {
             });
             return false;
         }
-        
+    
         // Validate colour
         if (!regexPatterns.colour.test(colour)) {
             Swal.fire({
@@ -208,6 +207,7 @@ export default function StockPhones() {
     
         return true;
     };
+    
     
     const fetchItems = async () => {
         const token = localStorage.getItem('authToken');
@@ -309,9 +309,9 @@ export default function StockPhones() {
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });
-                // setTimeout(() => {
-                //     window.location.reload();
-                // }, 4000);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 4000);
                 setPhones([...phones, response.data.data]);
                 setStockName('');
                 setDescription('');
