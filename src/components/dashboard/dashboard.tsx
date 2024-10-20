@@ -303,9 +303,11 @@ export default function Dashboard() {
   }));
   const navigation = useNavigate();
 
-const hanldeDailyCostOnClick=()=>{
+  const hanldeDailyCostOnClick=()=>{
   navigation('/expencess')
 }
+  const totalStockCount = Object.values(stockData).reduce((acc, count) => acc + count, 0);
+
 
 
   console.log('Product data:', productData);
@@ -422,6 +424,10 @@ const hanldeDailyCostOnClick=()=>{
                               <td className='border px-4 py-2'>{count}</td>
                             </tr>
                         ))}
+                        <tr className='font-bold'>
+                          <td className='border px-4 py-2'>Total</td>
+                          <td className='border px-4 py-2'>{totalStockCount}</td>
+                        </tr>
                         </tbody>
                       </table>
                     </div>
@@ -442,6 +448,7 @@ const hanldeDailyCostOnClick=()=>{
                   </div>
                 </div>
             )}
+
           </div>
 
 
@@ -636,3 +643,4 @@ const hanldeDailyCostOnClick=()=>{
     </div>
   );
 }
+
