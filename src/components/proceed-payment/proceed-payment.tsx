@@ -1,6 +1,6 @@
 import React,{useEffect, useRef, useState} from 'react';
 import TopNavbar from '../topNavbar';
-import {useLocation, useParams} from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import axios from "axios";
 import {backend_url} from "../../utill/utill.ts";
 import Swal from "sweetalert2";
@@ -81,6 +81,7 @@ interface ReturnPhone {
 
 const ProceedPayment: React.FC<any> = (props:any) => {
   console.log(props)
+  const navigate = useNavigate();
   const { orderType } = useParams<{ orderType: string }>();
   const [orderId, setOrderId] = useState<string>('');
   const location = useLocation() as unknown as { state: ProceedPaymentProps };
@@ -458,14 +459,13 @@ const ProceedPayment: React.FC<any> = (props:any) => {
               doc.save(`${order.customer.name}.bill.pdf`);
             };
 
-
-
             await Swal.fire({
               title: 'Success!',
               text: 'Order saved successfully',
               icon: 'success',
               confirmButtonText: 'OK'
             });
+            navigate(`/order`);
 
             // Update the UI after successful save
             console.log('Order saved successfully:', response.data);
