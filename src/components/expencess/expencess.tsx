@@ -17,6 +17,20 @@ export default function Expencess() {
     const [reason, setReason] = useState('');
     const [errors, setErrors] = useState<{ amount?: string, reason?: string }>({});
     const [token, setToken] = useState('');
+    const [totalIncomeMonth, setTotalIncomeMonth] = useState(0);
+
+    useEffect(() => {
+        const fetchTotalIncome = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/api/retailOrder/monthly');
+                const income = response.data; // Assuming the response is a number
+                setTotalIncomeMonth(income);
+            } catch (error) {
+                console.error('Error fetching total income:', error);
+            }
+        };
+        fetchTotalIncome();
+    }, []);
     
     useEffect(() => {
         const token = localStorage.getItem('authToken');
@@ -80,11 +94,27 @@ export default function Expencess() {
         }
 
         const currentDate = new Date();
-        const date = currentDate.toISOString().split('T')[0]; 
-        const time = currentDate.toTimeString().split(' ')[0]; 
+        const date = currentDate.toISOString().split('T')[0];
+        const time = currentDate.toTimeString().split(' ')[0];
+
+        const newExpenseAmount = parseFloat(amount);
+
+        // Calculate the total of all existing expenses
+        const totalExpenses = expenccessDetails.reduce((sum, expense) => sum + expense.amount, 0);
+
+        // Check if adding the new expense exceeds the total income for the month
+        if (totalExpenses + newExpenseAmount > totalIncomeMonth) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Total expenses cannot exceed total income for the month',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
 
         const newExpencess = {
-            amount: parseFloat(amount),
+            amount: newExpenseAmount,
             reason,
             date,
             time
@@ -120,6 +150,7 @@ export default function Expencess() {
         }
     };
 
+
     const handleDeleteExpencessOnClick = ()=>{
         // Implement the delete logic here
     };
@@ -129,6 +160,10 @@ export default function Expencess() {
     <div className='m-4'>
         <div>
             <TopNavbar />
+        </div>
+
+        <div className="text-red-500 text-center text-2xl font-bold mb-4">
+            Total Income: ${totalIncomeMonth.toFixed(2)}
         </div>
 
         {/* inputs */}
