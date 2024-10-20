@@ -5,8 +5,6 @@ import '../index.css';
 import { backend_url } from '../utill/utill';
 import { useNavigate } from "react-router-dom";
 
-
-
 interface UserData {
   username: string;
   password: string;
@@ -90,7 +88,6 @@ export default function LoginForm() {
       setError('Invalid username or password');
     }
   };
-
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gradient-custom">
