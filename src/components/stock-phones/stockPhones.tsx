@@ -19,6 +19,9 @@ interface Phone {
     iosversion: string;
     batteryHealth: string;
     colour: string;
+    stock?: {
+        id: number;
+    };
 }
 
 interface NewPhone {
@@ -98,8 +101,8 @@ export default function StockPhones() {
         stockName: /^[a-zA-Z0-9\s]+$/,  
         description: /^[a-zA-Z0-9\s]+$/,
         quantity: /^\d+$/, 
-        model: /^[a-zA-Z0-9\s]+$/, 
-        imeiNumber: /^\d{15}$/, 
+        model: /^[a-zA-Z0-9\s]+$/,
+        imeiNumber: /^\d+$/,
         storage: /^(64GB|128GB|256GB|512GB|1TB)$/,
         iosversion: /^\d+$/,
         batteryHealth: /^\d+$/,
@@ -220,7 +223,7 @@ export default function StockPhones() {
                     },
                 });
 
-                console.log(response.data)
+                console.log("Phone data all : "+response.data)
                 if (response.data && Array.isArray(response.data.data)) {
                     setPhones(response.data.data);
                 } else {
@@ -285,7 +288,7 @@ export default function StockPhones() {
         setIosversion('');
         setBatteryHealth('');
     };
-    
+
 
     const handlePushOnClick = async () => {
         const newPhone: NewPhone = {
@@ -365,46 +368,58 @@ export default function StockPhones() {
             Swal.fire('Error', 'An error occurred while updating the phone', 'error');
         }
     };
-    
-    
-    
 
-    const handleItemDeleteOnClick = async (phoneId: number) => {
-        if (!selectedPhone) return;
-    
+
+
+
+    const handleItemDeleteOnClick = async () => {
+        if (!selectedPhone) return;  // If no phone is selected, return early
+        const selectedStockId = selectedPhone.id;
+
+
         try {
-            const response = await axios.delete(`${backend_url}/api/stock/${phoneId}`, {
+            // Send a DELETE request to the API endpoint to delete the phone
+            const response = await axios.delete(`http://localhost:8080/api/stock/imei/delete/${selectedStockId}/16`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log(response)
 
-            const updatedPhones = phones.filter(phone => phone.id !== phoneId);
-            setPhones(updatedPhones);
-            setSelectedPhone(null);
+            // Check if the response was successful
+            if (response.status === 200) {
+                // Filter out the deleted phone from the local phones state
+                const updatedPhones = phones.filter(phone => phone.id !== selectedPhone.id);
+                setPhones(updatedPhones);  // Update the state with the filtered list
+                setSelectedPhone(null);    // Reset selected phone
 
-            Swal.fire({
-                title: 'Success!',
-                text: 'Phone deleted successfully',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
-            setTimeout(() => {
-                window.location.reload();
-            }, 4000);
+                // Display success notification using Swal
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Phone deleted successfully',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
 
-            setStockName('');
-            setDescription('');
-            setQuantity('');
-            setModel('');
-            setImeiNumber('');
-            setStorage('');
-            setIosversion('');
-            setBatteryHealth('');
-            setColour('');
+                // Optionally reload the page after 4 seconds
+                setTimeout(() => {
+                    window.location.reload();
+                }, 4000);
+
+                // Reset form fields (if necessary)
+                setStockName('');
+                setDescription('');
+                setQuantity('');
+                setModel('');
+                setImeiNumber('');
+                setStorage('');
+                setIosversion('');
+                setBatteryHealth('');
+                setColour('');
+            }
         } catch (error) {
             console.error('Error deleting phone:', error);
+
+            // Display error notification if deletion fails
             Swal.fire({
                 title: 'Error!',
                 text: 'Failed to delete phone',
@@ -413,6 +428,58 @@ export default function StockPhones() {
             });
         }
     };
+
+
+    /*const handleImeiDeleteOnClick = async (imei: string) => {
+        if (!imei) {
+            // If imei is not provided, show an error and return
+            Swal.fire({
+                title: 'Error!',
+                text: 'IMEI not found',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        try {
+            // Sending DELETE request to delete the IMEI by imei string
+            const response = await axios.delete(`${backend_url}/api/imei/${imei}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            console.log(response);
+
+            // Success alert
+            Swal.fire({
+                title: 'Success!',
+                text: 'IMEI deleted successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+
+            // Optionally update UI to remove the deleted phone from the list
+            // You can filter the list to remove the deleted IMEI if applicable
+            setPhones(phones.filter(phone => phone.imeiNumber !== imei));  // Assuming phone objects have `imei`
+
+            // Reset selected phone if necessary
+            setSelectedPhone(null);
+
+        } catch (error) {
+            console.error('Error deleting IMEI:', error);
+
+            // Error alert if deletion fails
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to delete IMEI',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    };*/
+
 
     const handleTableRowClick = async (phone: Phone) => {
         setSelectedPhone(phone);
@@ -450,8 +517,15 @@ export default function StockPhones() {
         }
     };
 
-
-
+    useEffect(() => {
+        if (selectedPhone) {
+            console.log('Phone selected:', selectedPhone);
+            // Ensure stockId is available when the phone is selected
+            if (selectedPhone.stock?.id) {
+                console.log('Stock associated with phone:', selectedPhone.stock);
+            }
+        }
+    }, [selectedPhone]);
 
 
     return (
@@ -528,14 +602,14 @@ export default function StockPhones() {
 
 
 
-          {/* Second table (list of phone models) */}
+           Second table (list of phone models)
                 <div className="m-4 mt-5 text-white" style={{ height: '35vh', overflowY: 'auto' }}>
                     <h2 className="text-xl font-semibold mb-4">Phone Models</h2>
                     <div className="overflow-x-auto">
                         <table className="min-w-full bg-gray-800 text-white">
                             <thead>
                                 <tr>
-                                    <th className="py-2 px-4 border-b border-gray-700">ID</th> {/* Added ID column */}
+                                    <th className="py-2 px-4 border-b border-gray-700">ID</th>  Added ID column
                                     <th className="py-2 px-4 border-b border-gray-700">Model Name</th>
                                     <th className="py-2 px-4 border-b border-gray-700">Stock Added Date</th>
                                     <th className="py-2 px-4 border-b border-gray-700">IMEI Number</th>
@@ -549,7 +623,7 @@ export default function StockPhones() {
                                 {modelsTable.map((model, index) => (
                                     model ? ( // Check if model is not null or undefined
                                         <tr key={index} onClick={() => handleModelTableRowClick(model)}>
-                                            <td className="py-2 px-4 border-b border-gray-700">{index + 1}</td> {/* Display ID */}
+                                            <td className="py-2 px-4 border-b border-gray-700">{index + 1}</td>  Display ID
                                             <td className="py-2 px-4 border-b border-gray-700">{model.name}</td>
                                             <td className="py-2 px-4 border-b border-gray-700">{model.stockAddedDate}</td>
                                             <td className="py-2 px-4 border-b border-gray-700">{model.imeiNumbers.map((imei) => imei.imei).join(', ')}</td>
@@ -570,7 +644,7 @@ export default function StockPhones() {
 
           
           
-          {/* buttons */}
+           buttons
          </div>
 
 
@@ -583,15 +657,24 @@ export default function StockPhones() {
             >
                 ADD
             </Button>
-            <Button
-                onClick={() => handleItemDeleteOnClick(selectedPhone?.id || 0)}
-                className='buttons-styles bg-red-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                iconSrc={'src/assets/icons/Delete Btn.svg'}
-                iconAlt='delete icon'
-            >
-                DELETE
-            </Button>
-            <Button
+             <Button
+                 onClick={handleItemDeleteOnClick}  // Directly use the handler
+                 className="buttons-styles bg-red-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center"
+                 iconSrc={'src/assets/icons/Delete Btn.svg'}
+                 iconAlt="delete icon"
+             >
+                 DELETE
+             </Button>
+
+
+
+
+
+
+
+
+
+             <Button
                 onClick={handleItemUpdateOnClick}
                 className='buttons-styles bg-blue-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
                 iconSrc={'src/assets/icons/Update Btn.svg'}

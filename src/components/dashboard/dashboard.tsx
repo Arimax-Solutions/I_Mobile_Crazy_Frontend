@@ -5,7 +5,7 @@ import TopNavbar from '../topNavbar.tsx';
 import axios from "axios";
 import html2canvas from "html2canvas";
 import {jsPDF} from "jspdf";
-import logo from '../../assets/images/logo.png';
+import logo from '../../assets/images/logo2.jpg';
 import { useNavigate } from 'react-router-dom';
 
 interface StockData {
@@ -68,6 +68,8 @@ export default function Dashboard() {
   const [orderCount, setOrderCount] = useState(0);
   const [soldCount, setSoldCount] = useState(0);
   const [orderCountWholesale, setOrderCountWholesale] = useState(0);
+  const [dailyCost, setDailyCost] = useState(0);
+  const [netIncome, setNetIncome] = useState(0);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -112,34 +114,43 @@ export default function Dashboard() {
         const imgHeight = canvas.height * imgWidth / canvas.width;
         let heightLeft = imgHeight;
 
-        let position = 0;
+        // Define margins and header positioning
+        const headerMarginTop = 10;
+        const headerMarginLeft = 10;
+        const headerMarginRight = 10;
+        const headerTextCenterX = imgWidth / 2;
 
-        // Add header
-        pdf.setFontSize(12);
-        pdf.setTextColor(40);
-        pdf.addImage(logo, 'PNG', 10, 10, 30, 30);
-        pdf.text('I Mobile Crazy', 50, 20);
-        pdf.text('Income Report', 50, 30);
-        pdf.text(`Date: ${new Date().toLocaleDateString()}`, 50, 40);
-        pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
+        // Function to add header content
+        const addHeader = () => {
+          pdf.addImage(logo, 'PNG', headerMarginLeft, headerMarginTop, 30, 30);
+          pdf.setFontSize(12);
+          pdf.setTextColor(40);
+          pdf.text('I Mobile Crazy', headerTextCenterX, headerMarginTop + 15, { align: 'center' });
+          pdf.text('Income Report', headerTextCenterX, headerMarginTop + 25, { align: 'center' });
+          pdf.text(`Date: ${new Date().toLocaleDateString()}`, headerTextCenterX, headerMarginTop + 35, { align: 'center' });
 
+          // Add right-aligned text
+          pdf.text(`Daily Income: ${totalIncome.toFixed(2)}`, imgWidth - headerMarginRight, headerMarginTop + 15, { align: 'right' });
+          pdf.text(`Daily Cost: ${dailyCost.toFixed(2)}`, imgWidth - headerMarginRight, headerMarginTop + 25, { align: 'right' });
+          pdf.text(`Total Income: ${netIncome.toFixed(2)}`, imgWidth - headerMarginRight, headerMarginTop + 35, { align: 'right' });
+        };
+
+        // Add header to the first page
+        addHeader();
+
+        // Add the image to the first page
         pdf.addImage(imgData, 'PNG', 0, 60, imgWidth, imgHeight);
         heightLeft -= (pageHeight - 60);
 
-        while (heightLeft >= 0) {
+        // Add additional pages if needed
+        while (heightLeft > 0) {
           pdf.addPage();
-          pdf.addImage(logo, 'PNG', 10, 10, 30, 30);
-          pdf.text('Shop Name', 50, 20);
-          pdf.text('Income Report', 50, 30);
-          pdf.text(`Date: ${new Date().toLocaleDateString()}`, 50, 40);
-          pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
-
-          position = heightLeft - imgHeight;
-          pdf.addImage(imgData, 'PNG', 0, position + 60, imgWidth, imgHeight);
+          addHeader();
+          pdf.addImage(imgData, 'PNG', 0, 60, imgWidth, imgHeight);
           heightLeft -= pageHeight;
         }
 
-        pdf.text(`Total Income: ${totalIncome.toFixed(2)}`, 50, 50);
+        // Save the PDF
         pdf.save('income-report.pdf');
       });
     } else {
@@ -213,6 +224,7 @@ export default function Dashboard() {
       });
     }
   };
+
   useEffect(() => {
   const fetchTotalIncome = async () => {
       try {
@@ -224,8 +236,23 @@ export default function Dashboard() {
       }
     };
 
+    const fetchDailyCost = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/dailyCost/monthly/cost');
+        const cost = response.data.data; // Assuming the data is the cost value
+        setDailyCost(cost);
+      } catch (error) {
+        console.error('Error fetching daily cost:', error);
+      }
+    };
+
+    fetchDailyCost();
   fetchTotalIncome();
   }, []);
+
+  useEffect(() => {
+    setNetIncome(totalIncome - dailyCost);
+  }, [totalIncome, dailyCost]);
 
   useEffect(() => {
     const fetchOrderCount = async () => {
@@ -344,8 +371,16 @@ const hanldeDailyCostOnClick=()=>{
                       </table>
                     </div>
                     <div className='mt-4'>
-                      <h3 className='text-lg font-semibold'>Total Income of {today}</h3>
+                      <h3 className='text-lg font-semibold'>Daily Income of {today}</h3>
                       <p className='text-xl'>{totalIncome.toFixed(2)}</p>
+                    </div>
+                    <div className='mt-4'>
+                      <h3 className='text-lg font-semibold'>Daily Cost of {today}</h3>
+                      <p className='text-xl'>{dailyCost.toFixed(2)}</p>
+                    </div>
+                    <div className='mt-4'>
+                      <h3 className='text-lg font-semibold'>Net Income of {today}</h3>
+                      <p className='text-xl'>{netIncome.toFixed(2)}</p>
                     </div>
                     <div className="flex justify-end mt-4">
                       <button className="buttons-styles bg-danger text-white rounded px-4 py-2" onClick={toggleModal}>

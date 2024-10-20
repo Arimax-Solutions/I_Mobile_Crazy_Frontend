@@ -272,7 +272,7 @@ export default function ReturnPhone() {
         }
     };
 
-    const handleSearch = async () => {
+    /*const handleSearch = async () => {
         if (!imei) {
             Swal.fire({
                 title: 'Error!',
@@ -331,7 +331,77 @@ export default function ReturnPhone() {
                 confirmButtonText: 'OK'
             });
         }
+    };*/
+    const handleSearch = async () => {
+        if (!imei) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter an IMEI Number',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        try {
+            const response = await axios.get(`${backend_url}/api/imei/return/${imei}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const phoneData = response.data;
+
+            if (phoneData) {
+                setSelectedItem(phoneData);
+
+                setModel(phoneData?.modelId?.name || ''); // Check if modelId exists
+                setStorage(phoneData?.storage || '');
+                setColour(phoneData?.colour || '');
+                setReason(phoneData?.reason || '');
+
+                if (phoneData.customer) {
+                    setName(phoneData.customer.name || '');
+                    setContact_number(phoneData.customer.contact_phone || '');
+                    setCustomer_id(phoneData.customer.customer_id || '');
+                    setShop_id(''); // Reset shop ID if customer exists
+                } else if (phoneData.shop) {
+                    setName(phoneData.shop.shop_name || '');
+                    setContact_number(phoneData.shop.contact_number || '');
+                    setShop_id(phoneData.shop.shop_id || '');
+                    setCustomer_id(''); // Reset customer ID if shop exists
+                } else {
+                    setName('');
+                    setContact_number('');
+                    setCustomer_id('');
+                    setShop_id('');
+                }
+
+                setOutStanding(phoneData.price || 0);
+                // Uncomment and adjust date formatting if needed
+                // setDate(new Date(phoneData.date));
+                setReturn_phone_id(phoneData.return_phone_id || '');
+
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'IMEI not found',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                clearForm();
+            }
+        } catch (error) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to fetch return phone data',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            clearForm();
+        }
     };
+
 
     const clearForm = () => {
         setImei('');
