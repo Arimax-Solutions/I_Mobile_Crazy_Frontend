@@ -32,32 +32,6 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF4848'];
 
 
 
-/*
-const salesData = [
-  { month: 'January', sales: 1000 },
-  { month: 'February', sales: 2000 },
-  { month: 'March', sales: 3000 },
-  { month: 'April', sales: 1500 },
-  { month: 'May', sales: 2000 },
-  { month: 'June', sales: 2500 },
-  { month: 'July', sales: 3000 },
-  { month: 'August', sales: 3500 },
-  { month: 'September', sales: 4000 },
-  { month: 'October', sales: 4500 },
-  { month: 'November', sales: 5000 },
-  { month: 'December', sales: 5500 }
-];
-
-const weeklyOrderIncrementData = [
-  { day: 'Monday', orders: 10 },
-  { day: 'Tuesday', orders: 15 },
-  { day: 'Wednesday', orders: 20 },
-  { day: 'Thursday', orders: 25 },
-  { day: 'Friday', orders: 30 },
-  { day: 'Saturday', orders: 35 },
-  { day: 'Sunday', orders: 40 }
-];*/
-
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpen1, setIsModalOpen1] = useState(false);
