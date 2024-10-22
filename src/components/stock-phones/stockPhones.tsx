@@ -44,7 +44,13 @@ interface ImeiNumberPhone {
 
 export default function StockPhones() {
   const today = new Date();
-  const formattedDate = today.toISOString().split("T")[0];
+  const formattedDate = today.toISOString().split("T")[0];  
+  const formattedTime = today.toTimeString().split(" ")[0];
+
+  const [date, setDate] = useState(formattedDate);
+  const [time, setTime] = useState(formattedTime);
+  const combinedDateTime = `${date}T${time}`;
+
   const [stockName, setStockName] = useState("");
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -270,7 +276,7 @@ export default function StockPhones() {
 
     const newPhoneModel: PhoneModel = {
       name: model,
-      stockAddedDate: formattedDate,
+      stockAddedDate: combinedDateTime,
       imeiNumbers: [
         {
           imei: imeiNumber,
