@@ -5,7 +5,7 @@ import TopNavbar from '../topNavbar.tsx';
 import axios from "axios";
 import html2canvas from "html2canvas";
 import {jsPDF} from "jspdf";
-import logo from '../../assets/images/logo2.jpg';
+import logo from '../../assets/images/logo2.png';
 import { useNavigate } from 'react-router-dom';
 
 interface StockData {
