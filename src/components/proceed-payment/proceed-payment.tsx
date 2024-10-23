@@ -267,6 +267,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
           })),
         };
 
+
         try {
           const response = await axios.post(
             `${backend_url}/api/retailOrder`,
