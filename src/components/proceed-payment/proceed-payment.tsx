@@ -5,7 +5,7 @@ import axios from "axios";
 import { backend_url } from "../../utill/utill.ts";
 import Swal from "sweetalert2";
 import { jsPDF } from "jspdf";
-import logo from "../../assets/images/logo2.jpg";
+import logo from "../../assets/images/logo2.png";
 
 export interface WholesalePhone {
   id: string;
@@ -282,74 +282,76 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             const topMargin = 20;
             const sectionMargin = 10;
             const rowHeight = 10;
-            const pageWidth = 210; // A4 page width in mm
-            const pageHeight = 297; // A4 page height in mm
+            const pageWidth = 210;
+            const pageHeight = 297;
             const leftMargin = 10;
             const leftInsideMargin = 20;
-            const rightMargin = 20; // Adjusted right margin for positioning
 
-// Image settings
-            const imgWidth = 20; // Adjust the width for the image
-            const imgHeight = imgWidth * (img.height / img.width); // Maintain aspect ratio
-            const imgX = 20; // Position image at the left margin
-            const imgY = 30; // Position image below the header
+            const imgWidth = 20;
+            const imgHeight = imgWidth * (img.height / img.width);
+            const imgX = 20;
+            const imgY = 33;
 
-// Set grey color for the watermark with some transparency
-            const greyShade = 200; // Choose a value between 0 (black) and 255 (white)
-            doc.setFillColor(greyShade, greyShade, greyShade, 20);
+// Calculate circle properties
+            const centerFX = imgX + imgWidth / 2;
+            const centerY = imgY + imgHeight / 2;
+            const radius = Math.min(imgWidth, imgHeight) / 2;
 
-// Add the watermark image
-            doc.addImage(
-                img,
-                "PNG",
-                imgX,
-                imgY,
-                imgWidth,
-                imgHeight,
-                "",
-                "NONE"
-            );
+// Draw a white circle behind the image
+            doc.setFillColor(255, 255, 255);
+            doc.circle(centerFX, centerY, radius, 'F');
 
-// Draw page border on top of the watermark
-            doc.setDrawColor(0, 0, 0);
-            doc.rect(
-                leftMargin,
-                topMargin,
-                pageWidth - 2 * leftMargin,
-                pageHeight - 2 * topMargin
-            );
+// Now draw your image on top of the circle
+            doc.addImage(img, 'JPEG', imgX, imgY, imgWidth, imgHeight);
+
+
+// Set dark green background for the upper section
+            doc.setFillColor(0, 100, 0);
+            doc.rect(leftMargin, topMargin, 80, 40, 'F');
+
+// Draw the right rounded end
+            doc.ellipse(leftMargin + 80, topMargin + 20, 20, 20, 'F');
 
 // Header
-            doc.setFontSize(18);
+            doc.setFontSize(20);
             doc.setFont("helvetica", "bold");
-            doc.text("INVOICE", pageWidth - 20, topMargin + 10, {
-              align: "right",
-            });
+            doc.setTextColor(0, 100, 0);
+            doc.text("INVOICE", pageWidth - 20, topMargin + 10, { align: "right" });
 
 // "I MOBILE CRAZY" Text
             doc.setFontSize(18);
-            doc.setTextColor(0, 0, 0);
+            doc.setTextColor(255, 255, 255);
             doc.text("I MOBILE CRAZY", 69, 40, {
               align: "center",
             });
 
-// Line below "I MOBILE CRAZY"
-            doc.setLineWidth(0.5);
-            //doc.line(leftMargin, imgY + imgHeight + 10, pageWidth - leftMargin, imgY + imgHeight + 10);
-
 // Additional Information
             doc.setFontSize(10);
-            doc.text("Distributors of Mobile", 62, 45 , {
+            doc.setTextColor(255, 255, 255);
+            doc.text("Distributors of Mobile", 62, 45, {
               align: "center",
             });
-            doc.text("Phones & Accessories", 62, 50 , {
+            doc.text("Phones & Accessories", 62, 50, {
               align: "center",
             });
+
+// Set grey color for the watermark
+            const greyShade = 200;
+            doc.setFillColor(greyShade, greyShade, greyShade);
+
+// Add the watermark image with reduced opacity
+            doc.addImage(img, "PNG", imgX, imgY, imgWidth, imgHeight, "", "NONE");
+
+// Draw page border on top of the watermark
+            doc.setDrawColor(0, 0, 0);
+            doc.rect(leftMargin, topMargin, pageWidth - 2 * leftMargin, pageHeight - 2 * topMargin);
+
 
             // Define the starting vertical position and spacing
-            const newY = topMargin + 15; // Starting vertical position
-            const lineSpacing = 5; // Vertical spacing between lines
+            const newY = topMargin + 15;
+            const lineSpacing = 5;
 
+            doc.setTextColor(0, 0, 0);
             doc.text(
                 "Galekade junction, Halthota road,",
                 pageWidth - 42,
@@ -357,27 +359,27 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                 { align: "right" }
             );
             doc.text(
-                "Raigama, Bandaragama",
-                pageWidth - 58,
-                newY + lineSpacing, // Adjusted position
+                "Raigama, Bandaragama.",
+                pageWidth - 57,
+                newY + lineSpacing,
                 { align: "right" }
             );
             doc.text(
-                "Hotline: 076 311 0859",
+                "Hotline: 074 029 3931",
                 pageWidth - 62.5,
-                newY + 2 * lineSpacing, // Adjusted position
+                newY + 2 * lineSpacing,
                 { align: "right" }
             );
             doc.text(
-                "Mobile: 076 464 1168",
+                "Mobile: 076 311 0859",
                 pageWidth - 63,
-                newY + 3 * lineSpacing, // Adjusted position
+                newY + 3 * lineSpacing,
                 { align: "right" }
             );
             doc.text(
                 "Email: imobilecrazybandaragama@gmail.com",
                 pageWidth - 21,
-                newY + 4 * lineSpacing, // Adjusted position
+                newY + 4 * lineSpacing,
                 { align: "right" }
             );
 
@@ -393,7 +395,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             );
 
             doc.text(
-                `Invoice Number: ${order.retail_order_id}`,
+                `Bill No : ${order.retail_order_id}`,
                 pageWidth - 70,
                 customerY
             );
@@ -404,25 +406,25 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             );
 
             // Initialize Y positions
-            let startY = customerY + 30; // Starting Y for tables
+            let startY = customerY + 30;
 
             // Check if there are items to display
             if (order.items.length > 0) {
-              // Table headers for items
+              doc.setFillColor(0, 100, 0);
               const headers = ["Items", "Quantity", "Price", "Amount"];
               const headerStartX = [
                 leftInsideMargin,
-                leftMargin + 80,
+                leftMargin + 90,
                 leftMargin + 120,
                 leftMargin + 150,
               ];
 
-              doc.setFillColor(128, 128, 128);
+
               doc.setTextColor(255, 255, 255); // White text color
               doc.rect(
-                  leftMargin,
+                  leftInsideMargin,
                   startY - rowHeight,
-                  pageWidth - 2 * leftMargin,
+                  170,
                   rowHeight,
                   "F"
               );
@@ -438,7 +440,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               doc.setTextColor(0, 0, 0);
 
               // Start Y for items
-              let itemsStartY = startY + rowHeight;
+              let itemsStartY = startY + 8;
 
               // Include item data
               order.items.forEach((item: any, index: number) => {
@@ -449,7 +451,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                 );
                 doc.text(
                     `${item.qty}`,
-                    leftMargin + 80,
+                    leftMargin + 100,
                     itemsStartY + index * 10
                 );
                 doc.text(
@@ -465,11 +467,12 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               });
 
               // Draw items border
+              doc.setFillColor(0, 100, 0);
               doc.rect(
-                  leftMargin,
+                  leftInsideMargin,
                   startY,
-                  pageWidth - 2 * leftMargin,
-                  itemsStartY - startY + order.items.length * 10
+                  170,
+                  9
               );
 
               // Update Y for IMEIs
@@ -488,12 +491,12 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                 leftMargin + 150,
               ];
 
-              doc.setFillColor(128, 128, 128);
-              doc.setTextColor(255, 255, 255); // White text color
+              doc.setFillColor(0, 100, 0);
+              doc.setTextColor(255, 255, 255);
               doc.rect(
-                  leftMargin,
+                  leftInsideMargin,
                   startY - rowHeight,
-                  pageWidth - 2 * leftMargin,
+                  170,
                   rowHeight,
                   "F"
               );
@@ -509,7 +512,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               doc.setTextColor(0, 0, 0);
 
               // Start Y for IMEI data
-              let imeiStartY = startY + rowHeight;
+              let imeiStartY = startY + 8;
 
               // Include IMEI data
               order.imeis.forEach((imei: any, index: number) => {
@@ -541,39 +544,22 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               });
 
               // Draw IMEI border
+              doc.setFillColor(0, 100, 0);
               doc.rect(
-                  leftMargin,
+                  leftInsideMargin,
                   startY,
-                  pageWidth - 2 * leftMargin,
-                  imeiStartY - startY + order.imeis.length * 10
+                  170,
+                  9
               );
 
               // Update Y for summary
               startY = imeiStartY + order.imeis.length * 10 + sectionMargin;
             }
 
-           /* // Summary
-            doc.setFontSize(12);
-            doc.text(
-                `Actual Price: ${order.actual_price.toFixed(2)}`,
-                leftMargin,
-                startY
-            );
-            doc.text(
-                `Discount: ${order.discount.toFixed(2)}`,
-                leftMargin,
-                startY + 10
-            );
-            doc.text(
-                `Total Amount: ${order.total_amount.toFixed(2)}`,
-                leftMargin,
-                startY + 20
-            );
-*/
 // Footer
-            const footerY = pageHeight - 50; // Set footer Y position
-            const footerStartY = footerY - 30; // Starting Y position for footer content
-            doc.setFontSize(10);
+            const footerY = pageHeight - 60;
+            const footerStartY = footerY - 30;
+            doc.setFontSize(12);
 
 // Right-aligned actual price, discount, and total amount in footer
             doc.text(
@@ -596,35 +582,53 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             );
 
 // Warranty terms and conditions below the amounts
-            const warrantyOffsetY = footerStartY + 20; // Offset for warranty terms
+            // Set font size for the footer
+            doc.setFontSize(10);
+            const warrantyOffsetY = footerStartY + 20;
+
+// Array of footer text
             const footerText = [
               "Warranty terms & conditions!",
-              "* One year software warranty.",
-              "* Warranty void if stickers damaged or removed.",
-              "* Item should be in good condition.",
-              "* Bill must be presented, No cash returns.",
+              " >  One year software warranty.",
+              " >  Warranty void if stickers damaged or removed.",
+              " >  Item should be in good condition.",
+              " >  Bill must be presented, No cash returns.",
             ];
 
+// Draw the footer text
             footerText.forEach((line, index) => {
-              doc.text(line, leftMargin, warrantyOffsetY + index * 5);
+              doc.text(line, leftInsideMargin, warrantyOffsetY + index * 5);
             });
 
-// Thank you message centered at the bottom
+// Thank you text
             const thankYouText = "Thank you for shopping with us!";
-            const textWidth = doc.getTextWidth(thankYouText); // Get width of the thank you text
-            const centerX = (pageWidth - textWidth) / 2; // Centering calculation
-            const thankYouY = pageHeight - 30; // Y position for thank you message
+            const developerText = "Developed by Arimax Solutions";
 
+// Calculate the width and center X position for the thank you text
+            const textWidth = doc.getTextWidth(thankYouText);
+            const centerX = (pageWidth - textWidth) / 2;
+            const thankYouY = pageHeight - 40;
+
+// Set font size for thank you text and render it
             doc.setFontSize(12);
-            doc.text(thankYouText, centerX, thankYouY); // Centered thank you message
+            doc.text(thankYouText, centerX, thankYouY);
 
+// Calculate Y position for the developer text
+            const developerY = thankYouY + 20;
+
+// Set a smaller font size for the developer text and render it
+            doc.setFontSize(10);
+            doc.text(developerText, 85, developerY - 15);
+
+// Draw a dark green filled rectangle above the thank you text
+            const rectY = thankYouY+8;
+
+            doc.setFillColor(0, 100, 0);
+            doc.roundedRect(leftInsideMargin, rectY, 170, 4, 4, 4, 'F');
 
             // Save the PDF
-            doc.save("Invoice.pdf");
+            doc.save(`${order.customer.name}.bill.pdf`);
           };
-
-
-          /*<Bill order={order} logo={logo} />*/
 
           await Swal.fire({
             title: "Success!",
@@ -632,7 +636,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             icon: "success",
             confirmButtonText: "OK",
           });
-          //navigate(`/order`);
+          navigate(`/order`);
 
           // Update the UI after successful save
           console.log("Order saved successfully:", response.data);
