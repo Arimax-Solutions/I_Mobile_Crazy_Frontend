@@ -276,10 +276,9 @@ const ProceedPayment: React.FC<any> = (props: any) => {
           const doc = new jsPDF();
 
           const img = new Image();
-          img.src = logo; // Path to your uploaded image
+          img.src = logo;
 
           img.onload = function () {
-            // Constants for layout
             const topMargin = 20;
             const sectionMargin = 10;
             const rowHeight = 10;
@@ -287,19 +286,19 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             const pageHeight = 297; // A4 page height in mm
             const leftMargin = 10;
             const leftInsideMargin = 20;
-            const rightMargin = 140;
+            const rightMargin = 20; // Adjusted right margin for positioning
 
-            // Add watermark image with shading effect first
-            const imgWidth = 0; // Adjust the width to make the image smaller
+// Image settings
+            const imgWidth = 20; // Adjust the width for the image
             const imgHeight = imgWidth * (img.height / img.width); // Maintain aspect ratio
-            const imgX = pageWidth - imgWidth - rightMargin; // Position image to the right margin
-            const imgY = (pageHeight - imgHeight) / 2; // Center vertically on the page
+            const imgX = 20; // Position image at the left margin
+            const imgY = 30; // Position image below the header
 
-            // Set grey color for the watermark with some transparency
+// Set grey color for the watermark with some transparency
             const greyShade = 200; // Choose a value between 0 (black) and 255 (white)
-            doc.setFillColor(greyShade, greyShade, greyShade, 20); // Add a shadow color with 20% opacity
+            doc.setFillColor(greyShade, greyShade, greyShade, 20);
 
-            // Add the watermark image
+// Add the watermark image
             doc.addImage(
                 img,
                 "PNG",
@@ -311,7 +310,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                 "NONE"
             );
 
-            // Draw page border on top of the watermark
+// Draw page border on top of the watermark
             doc.setDrawColor(0, 0, 0);
             doc.rect(
                 leftMargin,
@@ -320,46 +319,70 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                 pageHeight - 2 * topMargin
             );
 
-            // Header
+// Header
             doc.setFontSize(18);
-            doc.setTextColor(0, 0, 255);
-            doc.text("INVOICE", pageWidth / 2, topMargin + 10, {
-              align: "center",
+            doc.setFont("helvetica", "bold");
+            doc.text("INVOICE", pageWidth - 20, topMargin + 10, {
+              align: "right",
             });
 
-            // Header
+// "I MOBILE CRAZY" Text
             doc.setFontSize(18);
-            doc.setTextColor(0, 0, 255);
-            doc.text("INVOICE", pageWidth / 2, topMargin + 10, {
-              align: "center",
-            });
-
-            doc.setFontSize(12);
             doc.setTextColor(0, 0, 0);
-            doc.text("I MOBILE CRAZY", pageWidth / 2, topMargin + 20, {
+            doc.text("I MOBILE CRAZY", 69, 40, {
               align: "center",
             });
+
+// Line below "I MOBILE CRAZY"
+            doc.setLineWidth(0.5);
+            //doc.line(leftMargin, imgY + imgHeight + 10, pageWidth - leftMargin, imgY + imgHeight + 10);
+
+// Additional Information
+            doc.setFontSize(10);
+            doc.text("Distributors of Mobile", 62, 45 , {
+              align: "center",
+            });
+            doc.text("Phones & Accessories", 62, 50 , {
+              align: "center",
+            });
+
+            // Define the starting vertical position and spacing
+            const newY = topMargin + 15; // Starting vertical position
+            const lineSpacing = 5; // Vertical spacing between lines
+
             doc.text(
                 "Galekade junction, Halthota road,",
-                pageWidth / 2,
-                topMargin + 25,
-                { align: "center" }
+                pageWidth - 42,
+                newY,
+                { align: "right" }
             );
-            doc.text("Raigama,Bandaragama", pageWidth / 2, topMargin + 30, {
-              align: "center",
-            });
-            doc.text("Phone: 076 311 0859", pageWidth / 2, topMargin + 35, {
-              align: "center",
-            });
+            doc.text(
+                "Raigama, Bandaragama",
+                pageWidth - 58,
+                newY + lineSpacing, // Adjusted position
+                { align: "right" }
+            );
+            doc.text(
+                "Hotline: 076 311 0859",
+                pageWidth - 62.5,
+                newY + 2 * lineSpacing, // Adjusted position
+                { align: "right" }
+            );
+            doc.text(
+                "Mobile: 076 464 1168",
+                pageWidth - 63,
+                newY + 3 * lineSpacing, // Adjusted position
+                { align: "right" }
+            );
             doc.text(
                 "Email: imobilecrazybandaragama@gmail.com",
-                pageWidth / 2,
-                topMargin + 40,
-                { align: "center" }
+                pageWidth - 21,
+                newY + 4 * lineSpacing, // Adjusted position
+                { align: "right" }
             );
 
             // Customer and Invoice Details
-            const customerY = topMargin + 60;
+            const customerY = topMargin + 50;
             doc.setFontSize(12);
             doc.text("BILL TO:", leftInsideMargin, customerY);
             doc.text(order.customer.name, leftInsideMargin, customerY + 5);
@@ -371,18 +394,13 @@ const ProceedPayment: React.FC<any> = (props: any) => {
 
             doc.text(
                 `Invoice Number: ${order.retail_order_id}`,
-                rightMargin,
+                pageWidth - 70,
                 customerY
             );
             doc.text(
                 `Invoice Date: ${new Date(order.date).toLocaleDateString()}`,
-                rightMargin,
+                pageWidth - 70,
                 customerY + 5
-            );
-            doc.text(
-                `Payment Due: ${new Date(order.date).toLocaleDateString()}`,
-                rightMargin,
-                customerY + 10
             );
 
             // Initialize Y positions
@@ -461,11 +479,12 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             // Check if there are IMEIs to display
             if (order.imeis.length > 0) {
               // Table headers for IMEI
-              const imeiHeaders = ["Model", "IMEI", "Warranty", "Price"];
+              const imeiHeaders = ["Model","Storage" , "IMEI" ,"Warranty", "Price"];
               const imeiHeaderStartX = [
                 leftInsideMargin,
-                leftMargin + 60,
-                leftMargin + 110,
+                leftMargin + 40,
+                leftMargin + 70,
+                leftMargin + 120,
                 leftMargin + 150,
               ];
 
@@ -500,13 +519,18 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                     imeiStartY + index * 10
                 );
                 doc.text(
+                    `${imei.storage}`,
+                    leftMargin + 40,
+                    imeiStartY + index * 10
+                );
+                doc.text(
                     `${imei.imei}`,
-                    leftMargin + 60,
+                    leftMargin + 70,
                     imeiStartY + index * 10
                 );
                 doc.text(
                     `${imei.warranty}`,
-                    leftMargin + 110,
+                    leftMargin + 120,
                     imeiStartY + index * 10
                 );
                 doc.text(
