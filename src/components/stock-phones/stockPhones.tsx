@@ -69,6 +69,10 @@ export default function StockPhones() {
   const colourOptions = [
     { value: "Gold", label: "Gold" },
     { value: "White", label: "White" },
+    { value: "Black", label: "Black" },
+    { value: "Rose Gold", label: "Rose Gold" },
+    { value: "Silver", label: "Silver" },
+    { value: "Red", label: "Red" },
   ];
 
   const storageOptions = [
@@ -113,7 +117,7 @@ export default function StockPhones() {
     storage: /^(64GB|128GB|256GB|512GB|1TB)$/,
     iosversion: /^\d+$/,
     batteryHealth: /^\d+$/,
-    colour: /^(Gold|White)$/,
+    colour: /^(Gold|White|Red|Black|Silver|Rose Gold)$/,
   };
   const validateForm = (): boolean => {
     // Validate stockName

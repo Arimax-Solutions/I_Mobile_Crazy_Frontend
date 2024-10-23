@@ -267,12 +267,12 @@ const ProceedPayment: React.FC<any> = (props: any) => {
           })),
         };
 
+
         try {
           const response = await axios.post(
             `${backend_url}/api/retailOrder`,
             order
           );
-          // Create a new jsPDF instance for generating the invoice
           const doc = new jsPDF();
 
           const img = new Image();
@@ -290,10 +290,10 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             const rightMargin = 140;
 
             // Add watermark image with shading effect first
-            const imgWidth = 80; // Adjust the width as necessary
-            const imgHeight = imgWidth * (img.height / img.width);
-            const imgX = (pageWidth - imgWidth) / 2;
-            const imgY = (pageHeight - imgHeight) / 2;
+            const imgWidth = 0; // Adjust the width to make the image smaller
+            const imgHeight = imgWidth * (img.height / img.width); // Maintain aspect ratio
+            const imgX = pageWidth - imgWidth - rightMargin; // Position image to the right margin
+            const imgY = (pageHeight - imgHeight) / 2; // Center vertically on the page
 
             // Set grey color for the watermark with some transparency
             const greyShade = 200; // Choose a value between 0 (black) and 255 (white)
@@ -301,24 +301,31 @@ const ProceedPayment: React.FC<any> = (props: any) => {
 
             // Add the watermark image
             doc.addImage(
-              img,
-              "PNG",
-              imgX,
-              imgY,
-              imgWidth,
-              imgHeight,
-              "",
-              "NONE"
+                img,
+                "PNG",
+                imgX,
+                imgY,
+                imgWidth,
+                imgHeight,
+                "",
+                "NONE"
             );
 
             // Draw page border on top of the watermark
             doc.setDrawColor(0, 0, 0);
             doc.rect(
-              leftMargin,
-              topMargin,
-              pageWidth - 2 * leftMargin,
-              pageHeight - 2 * topMargin
+                leftMargin,
+                topMargin,
+                pageWidth - 2 * leftMargin,
+                pageHeight - 2 * topMargin
             );
+
+            // Header
+            doc.setFontSize(18);
+            doc.setTextColor(0, 0, 255);
+            doc.text("INVOICE", pageWidth / 2, topMargin + 10, {
+              align: "center",
+            });
 
             // Header
             doc.setFontSize(18);
@@ -333,10 +340,10 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               align: "center",
             });
             doc.text(
-              "Galekade junction, Halthota road,",
-              pageWidth / 2,
-              topMargin + 25,
-              { align: "center" }
+                "Galekade junction, Halthota road,",
+                pageWidth / 2,
+                topMargin + 25,
+                { align: "center" }
             );
             doc.text("Raigama,Bandaragama", pageWidth / 2, topMargin + 30, {
               align: "center",
@@ -345,10 +352,10 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               align: "center",
             });
             doc.text(
-              "Email: imobilecrazybandaragama@gmail.com",
-              pageWidth / 2,
-              topMargin + 40,
-              { align: "center" }
+                "Email: imobilecrazybandaragama@gmail.com",
+                pageWidth / 2,
+                topMargin + 40,
+                { align: "center" }
             );
 
             // Customer and Invoice Details
@@ -357,103 +364,26 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             doc.text("BILL TO:", leftInsideMargin, customerY);
             doc.text(order.customer.name, leftInsideMargin, customerY + 5);
             doc.text(
-              order.customer.contact_phone,
-              leftInsideMargin,
-              customerY + 10
+                order.customer.contact_phone,
+                leftInsideMargin,
+                customerY + 10
             );
 
             doc.text(
-              `Invoice Number: ${order.retail_order_id}`,
-              rightMargin,
-              customerY
+                `Invoice Number: ${order.retail_order_id}`,
+                rightMargin,
+                customerY
             );
             doc.text(
-              `Invoice Date: ${new Date(order.date).toLocaleDateString()}`,
-              rightMargin,
-              customerY + 5
+                `Invoice Date: ${new Date(order.date).toLocaleDateString()}`,
+                rightMargin,
+                customerY + 5
             );
             doc.text(
-              `Payment Due: ${new Date(order.date).toLocaleDateString()}`,
-              rightMargin,
-              customerY + 10
+                `Payment Due: ${new Date(order.date).toLocaleDateString()}`,
+                rightMargin,
+                customerY + 10
             );
-
-            /*// Table headers for items
-              const tableHeaderY = customerY + 30;
-              const headers = ['Items', 'Quantity', 'Price', 'Amount'];
-              const headerStartX = [leftInsideMargin, leftMargin + 80, leftMargin + 120, leftMargin + 150];
-
-              doc.setFillColor(128, 128, 128);
-              doc.setTextColor(255, 255, 255); // White text color
-              doc.rect(leftMargin, tableHeaderY - rowHeight, pageWidth - 2 * leftMargin, rowHeight, 'F');
-
-              doc.setFontSize(12);
-              headers.forEach((header, index) => {
-                const x = headerStartX[index] + 2;
-                const y = tableHeaderY - (rowHeight / 2) + 4;
-                doc.text(header, x, y, { align: 'left' });
-              });
-
-              // Reset text color for table content
-              doc.setTextColor(0, 0, 0);
-
-              // Start Y for items
-              let startY = tableHeaderY + rowHeight;
-
-              // Include item data if available
-              if (order.items.length > 0) {
-                order.items.forEach((item:any, index:number) => {
-                  doc.text(`${item.name} - ${item.warranty_period} WARRANTY`, leftInsideMargin, startY + index * 10);
-                  doc.text(`${item.qty}`, leftMargin + 80, startY + index * 10);
-                  doc.text(`${item.price.toFixed(2)}`, leftMargin + 120, startY + index * 10);
-                  doc.text(`${(item.qty * item.price).toFixed(2)}`, leftMargin + 150, startY + index * 10);
-                });
-
-                // Draw items border
-                doc.rect(leftMargin, tableHeaderY, pageWidth - 2 * leftMargin, startY - tableHeaderY + order.items.length * 10);
-
-                // Update Y for IMEIs
-                startY = startY + order.items.length * 10 + sectionMargin;
-              }
-
-              // Table headers for IMEI
-              const imeiTableHeaderY = startY;
-              const imeiHeaders = ['Model', 'IMEI', 'Warranty', 'Price'];
-              const imeiHeaderStartX = [leftInsideMargin, leftMargin + 60, leftMargin + 110, leftMargin + 150];
-
-              doc.setFillColor(128, 128, 128);
-              doc.setTextColor(255, 255, 255); // White text color
-              doc.rect(leftMargin, imeiTableHeaderY - rowHeight, pageWidth - 2 * leftMargin, rowHeight, 'F');
-
-              doc.setFontSize(12);
-              imeiHeaders.forEach((header, index) => {
-                const x = imeiHeaderStartX[index] + 2;
-                const y = imeiTableHeaderY - (rowHeight / 2) + 4;
-                doc.text(header, x, y, { align: 'left' });
-              });
-
-              // Reset text color for table content
-              doc.setTextColor(0, 0, 0);
-
-              // Start Y for IMEI data
-              let imeiStartY = imeiTableHeaderY + rowHeight;
-
-              // Include IMEI data if available
-              if (order.imeis.length > 0) {
-                order.imeis.forEach((imei:any, index:number) => {
-                  doc.text(`${imei.model}`, leftInsideMargin, imeiStartY + index * 10);
-                  doc.text(`${imei.imei}`, leftMargin + 60, imeiStartY + index * 10);
-                  doc.text(`${imei.warranty}`, leftMargin + 110, imeiStartY + index * 10);
-                  doc.text(`${imei.price}`, leftMargin + 150, imeiStartY + index * 10);
-                });
-
-                // Draw IMEI border
-                doc.rect(leftMargin, imeiTableHeaderY, pageWidth - 2 * leftMargin, imeiStartY - imeiTableHeaderY + order.imeis.length * 10);
-
-                // Update Y for next section or footer
-                imeiStartY = imeiStartY + order.imeis.length * 10 + sectionMargin;
-              }
-*/
 
             // Initialize Y positions
             let startY = customerY + 30; // Starting Y for tables
@@ -472,11 +402,11 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               doc.setFillColor(128, 128, 128);
               doc.setTextColor(255, 255, 255); // White text color
               doc.rect(
-                leftMargin,
-                startY - rowHeight,
-                pageWidth - 2 * leftMargin,
-                rowHeight,
-                "F"
+                  leftMargin,
+                  startY - rowHeight,
+                  pageWidth - 2 * leftMargin,
+                  rowHeight,
+                  "F"
               );
 
               doc.setFontSize(12);
@@ -495,33 +425,33 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               // Include item data
               order.items.forEach((item: any, index: number) => {
                 doc.text(
-                  `${item.name} - ${item.warranty_period} WARRANTY`,
-                  leftInsideMargin,
-                  itemsStartY + index * 10
+                    `${item.name} - ${item.warranty_period} WARRANTY`,
+                    leftInsideMargin,
+                    itemsStartY + index * 10
                 );
                 doc.text(
-                  `${item.qty}`,
-                  leftMargin + 80,
-                  itemsStartY + index * 10
+                    `${item.qty}`,
+                    leftMargin + 80,
+                    itemsStartY + index * 10
                 );
                 doc.text(
-                  `${item.price.toFixed(2)}`,
-                  leftMargin + 120,
-                  itemsStartY + index * 10
+                    `${item.price.toFixed(2)}`,
+                    leftMargin + 120,
+                    itemsStartY + index * 10
                 );
                 doc.text(
-                  `${(item.qty * item.price).toFixed(2)}`,
-                  leftMargin + 150,
-                  itemsStartY + index * 10
+                    `${(item.qty * item.price).toFixed(2)}`,
+                    leftMargin + 150,
+                    itemsStartY + index * 10
                 );
               });
 
               // Draw items border
               doc.rect(
-                leftMargin,
-                startY,
-                pageWidth - 2 * leftMargin,
-                itemsStartY - startY + order.items.length * 10
+                  leftMargin,
+                  startY,
+                  pageWidth - 2 * leftMargin,
+                  itemsStartY - startY + order.items.length * 10
               );
 
               // Update Y for IMEIs
@@ -542,11 +472,11 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               doc.setFillColor(128, 128, 128);
               doc.setTextColor(255, 255, 255); // White text color
               doc.rect(
-                leftMargin,
-                startY - rowHeight,
-                pageWidth - 2 * leftMargin,
-                rowHeight,
-                "F"
+                  leftMargin,
+                  startY - rowHeight,
+                  pageWidth - 2 * leftMargin,
+                  rowHeight,
+                  "F"
               );
 
               doc.setFontSize(12);
@@ -565,112 +495,112 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               // Include IMEI data
               order.imeis.forEach((imei: any, index: number) => {
                 doc.text(
-                  `${imei.model}`,
-                  leftInsideMargin,
-                  imeiStartY + index * 10
+                    `${imei.model}`,
+                    leftInsideMargin,
+                    imeiStartY + index * 10
                 );
                 doc.text(
-                  `${imei.imei}`,
-                  leftMargin + 60,
-                  imeiStartY + index * 10
+                    `${imei.imei}`,
+                    leftMargin + 60,
+                    imeiStartY + index * 10
                 );
                 doc.text(
-                  `${imei.warranty}`,
-                  leftMargin + 110,
-                  imeiStartY + index * 10
+                    `${imei.warranty}`,
+                    leftMargin + 110,
+                    imeiStartY + index * 10
                 );
                 doc.text(
-                  `${imei.price}`,
-                  leftMargin + 150,
-                  imeiStartY + index * 10
+                    `${imei.price}`,
+                    leftMargin + 150,
+                    imeiStartY + index * 10
                 );
               });
 
               // Draw IMEI border
               doc.rect(
-                leftMargin,
-                startY,
-                pageWidth - 2 * leftMargin,
-                imeiStartY - startY + order.imeis.length * 10
+                  leftMargin,
+                  startY,
+                  pageWidth - 2 * leftMargin,
+                  imeiStartY - startY + order.imeis.length * 10
               );
 
-              // Update Y for next section or footer
+              // Update Y for summary
               startY = imeiStartY + order.imeis.length * 10 + sectionMargin;
             }
 
-            // Summary
+           /* // Summary
             doc.setFontSize(12);
             doc.text(
-              `Actual Price: ${order.actual_price.toFixed(2)}`,
-              leftMargin,
-              startY
+                `Actual Price: ${order.actual_price.toFixed(2)}`,
+                leftMargin,
+                startY
             );
             doc.text(
-              `Discount: ${order.discount.toFixed(2)}`,
-              leftMargin,
-              startY + 10
+                `Discount: ${order.discount.toFixed(2)}`,
+                leftMargin,
+                startY + 10
             );
             doc.text(
-              `Total Amount: ${order.total_amount.toFixed(2)}`,
-              leftMargin,
-              startY + 20
+                `Total Amount: ${order.total_amount.toFixed(2)}`,
+                leftMargin,
+                startY + 20
             );
-
-            const notesY = startY + 70;
-            doc.text("Warranty terms & conditions!", leftInsideMargin, notesY);
+*/
+// Footer
+            const footerY = pageHeight - 50; // Set footer Y position
+            const footerStartY = footerY - 30; // Starting Y position for footer content
             doc.setFontSize(10);
+
+// Right-aligned actual price, discount, and total amount in footer
             doc.text(
+                `Actual Price: ${order.actual_price.toFixed(2)}`,
+                190,
+                footerStartY,
+                { align: "right" }
+            );
+            doc.text(
+                `Discount: ${order.discount.toFixed(2)}`,
+                190,
+                footerStartY + 5,
+                { align: "right" }
+            );
+            doc.text(
+                `Total Amount: ${order.total_amount.toFixed(2)}`,
+                190,
+                footerStartY + 10,
+                { align: "right" }
+            );
+
+// Warranty terms and conditions below the amounts
+            const warrantyOffsetY = footerStartY + 20; // Offset for warranty terms
+            const footerText = [
+              "Warranty terms & conditions!",
               "* One year software warranty.",
-              leftInsideMargin,
-              notesY + 15
-            );
-            doc.text(
               "* Warranty void if stickers damaged or removed.",
-              leftInsideMargin,
-              notesY + 20
-            );
-            doc.text(
-              "* Item should be in good condition",
-              leftInsideMargin,
-              notesY + 25
-            );
-            doc.text(
-              "* Bill must be presented , No cash returns",
-              leftInsideMargin,
-              notesY + 30
-            );
-            doc.text(
-              "* No warranty for water damage and over charged",
-              leftInsideMargin,
-              notesY + 35
-            );
+              "* Item should be in good condition.",
+              "* Bill must be presented, No cash returns.",
+            ];
 
-            // Footer
-            const footerY = notesY + 40;
-            const centerX = doc.internal.pageSize.width / 2; // Center of the page
+            footerText.forEach((line, index) => {
+              doc.text(line, leftMargin, warrantyOffsetY + index * 5);
+            });
 
-            // Function to get the width of the text
-            function getTextWidth(text: string) {
-              return doc.getStringUnitWidth(text) * doc.internal.scaleFactor;
-            }
+// Thank you message centered at the bottom
+            const thankYouText = "Thank you for shopping with us!";
+            const textWidth = doc.getTextWidth(thankYouText); // Get width of the thank you text
+            const centerX = (pageWidth - textWidth) / 2; // Centering calculation
+            const thankYouY = pageHeight - 30; // Y position for thank you message
 
-            // Calculate text width and adjust x position for centering
-            const thankYouText =
-              "Thank you for shopping with us! Let's visit us again";
-            const poweredByText = "Powered by Arimax Solutions";
+            doc.setFontSize(12);
+            doc.text(thankYouText, centerX, thankYouY); // Centered thank you message
 
-            const thankYouTextWidth = getTextWidth(thankYouText);
-            const poweredByTextWidth = getTextWidth(poweredByText);
-
-            const thankYouTextX = centerX - thankYouTextWidth / 2;
-            const poweredByTextX = centerX - poweredByTextWidth / 2;
-
-            doc.text(thankYouText, thankYouTextX, footerY);
-            doc.text(poweredByText, poweredByTextX, footerY + 5);
 
             // Save the PDF
-            doc.save(`${order.customer.name}.bill.pdf`);
+            doc.save("Invoice.pdf");
           };
+
+
+          /*<Bill order={order} logo={logo} />*/
 
           await Swal.fire({
             title: "Success!",
@@ -678,7 +608,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             icon: "success",
             confirmButtonText: "OK",
           });
-          navigate(`/order`);
+          //navigate(`/order`);
 
           // Update the UI after successful save
           console.log("Order saved successfully:", response.data);
@@ -2174,7 +2104,6 @@ const ProceedPayment: React.FC<any> = (props: any) => {
       );
   }
 
-  /*return <div>Error: Invalid order type</div>;*/
 };
 
 export default ProceedPayment;
