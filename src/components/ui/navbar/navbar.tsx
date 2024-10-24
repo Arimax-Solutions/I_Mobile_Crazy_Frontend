@@ -12,12 +12,6 @@ function NavigationMenu() {
     const [selectedItem, setSelectedItem] = useState<string>("");
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('username');
-        navigate('/');
-    };
-
     const handleNavigation = (location: string) => {
         if (isAuthenticated()) {
             navigate(location);
@@ -110,15 +104,6 @@ function NavigationMenu() {
                         <img src="src/assets/images/navbar/cart-svgrepo-com 1.svg" alt="cart" />
                         Place Order
                     </NavLink>
-                </div>
-
-                <div className='w-full px-8 mb-5'>
-                    <button
-                        onClick={handleLogout}
-                        className="mt-5 flex text-[25px] w-full justify-center rounded-md bg-[#FF4D4D] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 items-center gap-3"
-                    >
-                        Logout
-                    </button>
                 </div>
             </div>
         </nav>

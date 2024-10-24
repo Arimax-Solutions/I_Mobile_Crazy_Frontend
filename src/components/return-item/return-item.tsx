@@ -285,7 +285,7 @@ export default function ReturnItem() {
                     </div>
                 </div>
 
-                <div className='mt-5 flex flex-col sm:flex-row justify-between'>
+                <div className='mt-5 flex gap-14'>
                     <div className='flex flex-col'>
                         <input
                             className={`text-feild mb-1 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1 ${errors.reason ? 'border-red-500' : ''}`}
@@ -297,7 +297,7 @@ export default function ReturnItem() {
                     </div>
                     <div className='flex flex-col'>
                         <input
-                            className={`text-feild mb-1 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1 ${errors.contact_number ? 'border-red-500' : ''}`}
+                            className={`text-feild mb-1 md:mb-0 w-full sm:w-[50%] md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1 ${errors.contact_number ? 'border-red-500' : ''}`}
                             value={contact_number}
                             onChange={handleContactNumberChange}
                             placeholder='   Contact Number'
@@ -306,7 +306,6 @@ export default function ReturnItem() {
                     </div>
                 </div>
             </div>
-
 
             {/* buttons */}
             <div className='m-4 flex mt-5 gap-x-[3vw] justify-end'>
@@ -336,7 +335,7 @@ export default function ReturnItem() {
                 </Button>
             </div>
 
-    {/* Table to display users */}
+            {/* Table to display users */}
             <div className='m-4 mt-5 overflow-x-auto'>
                 <table className='min-w-full divide-y table-styles'>
                     <thead>
@@ -367,7 +366,6 @@ export default function ReturnItem() {
                     </tbody>
                 </table>
             </div>
-
 
         </div>
     );
