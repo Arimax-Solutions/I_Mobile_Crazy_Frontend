@@ -365,21 +365,15 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                 { align: "right" }
             );
             doc.text(
-                "Hotline: 074 029 3931",
+                "Hotline: 076 311 0859",
                 pageWidth - 62.5,
                 newY + 2 * lineSpacing,
                 { align: "right" }
             );
             doc.text(
-                "Mobile: 076 311 0859",
-                pageWidth - 63,
-                newY + 3 * lineSpacing,
-                { align: "right" }
-            );
-            doc.text(
                 "Email: imobilecrazybandaragama@gmail.com",
                 pageWidth - 21,
-                newY + 4 * lineSpacing,
+                newY + 3 * lineSpacing,
                 { align: "right" }
             );
 
@@ -998,135 +992,148 @@ const ProceedPayment: React.FC<any> = (props: any) => {
           img.src = logo; // Path to your uploaded image
 
           img.onload = () => {
-            // Constants for layout
             const topMargin = 20;
             const sectionMargin = 10;
             const rowHeight = 10;
-            const pageWidth = 210; // A4 page width in mm
-            const pageHeight = 297; // A4 page height in mm
+            const pageWidth = 210;
+            const pageHeight = 297;
             const leftMargin = 10;
             const leftInsideMargin = 20;
-            const rightMargin = 140;
 
-            // Add watermark image with shading effect first
-            const imgWidth = 80; // Adjust the width as necessary
+            const imgWidth = 20;
             const imgHeight = imgWidth * (img.height / img.width);
-            const imgX = (pageWidth - imgWidth) / 2;
-            const imgY = (pageHeight - imgHeight) / 2;
+            const imgX = 20;
+            const imgY = 33;
 
-            // Set grey color for the watermark with some transparency
-            const greyShade = 200; // Choose a value between 0 (black) and 255 (white)
-            doc.setFillColor(greyShade, greyShade, greyShade, 20); // Add a shadow color with 20% opacity
+// Calculate circle properties
+            const centerFX = imgX + imgWidth / 2;
+            const centerY = imgY + imgHeight / 2;
+            const radius = Math.min(imgWidth, imgHeight) / 2;
 
-            // Add the watermark image
-            doc.addImage(
-              img,
-              "PNG",
-              imgX,
-              imgY,
-              imgWidth,
-              imgHeight,
-              "",
-              "NONE"
-            );
+// Draw a white circle behind the image
+            doc.setFillColor(255, 255, 255);
+            doc.circle(centerFX, centerY, radius, 'F');
 
-            // Draw page border on top of the watermark
-            doc.setDrawColor(0, 0, 0);
-            doc.rect(
-              leftMargin,
-              topMargin,
-              pageWidth - 2 * leftMargin,
-              pageHeight - 2 * topMargin
-            );
+// Now draw your image on top of the circle
+            doc.addImage(img, 'JPEG', imgX, imgY, imgWidth, imgHeight);
 
-            // Header
+
+// Set dark green background for the upper section
+            doc.setFillColor(0, 100, 0);
+            doc.rect(leftMargin, topMargin, 80, 40, 'F');
+
+// Draw the right rounded end
+            doc.ellipse(leftMargin + 80, topMargin + 20, 20, 20, 'F');
+
+// Header
+            doc.setFontSize(20);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(0, 100, 0);
+            doc.text("INVOICE", pageWidth - 20, topMargin + 10, { align: "right" });
+
+// "I MOBILE CRAZY" Text
             doc.setFontSize(18);
-            doc.setTextColor(0, 0, 255);
-            doc.text("INVOICE", pageWidth / 2, topMargin + 10, {
+            doc.setTextColor(255, 255, 255);
+            doc.text("I MOBILE CRAZY", 69, 40, {
               align: "center",
             });
 
-            doc.setFontSize(12);
+// Additional Information
+            doc.setFontSize(10);
+            doc.setTextColor(255, 255, 255);
+            doc.text("Distributors of Mobile", 62, 45, {
+              align: "center",
+            });
+            doc.text("Phones & Accessories", 62, 50, {
+              align: "center",
+            });
+
+// Set grey color for the watermark
+            const greyShade = 200;
+            doc.setFillColor(greyShade, greyShade, greyShade);
+
+// Add the watermark image with reduced opacity
+            doc.addImage(img, "PNG", imgX, imgY, imgWidth, imgHeight, "", "NONE");
+
+// Draw page border on top of the watermark
+            doc.setDrawColor(0, 0, 0);
+            doc.rect(leftMargin, topMargin, pageWidth - 2 * leftMargin, pageHeight - 2 * topMargin);
+
+
+            // Define the starting vertical position and spacing
+            const newY = topMargin + 15;
+            const lineSpacing = 5;
+
             doc.setTextColor(0, 0, 0);
-            doc.text("I MOBILE CRAZY", pageWidth / 2, topMargin + 20, {
-              align: "center",
-            });
             doc.text(
-              "Galekade junction, Halthota road,",
-              pageWidth / 2,
-              topMargin + 25,
-              { align: "center" }
+                "Galekade junction, Halthota road,",
+                pageWidth - 42,
+                newY,
+                { align: "right" }
             );
-            doc.text("Raigama,Bandaragama", pageWidth / 2, topMargin + 30, {
-              align: "center",
-            });
-            doc.text("Phone: 076 311 0859", pageWidth / 2, topMargin + 35, {
-              align: "center",
-            });
             doc.text(
-              "Email: imobilecrazybandaragama@gmail.com",
-              pageWidth / 2,
-              topMargin + 40,
-              { align: "center" }
+                "Raigama, Bandaragama.",
+                pageWidth - 57,
+                newY + lineSpacing,
+                { align: "right" }
             );
+            doc.text(
+                "Hotline: 076 311 0859",
+                pageWidth - 62.5,
+                newY + 2 * lineSpacing,
+                { align: "right" }
+            );
+            doc.text(
+                "Email: imobilecrazybandaragama@gmail.com",
+                pageWidth - 21,
+                newY + 3 * lineSpacing,
+                { align: "right" }
+            );
+
 
             // Customer and Invoice Details
-            const customerY = topMargin + 60;
+            const customerY = topMargin + 50;
             doc.setFontSize(12);
             doc.text("BILL TO:", leftInsideMargin, customerY);
+            doc.text(wholesaleOrder.shop.shop_name, leftInsideMargin, customerY + 5);
             doc.text(
-              wholesaleOrder.shop.shop_name,
-              leftInsideMargin,
-              customerY + 5
-            );
-            doc.text(
-              wholesaleOrder.shop.contact_number,
-              leftInsideMargin,
-              customerY + 10
+                wholesaleOrder.shop.contact_number,
+                leftInsideMargin,
+                customerY + 10
             );
 
             doc.text(
-              `Invoice Number: ${wholesaleOrder.wholesale_order_id}`,
-              rightMargin,
-              customerY
+                `Bill No : ${wholesaleOrder.wholesale_order_id}`,
+                pageWidth - 70,
+                customerY
             );
             doc.text(
-              `Invoice Date: ${new Date(
-                wholesaleOrder.date
-              ).toLocaleDateString()}`,
-              rightMargin,
-              customerY + 5
-            );
-            doc.text(
-              `Payment Due: ${new Date(
-                wholesaleOrder.date
-              ).toLocaleDateString()}`,
-              rightMargin,
-              customerY + 10
+                `Invoice Date: ${new Date(wholesaleOrder.date).toLocaleDateString()}`,
+                pageWidth - 70,
+                customerY + 5
             );
 
             // Initialize Y positions
-            let startY = customerY + 30; // Starting Y for tables
+            let startY = customerY + 30;
 
-            // Check if there are items to display
             if (wholesaleOrder.items.length > 0) {
-              // Table headers for items
+              doc.setFillColor(0, 100, 0);
               const headers = ["Items", "Quantity", "Price", "Amount"];
               const headerStartX = [
                 leftInsideMargin,
-                leftMargin + 80,
+                leftMargin + 90,
                 leftMargin + 120,
                 leftMargin + 150,
               ];
 
-              doc.setFillColor(128, 128, 128);
+
               doc.setTextColor(255, 255, 255); // White text color
               doc.rect(
-                leftMargin,
-                startY - rowHeight,
-                pageWidth - 2 * leftMargin,
-                rowHeight,
-                "F"
+                  leftInsideMargin,
+                  startY - rowHeight,
+                  170,
+                  rowHeight,
+                  "F"
               );
 
               doc.setFontSize(12);
@@ -1140,64 +1147,64 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               doc.setTextColor(0, 0, 0);
 
               // Start Y for items
-              let itemsStartY = startY + rowHeight;
+              let itemsStartY = startY + 8;
 
               // Include item data
               wholesaleOrder.items.forEach((item: any, index: number) => {
                 doc.text(
-                  `${item.name} - ${item.warranty_period} WARRANTY`,
-                  leftInsideMargin,
-                  itemsStartY + index * 10
+                    `${item.name} - ${item.warranty_period} WARRANTY`,
+                    leftInsideMargin,
+                    itemsStartY + index * 10
                 );
                 doc.text(
-                  `${item.qty}`,
-                  leftMargin + 80,
-                  itemsStartY + index * 10
+                    `${item.qty}`,
+                    leftMargin + 100,
+                    itemsStartY + index * 10
                 );
                 doc.text(
-                  `${item.price.toFixed(2)}`,
-                  leftMargin + 120,
-                  itemsStartY + index * 10
+                    `${item.price.toFixed(2)}`,
+                    leftMargin + 120,
+                    itemsStartY + index * 10
                 );
                 doc.text(
-                  `${(item.qty * item.price).toFixed(2)}`,
-                  leftMargin + 150,
-                  itemsStartY + index * 10
+                    `${(item.qty * item.price).toFixed(2)}`,
+                    leftMargin + 150,
+                    itemsStartY + index * 10
                 );
               });
 
               // Draw items border
+              doc.setFillColor(0, 100, 0);
               doc.rect(
-                leftMargin,
-                startY,
-                pageWidth - 2 * leftMargin,
-                itemsStartY - startY + wholesaleOrder.items.length * 10
+                  leftInsideMargin,
+                  startY,
+                  170,
+                  9
               );
 
               // Update Y for IMEIs
-              startY =
-                itemsStartY + wholesaleOrder.items.length * 10 + sectionMargin;
+              startY = itemsStartY + wholesaleOrder.items.length * 10 + sectionMargin;
             }
 
-            // Check if there are IMEIs to display
             if (wholesaleOrder.imeis.length > 0) {
               // Table headers for IMEI
-              const imeiHeaders = ["Model", "IMEI", "Warranty", "Price"];
+              const imeiHeaders = ["Model","Storage" , "IMEI" ,"Warranty", "Price"];
               const imeiHeaderStartX = [
                 leftInsideMargin,
-                leftMargin + 60,
-                leftMargin + 110,
+                leftMargin + 40,
+                leftMargin + 70,
+                leftMargin + 120,
                 leftMargin + 150,
               ];
 
-              doc.setFillColor(128, 128, 128);
-              doc.setTextColor(255, 255, 255); // White text color
+              doc.setFillColor(0, 100, 0);
+              doc.setTextColor(255, 255, 255);
               doc.rect(
-                leftMargin,
-                startY - rowHeight,
-                pageWidth - 2 * leftMargin,
-                rowHeight,
-                "F"
+                  leftInsideMargin,
+                  startY - rowHeight,
+                  170,
+                  rowHeight,
+                  "F"
               );
 
               doc.setFontSize(12);
@@ -1211,114 +1218,117 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               doc.setTextColor(0, 0, 0);
 
               // Start Y for IMEI data
-              let imeiStartY = startY + rowHeight;
+              let imeiStartY = startY + 8;
 
               // Include IMEI data
               wholesaleOrder.imeis.forEach((imei: any, index: number) => {
                 doc.text(
-                  `${imei.model}`,
-                  leftInsideMargin,
-                  imeiStartY + index * 10
+                    `${imei.model}`,
+                    leftInsideMargin,
+                    imeiStartY + index * 10
                 );
                 doc.text(
-                  `${imei.imei}`,
-                  leftMargin + 60,
-                  imeiStartY + index * 10
+                    `${imei.storage}`,
+                    leftMargin + 40,
+                    imeiStartY + index * 10
                 );
                 doc.text(
-                  `${imei.warranty}`,
-                  leftMargin + 110,
-                  imeiStartY + index * 10
+                    `${imei.imei}`,
+                    leftMargin + 70,
+                    imeiStartY + index * 10
                 );
                 doc.text(
-                  `${imei.price}`,
-                  leftMargin + 150,
-                  imeiStartY + index * 10
+                    `${imei.warranty}`,
+                    leftMargin + 120,
+                    imeiStartY + index * 10
+                );
+                doc.text(
+                    `${imei.price}`,
+                    leftMargin + 150,
+                    imeiStartY + index * 10
                 );
               });
 
               // Draw IMEI border
+              doc.setFillColor(0, 100, 0);
               doc.rect(
-                leftMargin,
-                startY,
-                pageWidth - 2 * leftMargin,
-                imeiStartY - startY + wholesaleOrder.imeis.length * 10
+                  leftInsideMargin,
+                  startY,
+                  170,
+                  9
               );
 
-              // Update Y for next section or footer
-              startY =
-                imeiStartY + wholesaleOrder.imeis.length * 10 + sectionMargin;
+              // Update Y for summary
+              startY = imeiStartY + wholesaleOrder.imeis.length * 10 + sectionMargin;
             }
 
-            // Totals
+
+            const footerY = pageHeight - 60;
+            const footerStartY = footerY - 30;
+            doc.setFontSize(12);
+
+// Right-aligned actual price, discount, and total amount in footer
             doc.text(
-              `Subtotal  :  ${wholesaleOrder.actual_price.toFixed(2)}`,
-              leftMargin + 130,
-              startY + 30
+                `Actual Price: ${wholesaleOrder.actual_price.toFixed(2)}`,
+                190,
+                footerStartY,
+                { align: "right" }
             );
             doc.text(
-              `Discount  :  ${wholesaleOrder.discount.toFixed(2)}`,
-              leftMargin + 130,
-              startY + 40
+                `Discount: ${wholesaleOrder.discount.toFixed(2)}`,
+                190,
+                footerStartY + 5,
+                { align: "right" }
             );
             doc.text(
-              `Total      :  ${wholesaleOrder.total_amount.toFixed(2)}`,
-              leftMargin + 130,
-              startY + 50
+                `Total Amount: ${wholesaleOrder.total_amount.toFixed(2)}`,
+                190,
+                footerStartY + 10,
+                { align: "right" }
             );
 
-            // Notes section
-            const notesY = startY + 70;
-            doc.text("Warranty terms & conditions!", leftInsideMargin, notesY);
+            // Set font size for the footer
             doc.setFontSize(10);
-            doc.text(
-              "* One year software warranty.",
-              leftInsideMargin,
-              notesY + 15
-            );
-            doc.text(
-              "* Warranty void if stickers damaged or removed.",
-              leftInsideMargin,
-              notesY + 20
-            );
-            doc.text(
-              "* Item should be in good condition",
-              leftInsideMargin,
-              notesY + 25
-            );
-            doc.text(
-              "* Bill must be presented , No cash returns",
-              leftInsideMargin,
-              notesY + 30
-            );
-            doc.text(
-              "* No warranty for water damage and over charged",
-              leftInsideMargin,
-              notesY + 35
-            );
+            const warrantyOffsetY = footerStartY + 20;
 
-            // Footer
-            const footerY = notesY + 40;
-            const centerX = doc.internal.pageSize.width / 2; // Center of the page
+            const footerText = [
+              "Warranty terms & conditions!",
+              " >  One year software warranty.",
+              " >  Warranty void if stickers damaged or removed.",
+              " >  Item should be in good condition.",
+              " >  Bill must be presented, No cash returns.",
+            ];
 
-            // Function to get the width of the text
-            function getTextWidth(text: string) {
-              return doc.getStringUnitWidth(text) * doc.internal.scaleFactor;
-            }
+// Draw the footer text
+            footerText.forEach((line, index) => {
+              doc.text(line, leftInsideMargin, warrantyOffsetY + index * 5);
+            });
 
-            // Calculate text width and adjust x position for centering
-            const thankYouText =
-              "Thank you for shopping with us! Let's visit us again";
-            const poweredByText = "Powered by Arimax Solutions";
+// Thank you text
+            const thankYouText = "Thank you for shopping with us!";
+            const developerText = "Developed by Arimax Solutions";
 
-            const thankYouTextWidth = getTextWidth(thankYouText);
-            const poweredByTextWidth = getTextWidth(poweredByText);
+// Calculate the width and center X position for the thank you text
+            const textWidth = doc.getTextWidth(thankYouText);
+            const centerX = (pageWidth - textWidth) / 2;
+            const thankYouY = pageHeight - 40;
 
-            const thankYouTextX = centerX - thankYouTextWidth / 2;
-            const poweredByTextX = centerX - poweredByTextWidth / 2;
+// Set font size for thank you text and render it
+            doc.setFontSize(12);
+            doc.text(thankYouText, centerX, thankYouY);
 
-            doc.text(thankYouText, thankYouTextX, footerY);
-            doc.text(poweredByText, poweredByTextX, footerY + 5);
+// Calculate Y position for the developer text
+            const developerY = thankYouY + 20;
+
+// Set a smaller font size for the developer text and render it
+            doc.setFontSize(10);
+            doc.text(developerText, 85, developerY - 15);
+
+// Draw a dark green filled rectangle above the thank you text
+            const rectY = thankYouY+8;
+
+            doc.setFillColor(0, 100, 0);
+            doc.roundedRect(leftInsideMargin, rectY, 170, 4, 4, 4, 'F');
 
             // Save the PDF
             doc.save(`${wholesaleOrder.shop.shop_name}.bill.pdf`);
@@ -1330,6 +1340,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             icon: "success",
             confirmButtonText: "OK",
           });
+          navigate(`/order`);
 
           console.log("Wholesale order saved successfully:", response.data);
         } catch (error) {
@@ -1583,11 +1594,6 @@ const ProceedPayment: React.FC<any> = (props: any) => {
         setDiscountReturn(value);
       };
 
-      /*const handleCustomerAmountChangeReturn = (e) => {
-        const value = parseFloat(e.target.value) || 0;
-        setCustomerAmountReturn(value);
-      };*/
-
       const calculateTotalsReturn = (
         discountValueReturn: number,
         customerAmountValueReturn: number
@@ -1653,275 +1659,267 @@ const ProceedPayment: React.FC<any> = (props: any) => {
           img.src = logo; // Path to your uploaded image
 
           img.onload = function () {
-            // Constants for layout
             const topMargin = 20;
             const sectionMargin = 10;
             const rowHeight = 10;
-            const pageWidth = 210; // A4 page width in mm
-            const pageHeight = 297; // A4 page height in mm
+            const pageWidth = 210;
+            const pageHeight = 297;
             const leftMargin = 10;
             const leftInsideMargin = 20;
-            const rightMargin = 140;
 
-            // Add watermark image with shading effect first
-            const imgWidth = 80; // Adjust the width as necessary
+            const imgWidth = 20;
             const imgHeight = imgWidth * (img.height / img.width);
-            const imgX = (pageWidth - imgWidth) / 2;
-            const imgY = (pageHeight - imgHeight) / 2;
+            const imgX = 20;
+            const imgY = 33;
 
-            // Set grey color for the watermark with some transparency
-            const greyShade = 200; // Choose a value between 0 (black) and 255 (white)
-            doc.setFillColor(greyShade, greyShade, greyShade, 20); // Add a shadow color with 20% opacity
+// Calculate circle properties
+            const centerFX = imgX + imgWidth / 2;
+            const centerY = imgY + imgHeight / 2;
+            const radius = Math.min(imgWidth, imgHeight) / 2;
 
-            // Add the watermark image
-            doc.addImage(
-              img,
-              "PNG",
-              imgX,
-              imgY,
-              imgWidth,
-              imgHeight,
-              "",
-              "NONE"
-            );
+// Draw a white circle behind the image
+            doc.setFillColor(255, 255, 255);
+            doc.circle(centerFX, centerY, radius, 'F');
 
-            // Draw page border on top of the watermark
-            doc.setDrawColor(0, 0, 0);
-            doc.rect(
-              leftMargin,
-              topMargin,
-              pageWidth - 2 * leftMargin,
-              pageHeight - 2 * topMargin
-            );
+// Now draw your image on top of the circle
+            doc.addImage(img, 'JPEG', imgX, imgY, imgWidth, imgHeight);
 
-            // Header
+
+// Set dark green background for the upper section
+            doc.setFillColor(0, 100, 0);
+            doc.rect(leftMargin, topMargin, 80, 40, 'F');
+
+// Draw the right rounded end
+            doc.ellipse(leftMargin + 80, topMargin + 20, 20, 20, 'F');
+
+// Header
+            doc.setFontSize(20);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(0, 100, 0);
+            doc.text("INVOICE", pageWidth - 20, topMargin + 10, { align: "right" });
+
+// "I MOBILE CRAZY" Text
             doc.setFontSize(18);
-            doc.setTextColor(0, 0, 255);
-            doc.text("INVOICE", pageWidth / 2, topMargin + 10, {
+            doc.setTextColor(255, 255, 255);
+            doc.text("I MOBILE CRAZY", 69, 40, {
               align: "center",
             });
 
-            doc.setFontSize(12);
+// Additional Information
+            doc.setFontSize(10);
+            doc.setTextColor(255, 255, 255);
+            doc.text("Distributors of Mobile", 62, 45, {
+              align: "center",
+            });
+            doc.text("Phones & Accessories", 62, 50, {
+              align: "center",
+            });
+
+// Set grey color for the watermark
+            const greyShade = 200;
+            doc.setFillColor(greyShade, greyShade, greyShade);
+
+// Add the watermark image with reduced opacity
+            doc.addImage(img, "PNG", imgX, imgY, imgWidth, imgHeight, "", "NONE");
+
+// Draw page border on top of the watermark
+            doc.setDrawColor(0, 0, 0);
+            doc.rect(leftMargin, topMargin, pageWidth - 2 * leftMargin, pageHeight - 2 * topMargin);
+
+
+            // Define the starting vertical position and spacing
+            const newY = topMargin + 15;
+            const lineSpacing = 5;
+
             doc.setTextColor(0, 0, 0);
-            doc.text("I MOBILE CRAZY", pageWidth / 2, topMargin + 20, {
-              align: "center",
-            });
             doc.text(
-              "Galekade junction, Halthota road,",
-              pageWidth / 2,
-              topMargin + 25,
-              { align: "center" }
+                "Galekade junction, Halthota road,",
+                pageWidth - 42,
+                newY,
+                { align: "right" }
             );
-            doc.text("Raigama,Bandaragama", pageWidth / 2, topMargin + 30, {
-              align: "center",
-            });
-            doc.text("Phone: 076 311 0859", pageWidth / 2, topMargin + 35, {
-              align: "center",
-            });
             doc.text(
-              "Email: imobilecrazybandaragama@gmail.com",
-              pageWidth / 2,
-              topMargin + 40,
-              { align: "center" }
+                "Raigama, Bandaragama.",
+                pageWidth - 57,
+                newY + lineSpacing,
+                { align: "right" }
+            );
+            doc.text(
+                "Hotline: 076 311 0859",
+                pageWidth - 62.5,
+                newY + 2 * lineSpacing,
+                { align: "right" }
+            );
+            doc.text(
+                "Email: imobilecrazybandaragama@gmail.com",
+                pageWidth - 21,
+                newY + 3 * lineSpacing,
+                { align: "right" }
             );
 
-            // Customer and Invoice Details
-            const customerY = topMargin + 60;
+
+            const customerY = topMargin + 50;
             doc.setFontSize(12);
             doc.text("BILL TO:", leftInsideMargin, customerY);
+            doc.text(returnOrder.shop.shop_name, leftInsideMargin, customerY + 5);
             doc.text(
-              returnOrder.shop.shop_name,
-              leftInsideMargin,
-              customerY + 5
-            );
-            doc.text(
-              returnOrder.shop.contact_number,
-              leftInsideMargin,
-              customerY + 10
+                returnOrder.shop.contact_number,
+                leftInsideMargin,
+                customerY + 10
             );
 
             doc.text(
-              `Invoice Number: ${returnOrder.return_order_id}`,
-              rightMargin,
-              customerY
+                `Bill No : ${returnOrder.return_order_id}`,
+                pageWidth - 70,
+                customerY
             );
             doc.text(
-              `Invoice Date: ${new Date(
-                returnOrder.date
-              ).toLocaleDateString()}`,
-              rightMargin,
-              customerY + 5
-            );
-            doc.text(
-              `Payment Due: ${new Date(returnOrder.date).toLocaleDateString()}`,
-              rightMargin,
-              customerY + 10
+                `Invoice Date: ${new Date(returnOrder.date).toLocaleDateString()}`,
+                pageWidth - 70,
+                customerY + 5
             );
 
-            const tableHeaderY = customerY + 30;
-            const headers = ["Items", "Quantity", "Price", "Amount"];
-            const headerStartX = [
-              leftInsideMargin,
-              leftMargin + 80,
-              leftMargin + 120,
-              leftMargin + 150,
-            ];
+            // Initialize Y positions
+            let startY = customerY + 30;
 
-            doc.setFillColor(128, 128, 128);
-            doc.setTextColor(255, 255, 255); // White text color
-            doc.rect(
-              leftMargin,
-              tableHeaderY - rowHeight,
-              pageWidth - 2 * leftMargin,
-              rowHeight,
-              "F"
-            );
-
-            doc.setFontSize(12);
-            headers.forEach((header, index) => {
-              const x = headerStartX[index] + 2;
-              const y = tableHeaderY - rowHeight / 2 + 4;
-              doc.text(header, x, y, { align: "left" });
-            });
-
-            // Reset text color for table content
-            doc.setTextColor(0, 0, 0);
-
-            // Start Y for items
-            let startY = tableHeaderY + rowHeight;
-
-            // Table headers for IMEI
-            const imeiTableHeaderY = startY;
-            const imeiHeaders = ["Model", "IMEI", "Warranty", "Price"];
-            const imeiHeaderStartX = [
-              leftInsideMargin,
-              leftMargin + 60,
-              leftMargin + 110,
-              leftMargin + 150,
-            ];
-
-            doc.setFillColor(128, 128, 128);
-            doc.setTextColor(255, 255, 255); // White text color
-            doc.rect(
-              leftMargin,
-              imeiTableHeaderY - rowHeight,
-              pageWidth - 2 * leftMargin,
-              rowHeight,
-              "F"
-            );
-
-            doc.setFontSize(12);
-            imeiHeaders.forEach((header, index) => {
-              const x = imeiHeaderStartX[index] + 2;
-              const y = imeiTableHeaderY - rowHeight / 2 + 4;
-              doc.text(header, x, y, { align: "left" });
-            });
-
-            // Reset text color for table content
-            doc.setTextColor(0, 0, 0);
-
-            // Start Y for IMEI data
-            let imeiStartY = imeiTableHeaderY + rowHeight;
-
-            // Include IMEI data if available
             if (returnOrder.imeis.length > 0) {
+              // Table headers for IMEI
+              const imeiHeaders = ["Model","Storage" , "IMEI" , "Price"];
+              const imeiHeaderStartX = [
+                leftInsideMargin,
+                leftMargin + 40,
+                leftMargin + 70,
+                leftMargin + 130,
+              ];
+
+              doc.setFillColor(0, 100, 0);
+              doc.setTextColor(255, 255, 255);
+              doc.rect(
+                  leftInsideMargin,
+                  startY - rowHeight,
+                  170,
+                  rowHeight,
+                  "F"
+              );
+
+              doc.setFontSize(12);
+              imeiHeaders.forEach((header, index) => {
+                const x = imeiHeaderStartX[index] + 2;
+                const y = startY - rowHeight / 2 + 4;
+                doc.text(header, x, y, { align: "left" });
+              });
+
+              // Reset text color for table content
+              doc.setTextColor(0, 0, 0);
+
+              // Start Y for IMEI data
+              let imeiStartY = startY + 8;
+
+              // Include IMEI data
               returnOrder.imeis.forEach((imei: any, index: number) => {
-                doc.text(imei.model, leftInsideMargin, imeiStartY + index * 10);
-                doc.text(imei.imei, leftMargin + 60, imeiStartY + index * 10);
                 doc.text(
-                  imei.warranty,
-                  leftMargin + 110,
-                  imeiStartY + index * 10
+                    `${imei.model}`,
+                    leftInsideMargin,
+                    imeiStartY + index * 10
                 );
                 doc.text(
-                  imei.price.toFixed(2),
-                  leftMargin + 150,
-                  imeiStartY + index * 10
+                    `${imei.storage}`,
+                    leftMargin + 40,
+                    imeiStartY + index * 10
+                );
+                doc.text(
+                    `${imei.imei}`,
+                    leftMargin + 70,
+                    imeiStartY + index * 10
+                );
+                doc.text(
+                    `${imei.price}`,
+                    leftMargin + 130,
+                    imeiStartY + index * 10
                 );
               });
 
               // Draw IMEI border
+              doc.setFillColor(0, 100, 0);
               doc.rect(
-                leftMargin,
-                imeiTableHeaderY,
-                pageWidth - 2 * leftMargin,
-                imeiStartY - imeiTableHeaderY + returnOrder.imeis.length * 10
+                  leftInsideMargin,
+                  startY,
+                  170,
+                  9
               );
 
-              // Update Y for next section or footer
-              imeiStartY =
-                imeiStartY + returnOrder.imeis.length * 10 + sectionMargin;
+              // Update Y for summary
+              startY = imeiStartY + returnOrder.imeis.length * 10 + sectionMargin;
             }
-
-            // Totals
-            doc.text(
-              `Subtotal  :  ${returnOrder.actual_price.toFixed(2)}`,
-              leftMargin + 130,
-              startY + 30
-            );
-            doc.text(
-              `Discount  :  ${returnOrder.discount.toFixed(2)}`,
-              leftMargin + 130,
-              startY + 40
-            );
-            doc.text(
-              `Total      :  ${returnOrder.total_amount.toFixed(2)}`,
-              leftMargin + 130,
-              startY + 50
-            );
-
-            // Notes section
-            const notesY = startY + 70;
-            doc.text("Warranty terms & conditions!", leftInsideMargin, notesY);
-            doc.setFontSize(10);
-            doc.text(
-              "* One year software warranty.",
-              leftInsideMargin,
-              notesY + 15
-            );
-            doc.text(
-              "* Warranty void if stickers damaged or removed.",
-              leftInsideMargin,
-              notesY + 20
-            );
-            doc.text(
-              "* Item should be in good condition",
-              leftInsideMargin,
-              notesY + 25
-            );
-            doc.text(
-              "* Bill must be presented , No cash returns",
-              leftInsideMargin,
-              notesY + 30
-            );
-            doc.text(
-              "* No warranty for water damage and over charged",
-              leftInsideMargin,
-              notesY + 35
-            );
 
             // Footer
-            const footerY = notesY + 40;
-            const centerX = doc.internal.pageSize.width / 2; // Center of the page
+            const footerY = pageHeight - 60;
+            const footerStartY = footerY - 30;
+            doc.setFontSize(12);
 
-            // Function to get the width of the text
-            function getTextWidth(text: string) {
-              return doc.getStringUnitWidth(text) * doc.internal.scaleFactor;
-            }
+            doc.text(
+                `Actual Price: ${returnOrder.actual_price.toFixed(2)}`,
+                190,
+                footerStartY,
+                { align: "right" }
+            );
+            doc.text(
+                `Discount: ${returnOrder.discount.toFixed(2)}`,
+                190,
+                footerStartY + 5,
+                { align: "right" }
+            );
+            doc.text(
+                `Total Amount: ${returnOrder.total_amount.toFixed(2)}`,
+                190,
+                footerStartY + 10,
+                { align: "right" }
+            );
 
-            // Calculate text width and adjust x position for centering
-            const thankYouText =
-              "Thank you for shopping with us! Let's visit us again";
-            const poweredByText = "Powered by Arimax Solutions";
+// Warranty terms and conditions below the amounts
+            // Set font size for the footer
+            doc.setFontSize(10);
+            const warrantyOffsetY = footerStartY + 20;
 
-            const thankYouTextWidth = getTextWidth(thankYouText);
-            const poweredByTextWidth = getTextWidth(poweredByText);
+// Array of footer text
+            const footerText = [
+              "Warranty terms & conditions!",
+              " >  One year software warranty.",
+              " >  Warranty void if stickers damaged or removed.",
+              " >  Item should be in good condition.",
+              " >  Bill must be presented, No cash returns.",
+            ];
 
-            const thankYouTextX = centerX - thankYouTextWidth / 2;
-            const poweredByTextX = centerX - poweredByTextWidth / 2;
+// Draw the footer text
+            footerText.forEach((line, index) => {
+              doc.text(line, leftInsideMargin, warrantyOffsetY + index * 5);
+            });
 
-            doc.text(thankYouText, thankYouTextX, footerY);
-            doc.text(poweredByText, poweredByTextX, footerY + 5);
+// Thank you text
+            const thankYouText = "Thank you for shopping with us!";
+            const developerText = "Developed by Arimax Solutions";
+
+// Calculate the width and center X position for the thank you text
+            const textWidth = doc.getTextWidth(thankYouText);
+            const centerX = (pageWidth - textWidth) / 2;
+            const thankYouY = pageHeight - 40;
+
+// Set font size for thank you text and render it
+            doc.setFontSize(12);
+            doc.text(thankYouText, centerX, thankYouY);
+
+// Calculate Y position for the developer text
+            const developerY = thankYouY + 20;
+
+// Set a smaller font size for the developer text and render it
+            doc.setFontSize(10);
+            doc.text(developerText, 85, developerY - 15);
+
+// Draw a dark green filled rectangle above the thank you text
+            const rectY = thankYouY+8;
+
+            doc.setFillColor(0, 100, 0);
+            doc.roundedRect(leftInsideMargin, rectY, 170, 4, 4, 4, 'F');
 
             // Save the PDF
             doc.save(`${returnOrder.shop.shop_name}.bill.pdf`);
@@ -1932,8 +1930,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             icon: "success",
             confirmButtonText: "OK",
           });
-
-          // Update the UI after successful save
+          navigate("/order")
           console.log("Return order saved successfully:", response.data);
         } catch (error) {
           // SweetAlert error message
