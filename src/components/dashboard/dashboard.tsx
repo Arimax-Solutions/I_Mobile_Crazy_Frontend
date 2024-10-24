@@ -21,16 +21,7 @@ const data = [
   { name: 'Label 5', value: 12212821.83 }
 ];
 
-/*const productData = [
-  { name: 'iPhone 13 Pro', popularity: 46, color: '#FFBB28' },
-  { name: 'iPhone 12 Pro', popularity: 17, color: '#00C49F' },
-  { name: 'iPhone 8+', popularity: 19, color: '#0088FE' },
-  { name: 'iPhone X', popularity: 29, color: '#FF8042' }
-];*/
-
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF4848'];
-
-
 
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);

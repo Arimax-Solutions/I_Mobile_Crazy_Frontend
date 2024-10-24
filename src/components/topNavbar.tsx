@@ -55,10 +55,10 @@ export default function TopNavbar(): JSX.Element {
           <p className='text-white opacity-40 text-lg'>{getFormattedDate()}</p>
         </div>
         <div className='flex items-center sm:items-start'>
-          <input
+          {/*<input
               placeholder='  search reports'
               className='w-full sm:w-[300px] p-1 text-xl rounded-xl mb-4 sm:mb-0 sm:mr-2 input-bg-gradient-custom'
-          />
+          />*/}
           <button
               onClick={logoutFunction}
               className='input-bg-gradient-custom p-2 bg-blue-500 rounded-full text-white'

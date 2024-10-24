@@ -327,7 +327,7 @@ const Item = () => {
             {/* Buttons for add, delete, update */}
             <div className='m-4 flex justify-between items-end'>
                 <div className='flex flex-col'>
-                        <input className='text-feild' value={qty} onChange={handleInputChange(setQty, 'qty')} placeholder='   qty' />
+                        <input className='text-feild text-white' value={qty} onChange={handleInputChange(setQty, 'qty')} placeholder='   qty' />
                         {errors.qty && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.qty}</span>}
                     </div>
 
