@@ -96,19 +96,45 @@ export default function CheckImei() {
             {imeiDetails && (
                 <div className='mt-4'>
                     <h2 className='text-xl font-bold mb-2'>IMEI Details</h2>
-                    <p><strong>ID:</strong> {imeiDetails.id}</p>
-                    <p><strong>IMEI:</strong> {imeiDetails.imei}</p>
-                    <p><strong>Storage:</strong> {imeiDetails.storage}</p>
-                    <p><strong>Colour:</strong> {imeiDetails.colour}</p>
-                    <p><strong>Warranty:</strong> {imeiDetails.warranty || 'Not Available'}</p>
-                    <p><strong>Battery Health:</strong> {imeiDetails.batteryHealth}%</p>
-                    <p><strong>Price:</strong> {imeiDetails.price}</p>
-                    <p><strong>Status:</strong> {imeiDetails.status}</p>
-                    <p><strong>IOS Version:</strong> {imeiDetails.iosversion}</p>
-                    <p><strong>Model:</strong> {imeiDetails.modelId.name}</p>
-                    <p><strong>Retail Order Date:</strong> {imeiDetails.retailOrderDate ? new Date(imeiDetails.retailOrderDate).toLocaleString() : 'Not Available'}</p>
-                    <p><strong>Wholesale Order Date:</strong> {imeiDetails.wholesaleOrderDate ? new Date(imeiDetails.wholesaleOrderDate).toLocaleString() : 'Not Available'}</p>
-                    <p><strong>Deleted:</strong> {imeiDetails.deleted ? 'Yes' : 'No'}</p>
+                    <div className='flex flex-wrap'>
+                        <div className='w-1/3 p-2'>
+                            <p className='text-lg'><strong>IMEI:</strong> {imeiDetails.imei}</p>
+                        </div>
+                        <div className='w-1/3 p-2'>
+                            <p className='text-lg'><strong>Model:</strong> {imeiDetails.modelId.name}</p>
+                        </div>
+                        <div className='w-1/3 p-2'>
+                            <p className='text-lg'><strong>Storage:</strong> {imeiDetails.storage}</p>
+                        </div>
+                        <div className='w-1/3 p-2'>
+                            <p className='text-lg'><strong>iOS Version:</strong> {imeiDetails.iosversion}</p>
+                        </div>
+                        <div className='w-1/3 p-2'>
+                            <p className='text-lg'><strong>Colour:</strong> {imeiDetails.colour}</p>
+                        </div>
+                        <div className='w-1/3 p-2'>
+                            <p className='text-lg'><strong>Battery Health:</strong> {imeiDetails.batteryHealth}%</p>
+                        </div>
+                        <div className='w-1/3 p-2'>
+                            <p className='text-lg'><strong>Price:</strong> {imeiDetails.price}</p>
+                        </div>
+                        <div className='w-1/3 p-2'>
+                            <p className='text-lg'><strong>Warranty:</strong> {imeiDetails.warranty || 'Not Available'}</p>
+                        </div>
+                        {imeiDetails.customer && (
+                            <p className='text-lg'>
+                                <strong>Retail Order Date:</strong> {imeiDetails.retailOrderDate ? new Date(imeiDetails.retailOrderDate).toLocaleString() : 'Not Available'}
+                            </p>
+                        )}
+
+                        {/* Conditional Rendering for Wholesale Order Date */}
+                        {imeiDetails.shop && (
+                            <p className='text-lg'>
+                                <strong>Wholesale Order Date:</strong> {imeiDetails.wholesaleOrderDate ? new Date(imeiDetails.wholesaleOrderDate).toLocaleString() : 'Not Available'}
+                            </p>
+                        )}
+                    </div>
+
 
                     {/* Display customer details if available */}
                     {imeiDetails.customer ? (
@@ -129,15 +155,11 @@ export default function CheckImei() {
                     {imeiDetails.shop ? (
                         <div className='mt-4'>
                             <h3 className='text-lg font-bold'>Shop Details</h3>
-                            <p><strong>Shop ID:</strong> {imeiDetails.shop.shop_id}</p>
                             <p><strong>Shop Name:</strong> {imeiDetails.shop.shop_name}</p>
                             <p><strong>Address:</strong> {imeiDetails.shop.address}</p>
                             <p><strong>Email:</strong> {imeiDetails.shop.email}</p>
                             <p><strong>Contact Number:</strong> {imeiDetails.shop.contact_number}</p>
                             <p><strong>Owner NIC:</strong> {imeiDetails.shop.owner_nic}</p>
-                            <p><strong>Credit Limit:</strong> {imeiDetails.shop.credit_limit}</p>
-                            <p><strong>Outstanding:</strong> {imeiDetails.shop.outstanding || 'Not Available'}</p>
-                            <p><strong>Deleted:</strong> {imeiDetails.shop._deleted ? 'Yes' : 'No'}</p>
                         </div>
                     ) : (
                         <div className='mt-4'>
@@ -146,6 +168,7 @@ export default function CheckImei() {
                     )}
                 </div>
             )}
+
         </div>
     );
 }
