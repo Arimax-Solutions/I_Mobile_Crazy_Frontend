@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import Button from '../crudbuttons/buttons';
 import { backend_url } from '../../utill/utill';
@@ -76,54 +76,55 @@ interface Customer {
     outstandingAmount: number;
 }
 
-
-// Component
 export default function WholesaleOrderView() {
     const [visibleTable, setVisibleTable] = useState<'retail' | 'wholesale' | 'return' | null>(null);
     const [token, setToken] = useState<string>('');
     const [wholesaleOrders, setWholesaleOrders] = useState<WholesaleOrder[]>([]);
     const [retailOrders, setRetailOrders] = useState<RetailOrder[]>([]);
     const [returnOrders, setReturnOrders] = useState<ReturnOrder[]>([]);
+    const [loading, setLoading] = useState(false); // Loading state
     const [selectedOrder, setSelectedOrder] = useState<WholesaleOrder | RetailOrder | ReturnOrder | null>(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            setToken(token);
-        }
+        const storedToken = localStorage.getItem('authToken');
+        if (storedToken) setToken(storedToken);
     }, []);
 
+    // Fetch data based on visibleTable change
     useEffect(() => {
-        const fetchData = async () => {
-            if (!token) return;
-
+        const fetchOrders = async () => {
+            if (!token || !visibleTable) return;
+            setLoading(true);
             try {
-                const [wholesaleResponse, retailResponse, returnResponse] = await Promise.all([
-                    axios.get(`${backend_url}/api/wholesaleOrder`, {
+                if (visibleTable === 'wholesale') {
+                    const response = await axios.get(`${backend_url}/api/wholesaleOrder`, {
                         headers: { Authorization: `Bearer ${token}` }
-                    }),
-                    axios.get(`${backend_url}/api/retailOrder`, {
+                    });
+                    setWholesaleOrders(response.data.data);
+                } else if (visibleTable === 'retail') {
+                    const response = await axios.get(`${backend_url}/api/retailOrder`, {
                         headers: { Authorization: `Bearer ${token}` }
-                    }),
-                    axios.get(`${backend_url}/api/returnOrder`, {
+                    });
+                    setRetailOrders(response.data.data);
+                } else if (visibleTable === 'return') {
+                    const response = await axios.get(`${backend_url}/api/returnOrder`, {
                         headers: { Authorization: `Bearer ${token}` }
-                    })
-                ]);
-
-                setWholesaleOrders(wholesaleResponse.data.data);
-                setRetailOrders(retailResponse.data.data);
-                setReturnOrders(returnResponse.data.data);
+                    });
+                    setReturnOrders(response.data.data);
+                }
             } catch (error) {
-                console.error('No data available', error);
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchData();
-    }, [token]);
+        fetchOrders();
+    }, [visibleTable, token]);
 
-    const handleTableVisibility = (table: 'retail' | 'wholesale' | 'return') => {
+    const handleTableVisibility = useCallback((table: 'retail' | 'wholesale' | 'return') => {
         setVisibleTable(table);
-    };
+    }, []);
 
     const handleViewOrderDetails = (order: WholesaleOrder | RetailOrder | ReturnOrder) => {
         setSelectedOrder(order);
@@ -132,7 +133,6 @@ export default function WholesaleOrderView() {
     const handleCloseModal = () => {
         setSelectedOrder(null);
     };
-
     return (
         <div className="m-4">
             {/* Buttons */}
