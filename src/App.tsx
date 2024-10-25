@@ -14,6 +14,7 @@ import ProceedPayment from './components/proceed-payment/proceed-payment.tsx';
 import ReturnItem from "./components/return-item/return-item.tsx";
 import Expencess from './components/expencess/expencess.tsx';
 import OrderView from "./components/view-orders/OrderView.tsx";
+import CheckImei from "./components/CheckImei/checkImei.tsx";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="shop" element={<Shop />} />
           <Route path="stockPhones" element={<StockPhones />} />
           <Route path="returnPhone" element={<ReturnPhone />} />
+          <Route path="checkImei" element={<CheckImei />} />
           <Route path="order" element={<Order />} />
           <Route path='orderType/:orderType' element={<ProceedPayment />}/>
           <Route path='expencess' element={<Expencess />}/>

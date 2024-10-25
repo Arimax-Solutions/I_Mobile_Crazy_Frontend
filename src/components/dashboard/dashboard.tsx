@@ -329,6 +329,11 @@ export default function Dashboard() {
   const hanldeDailyCostOnClick=()=>{
     navigation('/expencess')
   }
+
+  const hanldeCheckImeiOnClick=()=>{
+    navigation('/checkImei')
+  }
+
   const totalStockCount = Object.values(stockData).reduce((acc, count) => acc + count, 0);
 
   console.log('Product data:', productData);
@@ -500,6 +505,10 @@ export default function Dashboard() {
 
           <button className='daily_cost-buttons-styles p-1 rounded-xl w-full sm:w-auto flex items-center' onClick={hanldeDailyCostOnClick}>
             Daily Cost<img src={'src/assets/icons/daily cost.svg'} className='ml-2' alt='icon' />
+          </button>
+
+          <button className='daily_cost-buttons-styles p-1 rounded-xl w-full sm:w-auto flex items-center' onClick={hanldeCheckImeiOnClick}>
+            Check IMEI<img src={'src/assets/icons/daily cost.svg'} className='ml-2' alt='icon' />
           </button>
         </div>
 

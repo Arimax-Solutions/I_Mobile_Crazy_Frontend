@@ -288,6 +288,13 @@ export default function RetailOrder(prop: IProp) {
         }
     };
 
+    const formatNumber = (value:any) => {
+        // Remove non-numeric characters
+        const cleanedValue = value.replace(/\D/g, '');
+        // Format as currency with commas
+        return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
     return (
         <>
             {/* ... Existing code ... */}
@@ -489,10 +496,19 @@ export default function RetailOrder(prop: IProp) {
                                     onChange={(ev) => setPhone({ ...phone, batteryHealth: ev.target.value })}
                                     placeholder='   Battery Health'
                                 />
-                                <input
+                                {/*<input
                                     className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                                     value={phone.price}
                                     onChange={(ev) => setPhone({ ...phone, price: ev.target.value })}
+                                    placeholder='   Price'
+                                />*/}
+                                <input
+                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                                    value={phone.price}
+                                    onChange={(ev) => {
+                                        const formattedPrice = formatNumber(ev.target.value);
+                                        setPhone({ ...phone, price: formattedPrice });
+                                    }}
                                     placeholder='   Price'
                                 />
                             </div>

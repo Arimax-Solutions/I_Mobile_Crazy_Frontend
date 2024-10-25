@@ -172,13 +172,21 @@ const ProceedPayment: React.FC<any> = (props: any) => {
       const [totalAfterDiscount, setTotalAfterDiscount] = useState(0);
       const [balance, setBalance] = useState(0);
       const [customerAmount, setCustomerAmount] = useState(0);
+      const [formattedCustomerAmount, setFormattedCustomerAmount] = useState("");
 
       useEffect(() => {
         calculateTotals(discount, customerAmount);
       }, [discount, customerAmount, phones, items, customerOutstanding]);
 
+      const formatNumber = (value:any) => {
+        // Remove non-numeric characters
+        const cleanedValue = value.replace(/\D/g, '');
+        // Format as currency with commas
+        return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      };
+
       const handleDiscountChange = (e: any) => {
-        const value = parseFloat(e.target.value) || 0;
+        const value =  parseFloat(e.target.value) || 0;
         setDiscount(value);
       };
 
@@ -187,20 +195,29 @@ const ProceedPayment: React.FC<any> = (props: any) => {
           setCustomerAmount(value);
         };*/
 
-      const calculateTotals = (
-        discountValue: number,
-        customerAmountValue: number
-      ) => {
-        const totalPhonePrice = phones.reduce(
-          (sum: any, phone: any) => sum + (parseFloat(phone.price) || 0),
-          0
-        );
+      const handleCustomerAmountChange = (e:any) => {
+        const inputValue = e.target.value;
+
+        // Parse the input value to float and set it as the raw customer amount
+        const cleanedValue = inputValue.replace(/,/g, ''); // Remove commas for raw value
+        const numericValue = parseFloat(cleanedValue) || 0; // Parse to float or default to 0
+
+        setCustomerAmount(numericValue); // Update raw amount
+        setFormattedCustomerAmount(formatNumber(inputValue)); // Update formatted value
+      };
+
+      const calculateTotals = (discountValue: any, customerAmountValue: number) => {
+        const totalPhonePrice = phones.reduce((sum:any, phone:any) => {
+          // Remove commas and parse the price
+          const price = parseFloat(phone.price.replace(/,/g, '') || 0);
+          return sum + (price || 0);
+        }, 0);
+
         const totalItemPrice = items.reduce(
           (sum: number, item: Item) => sum + item.price * item.qty,
           0
         );
-        const subtotalValue =
-          totalPhonePrice + totalItemPrice - customerOutstanding;
+        const subtotalValue = totalPhonePrice + totalItemPrice - customerOutstanding;
         const totalAfterDiscountValue = subtotalValue - discountValue;
         const balanceValue = customerAmountValue - totalAfterDiscountValue;
 
@@ -214,7 +231,12 @@ const ProceedPayment: React.FC<any> = (props: any) => {
         };
       };
 
-      // Function to generate the retail_order_id
+    function parsePriceRetail(price: string | number): number {
+      if (typeof price === 'string') {
+        return parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
+      }
+      return price; // Return as is if it's already a number
+    }
 
       const saveOrder = async () => {
         console.log(`Saving order with discount`);
@@ -262,7 +284,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             colour: phone.colour,
             ios_version: phone.ios_version,
             battery_health: phone.battery_health,
-            price: phone.price,
+            price: parsePriceRetail(phone.price),
             warranty: phone.warranty,
           })),
         };
@@ -753,7 +775,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                       </td>
                       <td className="py-2 px-4">
                         <div className="mt-1">
-                          <p>{subtotal.toFixed(2)}</p>
+                          <p>{subtotal}</p>
                         </div>
                       </td>
                     </tr>
@@ -808,13 +830,20 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                       </td>
                       <td className="py-2 px-4">
                         <div className="mt-1">
-                          <input
+                          {/*<input
                             type="number"
                             value={customerAmount}
                             onChange={(e) =>
                               setCustomerAmount(parseFloat(e.target.value) || 0)
                             }
                             className="bg-[#1E1E1E] text-white px-2 py-1 rounded-md"
+                          />*/}
+                          <input
+                              type="text" // Changed from "number" to "text"
+                              value={formattedCustomerAmount} // Use formatted value
+                              onChange={handleCustomerAmountChange}
+                              className="bg-[#1E1E1E] text-white px-2 py-1 rounded-md"
+                              placeholder="Customer Amount"
                           />
                         </div>
                       </td>
@@ -855,8 +884,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
       const [totalAfterDiscountWholesale, setTotalAfterDiscountWholesale] =
         useState<number>(0);
       const [balanceWholesale, setBalanceWholesale] = useState<number>(0);
-      const [customerAmountWholesale, setCustomerAmountWholesale] =
-        useState<number>(0);
+      const [customerAmountWholesale, setCustomerAmountWholesale] = useState<number>(0);
 
       useEffect(() => {
         calculateTotalsWholesale(discountWholesale, customerAmountWholesale);
@@ -868,14 +896,19 @@ const ProceedPayment: React.FC<any> = (props: any) => {
         outstanding,
       ]);
 
-      const handleDiscountChangeWholesale = (
-        e: React.ChangeEvent<HTMLInputElement>
-      ) => {
+      const formatWholesaleNumber = (value:any) => {
+        // Remove non-numeric characters
+        const cleanedValue = value.replace(/\D/g, '');
+        // Format as currency with commas
+        return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      };
+
+      const handleDiscountChangeWholesale = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseFloat(e.target.value) || 0;
         setDiscountWholesale(value);
       };
 
-      const calculateTotalsWholesale = (
+      /*const calculateTotalsWholesale = (
         discountValueWholesale: number,
         customerAmountValueWholesale: number
       ) => {
@@ -887,6 +920,17 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               0
             )
             .toFixed(2)
+        );*/
+
+      const calculateTotalsWholesale = (discountValueWholesale: number, customerAmountValueWholesale: number) => {
+        const totalPhonePriceWholesale = parseFloat(
+            wholesalePhones
+                .reduce((sum: number, wholesalePhone: any) => {
+                  // Clean the price by removing non-numeric characters (like commas)
+                  const price = parseFloat(wholesalePhone.price?.replace(/,/g, '') || '0');
+                  return sum + price;
+                }, 0)
+                .toFixed(2) // Ensure two decimal places for total
         );
 
         const totalItemPriceWholesale = parseFloat(
@@ -934,6 +978,14 @@ const ProceedPayment: React.FC<any> = (props: any) => {
         };
       };
 
+
+    function parsePrice(price: string | number): number {
+      if (typeof price === 'string') {
+        return parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
+      }
+      return price; // Return as is if it's already a number
+    }
+
       const saveOrderWholesale = async () => {
         console.log("Saving order...");
         const { subtotalWholesale, totalAfterDiscountWholesale } =
@@ -974,7 +1026,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             colour: wholesalePhone.colour,
             ios_version: wholesalePhone.ios_version,
             battery_health: wholesalePhone.battery_health,
-            price: wholesalePhone.price,
+            price: parsePrice(wholesalePhone.price),
             status: wholesalePhone.status,
             warranty: wholesalePhone.warranty,
             isDeleted: wholesalePhone.isDeleted,
@@ -1529,15 +1581,14 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                       <td className="py-2 px-4">
                         <div className="mt-1">
                           <input
-                            type="number"
-                            placeholder="0.00"
-                            className="bg-[#14141E] border border-[#3A3A3A] text-[#717171] p-1 rounded-lg"
-                            value={customerAmountWholesale}
-                            onChange={(e) =>
-                              setCustomerAmountWholesale(
-                                parseFloat(e.target.value)
-                              )
-                            }
+                              type="text" // Change to text to allow formatted value with commas
+                              placeholder="0.00"
+                              className="bg-[#14141E] border border-[#3A3A3A] text-[#717171] p-1 rounded-lg"
+                              value={formatWholesaleNumber(customerAmountWholesale.toString())} // Format value for display
+                              onChange={(e) => {
+                                const numericValue = parseFloat(e.target.value.replace(/,/g, '')); // Remove commas for actual numeric value
+                                setCustomerAmountWholesale(numericValue || 0); // Handle NaN case
+                              }}
                           />
                         </div>
                       </td>
@@ -1588,6 +1639,12 @@ const ProceedPayment: React.FC<any> = (props: any) => {
         returnPhones,
         outstandingReturn,
       ]);
+      const formatNumberReturn = (value: string) => {
+        // Remove non-numeric characters
+        const cleanedValue = value.replace(/\D/g, '');
+        // Format as currency with commas
+        return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      };
 
       const handleDiscountChangeReturn = (e: any) => {
         const value = parseFloat(e.target.value) || 0;
@@ -1625,6 +1682,13 @@ const ProceedPayment: React.FC<any> = (props: any) => {
         const { subtotalReturn, totalAfterDiscountReturn } =
           calculateTotalsReturn(discountReturn, customerAmountReturn);
 
+        function parsePriceReturn(price: string | number): number {
+          if (typeof price === 'string') {
+            return parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
+          }
+          return price; // Return as is if it's already a number
+        }
+
         const returnOrder = {
           return_order_id: generateRetailOrderId(),
           discount: discountReturn,
@@ -1643,7 +1707,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             imei: returnPhone.imei,
             storage: returnPhone.storage,
             colour: returnPhone.colour,
-            price: returnPhone.price,
+            price: parsePriceReturn(returnPhone.price),
             warranty: returnPhone.warranty,
           })),
         };
@@ -2084,14 +2148,13 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                       <td className="py-2 px-4">
                         <div className="mt-1">
                           <input
-                            type="number"
-                            value={customerAmountReturn}
-                            onChange={(e) =>
-                              setCustomerAmountReturn(
-                                parseFloat(e.target.value) || 0
-                              )
-                            }
-                            className="bg-[#1E1E1E] text-white px-2 py-1 rounded-md"
+                              type="text" // Change to text to allow formatting with commas
+                              value={formatNumberReturn(customerAmountReturn.toString())} // Format the value for display
+                              onChange={(e) => {
+                                const numericValue = e.target.value.replace(/,/g, ''); // Remove commas for actual numeric value
+                                setCustomerAmountReturn(parseFloat(numericValue) || 0); // Update state with the numeric value
+                              }}
+                              className="bg-[#1E1E1E] text-white px-2 py-1 rounded-md"
                           />
                         </div>
                       </td>

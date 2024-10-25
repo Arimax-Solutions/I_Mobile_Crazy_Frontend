@@ -282,8 +282,21 @@ const Item = () => {
             setErrors(newErrors);
         }
     };
-    
 
+
+    const formatNumber = (value:any) => {
+        // Remove non-numeric characters
+        const cleanedValue = value.replace(/\D/g, '');
+        // Format as currency with commas
+        return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    const handleInputChangeNew = (setter:any) => (event:any) => {
+        const value = event.target.value;
+        // Format the input value
+        const formattedValue = formatNumber(value);
+        setter(formattedValue);
+    };
 
     return (
         <div className='m-4 w-full'>
@@ -313,10 +326,10 @@ const Item = () => {
                             {errors.colour && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.colour}</span>}
                         </div>
                         <div className='flex flex-col'>
-                            <input className='text-feild' value={price} onChange={handleInputChange(setPrice, 'price')} placeholder='   price' />
+                            <input className='text-feild' value={price} onChange={handleInputChangeNew(setPrice)} placeholder='   price' />
                             {errors.price && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.price}</span>}
                         </div>
-                        <div className='flex flex-col'>
+                    <div className='flex flex-col'>
                             <input className='text-feild' value={warranty_period} onChange={handleInputChange(setWarrantyPeriod, 'warranty_period')} placeholder='   warranty period' />
                             {errors.warranty_period && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.warranty_period}</span>}
                         </div>

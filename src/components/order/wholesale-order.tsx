@@ -61,6 +61,13 @@ export default function WholeSaleOrder(prop:IProp) {
         price: ""
     });
 
+    const formatNumber = (value:any) => {
+        // Remove non-numeric characters
+        const cleanedValue = value.replace(/\D/g, '');
+        // Format as currency with commas
+        return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
     const [wholesalePhones, setwholesalePhones] = useState<Array<typeof wholesalePhone>>([]);
     /*const [multiplewholesalePhones, setMultiplewholesalePhones] = useState<Array<typeof wholesalePhone>>([]);*/
 
@@ -392,7 +399,10 @@ export default function WholeSaleOrder(prop:IProp) {
                             <input
                                 className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
                                 value={wholesalePhone.price}
-                                onChange={(ev) => setwholesalePhone({ ...wholesalePhone, price: ev.target.value })}
+                                onChange={(ev) => {
+                                    const formattedPrice = formatNumber(ev.target.value);
+                                    setwholesalePhone({ ...wholesalePhone, price: formattedPrice });
+                                }}
                                 placeholder='   Price'
                             />
                         </div>
