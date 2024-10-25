@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Button from "../crudbuttons/buttons";
 import { backend_url } from "../../utill/utill";
+import TopNavbar from "../topNavbar.tsx";
 
 // Interfaces
 interface Shop {
@@ -84,6 +85,11 @@ export default function WholesaleOrderView() {
   const [wholesaleOrders, setWholesaleOrders] = useState<WholesaleOrder[]>([]);
   const [retailOrders, setRetailOrders] = useState<RetailOrder[]>([]);
   const [returnOrders, setReturnOrders] = useState<ReturnOrder[]>([]);
+
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+
+
+
   // @ts-ignore
   const [loading, setLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<
@@ -146,8 +152,56 @@ export default function WholesaleOrderView() {
   const handleCloseModal = () => {
     setSelectedOrder(null);
   };
+
+  const filteredWholesaleOrders = wholesaleOrders.filter((order) => {
+    const orderDate = new Date(order.date);
+    const orderMonth = String(orderDate.getMonth() + 1).padStart(2, '0');
+    return selectedMonth ? orderMonth === selectedMonth : true;
+  });
+
+  const filteredRetailOrders = retailOrders.filter((order) => {
+    const orderDate = new Date(order.date);
+    const orderMonth = String(orderDate.getMonth() + 1).padStart(2, '0');
+    return selectedMonth ? orderMonth === selectedMonth : true;
+  });
+
+  const filteredReturnOrders = returnOrders.filter((order) => {
+    const orderDate = new Date(order.date);
+    const orderMonth = String(orderDate.getMonth() + 1).padStart(2, '0');
+    return selectedMonth ? orderMonth === selectedMonth : true;
+  });
+
   return (
-    <div className="m-4">
+    <div className="m-4 w-full">
+      <div className="m-4">
+        <TopNavbar />
+      </div>
+
+
+      {/* Month Selector */}
+      <div className="m-4">
+        <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="p-2 border rounded w-full"
+        >
+          <option value="">All Months</option>
+          <option value="01">January</option>
+          <option value="02">February</option>
+          <option value="03">March</option>
+          <option value="04">April</option>
+          <option value="05">May</option>
+          <option value="06">June</option>
+          <option value="07">July</option>
+          <option value="08">August</option>
+          <option value="09">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+      </div>
+
+
       {/* Buttons */}
       <div className="m-4 flex mt-5 gap-x-[1vw] justify-between">
         <Button
@@ -206,67 +260,61 @@ export default function WholesaleOrderView() {
               </tr>
             </thead>
             <tbody>
-              {visibleTable === "wholesale" &&
-                wholesaleOrders.map((order, index) => (
-                  <tr key={index} className="cursor-pointer hover:bg-gray-600 ">
-                    <td className="p-2 border">{order.wholesale_order_id}</td>
-                    <td className="p-2 border">{order.discount}</td>
-                    <td className="p-2 border">{order.actual_price}</td>
-                    <td className="p-2 border">{order.total_amount}</td>
-                    <td className="p-2 border">{order.date}</td>
-                    <td className="p-2 border">
-                      {order.shop?.shop_name || "N/A"}
-                    </td>
-                    <td className="p-2 border">
-                      <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={() => handleViewOrderDetails(order)}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
+            {visibleTable === "wholesale" &&
+                filteredWholesaleOrders.map((order, index) => (
+                    <tr key={index} className="cursor-pointer hover:bg-gray-600 ">
+                      <td className="p-2 border">{order.wholesale_order_id}</td>
+                      <td className="p-2 border">{order.discount}</td>
+                      <td className="p-2 border">{order.actual_price}</td>
+                      <td className="p-2 border">{order.total_amount}</td>
+                      <td className="p-2 border">{order.date}</td>
+                      <td className="p-2 border">{order.shop?.shop_name || "N/A"}</td>
+                      <td className="p-2 border">
+                        <button
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            onClick={() => handleViewOrderDetails(order)}
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
                 ))}
-              {visibleTable === "retail" &&
-                retailOrders.map((order, index) => (
-                  <tr
-                    key={index}
-                    className="cursor-pointer hover:bg-gray-600 hover:font-bold"
-                  >
-                    <td className="p-2 border">{order.retail_order_id}</td>
-                    <td className="p-2 border">{order.discount}</td>
-                    <td className="p-2 border">{order.actual_price}</td>
-                    <td className="p-2 border">{order.total_amount}</td>
-                    <td className="p-2 border">{order.date}</td>
-                    <td className="p-2 border">
-                      <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={() => handleViewOrderDetails(order)}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
+
+            {visibleTable === "retail" &&
+                filteredRetailOrders.map((order, index) => (
+                    <tr key={index} className="cursor-pointer hover:bg-gray-600 hover:font-bold">
+                      <td className="p-2 border">{order.retail_order_id}</td>
+                      <td className="p-2 border">{order.discount}</td>
+                      <td className="p-2 border">{order.actual_price}</td>
+                      <td className="p-2 border">{order.total_amount}</td>
+                      <td className="p-2 border">{order.date}</td>
+                      <td className="p-2 border">
+                        <button
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            onClick={() => handleViewOrderDetails(order)}
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
                 ))}
-              {visibleTable === "return" &&
-                returnOrders.map((order, index) => (
-                  <tr
-                    key={index}
-                    className="cursor-pointer hover:bg-gray-600 hover:font-bold"
-                  >
-                    <td className="p-2 border">{order.return_order_id}</td>
-                    <td className="p-2 border">{order.reason}</td>
-                    <td className="p-2 border">{order.price}</td>
-                    <td className="p-2 border">{order.date}</td>
-                    <td className="p-2 border">
-                      <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={() => handleViewOrderDetails(order)}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
+
+            {visibleTable === "return" &&
+                filteredReturnOrders.map((order, index) => (
+                    <tr key={index} className="cursor-pointer hover:bg-gray-600 hover:font-bold">
+                      <td className="p-2 border">{order.return_order_id}</td>
+                      <td className="p-2 border">{order.reason}</td>
+                      <td className="p-2 border">{order.price}</td>
+                      <td className="p-2 border">{order.date}</td>
+                      <td className="p-2 border">
+                        <button
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            onClick={() => handleViewOrderDetails(order)}
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
                 ))}
             </tbody>
           </table>
