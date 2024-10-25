@@ -93,6 +93,14 @@ function NavigationMenu() {
                             setSelected={setSelectedItem}
                             onClick={() => handleNavigation('/shop')}
                         />
+                        <NavItems
+                            logo='src/assets/images/navbar/Shops.svg'
+                            name='View Orders'
+                            location='/orderView'
+                            selected={selectedItem}
+                            setSelected={setSelectedItem}
+                            onClick={() => handleNavigation('/orderView')}
+                        />
                     </ul>
                 </div>
 
