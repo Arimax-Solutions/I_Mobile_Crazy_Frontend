@@ -47,6 +47,13 @@ export default function ReturnOrder(prop:IProp) {
         price: ""
     });
 
+    const formatNumber = (value:any) => {
+        // Remove non-numeric characters
+        const cleanedValue = value.replace(/\D/g, '');
+        // Format as currency with commas
+        return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
     const [returnPhones, setreturnPhones] = useState<Array<typeof returnPhone>>([]);
     /*const [multiplereturnPhones, setMultiplereturnPhones] = useState<Array<typeof returnPhone>>([]);*/
 
@@ -258,8 +265,11 @@ export default function ReturnOrder(prop:IProp) {
                                 />
                                 <input
                                     className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={returnPhone.price}
-                                    onChange={(ev) => setreturnPhone({ ...returnPhone, price: ev.target.value })}
+                                    value={formatNumber(returnPhone.price.toString())} // Format the price for display
+                                    onChange={(ev) => {
+                                        const numericValue = ev.target.value.replace(/,/g, ''); // Remove commas for numeric input
+                                        setreturnPhone({ ...returnPhone, price: numericValue }); // Update the state with unformatted value
+                                    }}
                                     placeholder='   Price'
                                 />
                             </div>
