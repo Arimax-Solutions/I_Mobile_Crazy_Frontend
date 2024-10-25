@@ -1345,9 +1345,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
 
             const footerText = [
               "Warranty terms & conditions!",
-              " >  One year software warranty.",
               " >  Warranty void if stickers damaged or removed.",
-              " >  Item should be in good condition.",
               " >  Bill must be presented, No cash returns.",
             ];
 
@@ -1942,9 +1940,10 @@ const ProceedPayment: React.FC<any> = (props: any) => {
 
 // Warranty terms and conditions below the amounts
             // Set font size for the footer
-            doc.setFontSize(10);
-            const warrantyOffsetY = footerStartY + 20;
+            /*doc.setFontSize(10);
+            const warrantyOffsetY = footerStartY + 20;*/
 
+/*
 // Array of footer text
             const footerText = [
               "Warranty terms & conditions!",
@@ -1953,11 +1952,12 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               " >  Item should be in good condition.",
               " >  Bill must be presented, No cash returns.",
             ];
+*/
 
-// Draw the footer text
+/*// Draw the footer text
             footerText.forEach((line, index) => {
               doc.text(line, leftInsideMargin, warrantyOffsetY + index * 5);
-            });
+            });*/
 
 // Thank you text
             const thankYouText = "Thank you for shopping with us!";
