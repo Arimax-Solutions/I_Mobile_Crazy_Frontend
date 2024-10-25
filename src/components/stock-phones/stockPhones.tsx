@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import TopNavbar from "../topNavbar";
 import Combobox from "../combobox/combobox";
 import Button from "../crudbuttons/buttons";
@@ -43,13 +43,12 @@ interface ImeiNumberPhone {
 }
 
 export default function StockPhones() {
-  const today = new Date();
-  const formattedDate = today.toISOString().split("T")[0];  
-  const formattedTime = today.toTimeString().split(" ")[0];
+  const today = useMemo(() => new Date().toISOString().split("T")[0], []);
+  const time = useMemo(() => new Date().toTimeString().split(" ")[0], []);
+  const combinedDateTime = `${today}T${time}`;
 
-  const [date, setDate] = useState(formattedDate);
-  const [time, setTime] = useState(formattedTime);
-  const combinedDateTime = `${date}T${time}`;
+  const [date, setDate] = useState(today);
+  const [timeValue, setTimeValue] = useState(time);
 
   const [stockName, setStockName] = useState("");
   const [description, setDescription] = useState("");
@@ -60,12 +59,13 @@ export default function StockPhones() {
   const [iosversion, setIosversion] = useState("");
   const [batteryHealth, setBatteryHealth] = useState("");
   const [colour, setColour] = useState("");
-  const [token, setToken] = useState("");
   const [phones, setPhones] = useState<Phone[]>([]);
   const [selectedPhone, setSelectedPhone] = useState<Phone | null>(null);
   const [phoneModels, setPhoneModels] = useState<PhoneModel[]>([]);
   const [modelsTable, setModelsTable] = useState<PhoneModel[]>([]);
   const [isPushDisabled, setIsPushDisabled] = useState(false);
+  const token = useMemo(() => localStorage.getItem("authToken"), []);
+
   const colourOptions = [
     { value: "Gold", label: "Gold" },
     { value: "White", label: "White" },
@@ -228,33 +228,27 @@ export default function StockPhones() {
     return true;
   };
 
-  const fetchItems = async () => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      setToken(token);
-      try {
-        const response = await axios.get(`${backend_url}/api/stock`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  const fetchItems = useCallback(async () => {
+    if (!token) return;
 
-        console.log("Phone data all : " + response.data);
-        if (response.data && Array.isArray(response.data.data)) {
-          setPhones(response.data.data);
-        } else {
-          console.error(
-            "Invalid data format received from server:",
-            response.data
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching items:", error);
+    try {
+      const response = await axios.get(`${backend_url}/api/stock`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data && Array.isArray(response.data.data)) {
+        setPhones(response.data.data);
+      } else {
+        console.error(
+          "Invalid data format received from server:",
+          response.data
+        );
       }
-    } else {
-      console.log("No token found");
+    } catch (error) {
+      console.error("Error fetching items:", error);
     }
-  };
+  }, [token]);
+
 
   const handleTableRowClick = (phone: Phone) => {
     setSelectedPhone(phone);
@@ -265,8 +259,7 @@ export default function StockPhones() {
     fetchPhoneModels(phone.id);
   };
 
-  const handleAddPhone = () => {
-    console.log(model.length);
+  const handleAddPhone = useCallback(() => {
     const stockQuantity = parseInt(quantity, 10);
     if (modelsTable.length >= stockQuantity) {
       Swal.fire({
@@ -292,58 +285,42 @@ export default function StockPhones() {
       ],
     };
 
-    // Log the new phone model before adding it to the state
-    console.log("newPhoneModel:", newPhoneModel);
-
-    // Add the new phone model to the phoneModels and modelsTable arrays
-    const updatedPhoneModels = [...phoneModels, newPhoneModel];
-    const updatedModelsTable = [...modelsTable, newPhoneModel];
-
-    setPhoneModels(updatedPhoneModels);
-    setModelsTable(updatedModelsTable);
-
-    // Log the updated state arrays after setting the state
-    console.log("updatedPhoneModels:", updatedPhoneModels);
-    console.log("updatedModelsTable:", updatedModelsTable);
+    setPhoneModels((prev) => [...prev, newPhoneModel]);
+    setModelsTable((prev) => [...prev, newPhoneModel]);
     setModel("");
     setImeiNumber("");
     setStorage("");
     setColour("");
     setIosversion("");
     setBatteryHealth("");
-  };
+  }, [combinedDateTime, colour, imeiNumber, iosversion, model, storage, batteryHealth, quantity, modelsTable]);
 
-  const fetchPhoneModels = async (phoneId: any) => {
+
+  const fetchPhoneModels = useCallback(async (phoneId: number) => {
     try {
-      const response = await axios.get(
-        `${backend_url}/api/stock/models/${phoneId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`${backend_url}/api/stock/models/${phoneId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (Array.isArray(response.data)) {
         setModelsTable(response.data);
       } else {
-        console.error(
-          "Invalid data format received from server:",
-          response.data
-        );
+        console.error("Invalid data format received from server:", response.data);
       }
     } catch (error) {
       console.error("Error fetching phone models:", error);
     }
-  };
+  }, [token]);
 
-  const handlePushOnClick = async () => {
+
+  const handlePushOnClick = useCallback(async () => {
     const newPhone: NewPhone = {
       name: stockName,
       description: description,
       qty: parseInt(quantity),
       models: phoneModels,
     };
+
     try {
       const response = await axios.post(`${backend_url}/api/stock`, newPhone, {
         headers: {
@@ -359,10 +336,7 @@ export default function StockPhones() {
           icon: "success",
           confirmButtonText: "OK",
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 4000);
-        setPhones([...phones, response.data.data]);
+        setPhones((prev) => [...prev, response.data.data]);
         setStockName("");
         setDescription("");
         setQuantity("");
@@ -371,15 +345,11 @@ export default function StockPhones() {
       }
     } catch (error) {
       console.error("Error adding phone:", error);
-      Swal.fire({
-        title: "Error!",
-        text: "Failed to add phone",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+      Swal.fire({ title: "Error!", text: "Failed to add phone", icon: "error", confirmButtonText: "OK" });
     }
-  };
+  }, [stockName, description, quantity, phoneModels, token]);
 
+  
   const handleItemUpdateOnClick = async () => {
     if (!selectedPhone) return;
     const updatedPhoneModels = modelsTable
