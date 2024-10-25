@@ -82,7 +82,8 @@ export default function WholesaleOrderView() {
     const [wholesaleOrders, setWholesaleOrders] = useState<WholesaleOrder[]>([]);
     const [retailOrders, setRetailOrders] = useState<RetailOrder[]>([]);
     const [returnOrders, setReturnOrders] = useState<ReturnOrder[]>([]);
-    const [loading, setLoading] = useState(false); // Loading state
+    // @ts-ignore
+    const [loading, setLoading] = useState(false); 
     const [selectedOrder, setSelectedOrder] = useState<WholesaleOrder | RetailOrder | ReturnOrder | null>(null);
 
     useEffect(() => {

@@ -46,8 +46,9 @@ export default function StockPhones() {
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
   const time = useMemo(() => new Date().toTimeString().split(" ")[0], []);
   const combinedDateTime = `${today}T${time}`;
-
+// @ts-ignore
   const [date, setDate] = useState(today);
+  // @ts-ignore
   const [timeValue, setTimeValue] = useState(time);
 
   const [stockName, setStockName] = useState("");

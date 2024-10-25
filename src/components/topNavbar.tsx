@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const TopNavbar = React.memo((): JSX.Element => {
+  // @ts-ignore
   const [token, setToken] = useState<string>(
     localStorage.getItem("authToken") || ""
   );
