@@ -17,6 +17,15 @@ interface Shop {
   outstanding: number | null;
 }
 
+interface Item {
+  item_id: number;
+  name: string;
+  category: string;
+  colour: string;
+  brand: string;
+  price: string;
+}
+
 interface WholesaleOrder {
   wholesale_order_id: number;
   discount: number;
@@ -24,7 +33,7 @@ interface WholesaleOrder {
   total_amount: number;
   date: string;
   shop: Shop;
-  items: string[];
+  items: Item[];
   imeis: Imei[];
 }
 
@@ -57,7 +66,7 @@ interface RetailOrder {
   actual_price: number;
   total_amount: number;
   date: string;
-  items: string[];
+  items: Item[];
   imeis: Imei[];
   customer: Customer;
 }
@@ -88,8 +97,6 @@ export default function WholesaleOrderView() {
 
   const [selectedMonth, setSelectedMonth] = useState<string>("");
 
-
-
   // @ts-ignore
   const [loading, setLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<
@@ -119,6 +126,8 @@ export default function WholesaleOrderView() {
           const response = await axios.get(`${backend_url}/api/retailOrder`, {
             headers: { Authorization: `Bearer ${token}` },
           });
+          console.log(response.data.data);
+
           setRetailOrders(response.data.data);
         } else if (visibleTable === "return") {
           const response = await axios.get(`${backend_url}/api/returnOrder`, {
@@ -155,19 +164,19 @@ export default function WholesaleOrderView() {
 
   const filteredWholesaleOrders = wholesaleOrders.filter((order) => {
     const orderDate = new Date(order.date);
-    const orderMonth = String(orderDate.getMonth() + 1).padStart(2, '0');
+    const orderMonth = String(orderDate.getMonth() + 1).padStart(2, "0");
     return selectedMonth ? orderMonth === selectedMonth : true;
   });
 
   const filteredRetailOrders = retailOrders.filter((order) => {
     const orderDate = new Date(order.date);
-    const orderMonth = String(orderDate.getMonth() + 1).padStart(2, '0');
+    const orderMonth = String(orderDate.getMonth() + 1).padStart(2, "0");
     return selectedMonth ? orderMonth === selectedMonth : true;
   });
 
   const filteredReturnOrders = returnOrders.filter((order) => {
     const orderDate = new Date(order.date);
-    const orderMonth = String(orderDate.getMonth() + 1).padStart(2, '0');
+    const orderMonth = String(orderDate.getMonth() + 1).padStart(2, "0");
     return selectedMonth ? orderMonth === selectedMonth : true;
   });
 
@@ -177,13 +186,12 @@ export default function WholesaleOrderView() {
         <TopNavbar />
       </div>
 
-
       {/* Month Selector */}
       <div className="m-4">
         <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="p-2 border rounded w-full"
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          className="p-2 border rounded w-full"
         >
           <option value="">All Months</option>
           <option value="01">January</option>
@@ -200,7 +208,6 @@ export default function WholesaleOrderView() {
           <option value="12">December</option>
         </select>
       </div>
-
 
       {/* Buttons */}
       <div className="m-4 flex mt-5 gap-x-[1vw] justify-between">
@@ -260,61 +267,69 @@ export default function WholesaleOrderView() {
               </tr>
             </thead>
             <tbody>
-            {visibleTable === "wholesale" &&
+              {visibleTable === "wholesale" &&
                 filteredWholesaleOrders.map((order, index) => (
-                    <tr key={index} className="cursor-pointer hover:bg-gray-600 ">
-                      <td className="p-2 border">{order.wholesale_order_id}</td>
-                      <td className="p-2 border">{order.discount}</td>
-                      <td className="p-2 border">{order.actual_price}</td>
-                      <td className="p-2 border">{order.total_amount}</td>
-                      <td className="p-2 border">{order.date}</td>
-                      <td className="p-2 border">{order.shop?.shop_name || "N/A"}</td>
-                      <td className="p-2 border">
-                        <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                            onClick={() => handleViewOrderDetails(order)}
-                        >
-                          View Details
-                        </button>
-                      </td>
-                    </tr>
+                  <tr key={index} className="cursor-pointer hover:bg-gray-600 ">
+                    <td className="p-2 border">{order.wholesale_order_id}</td>
+                    <td className="p-2 border">{order.discount}</td>
+                    <td className="p-2 border">{order.actual_price}</td>
+                    <td className="p-2 border">{order.total_amount}</td>
+                    <td className="p-2 border">{order.date}</td>
+                    <td className="p-2 border">
+                      {order.shop?.shop_name || "N/A"}
+                    </td>
+                    <td className="p-2 border">
+                      <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => handleViewOrderDetails(order)}
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
                 ))}
 
-            {visibleTable === "retail" &&
+              {visibleTable === "retail" &&
                 filteredRetailOrders.map((order, index) => (
-                    <tr key={index} className="cursor-pointer hover:bg-gray-600 hover:font-bold">
-                      <td className="p-2 border">{order.retail_order_id}</td>
-                      <td className="p-2 border">{order.discount}</td>
-                      <td className="p-2 border">{order.actual_price}</td>
-                      <td className="p-2 border">{order.total_amount}</td>
-                      <td className="p-2 border">{order.date}</td>
-                      <td className="p-2 border">
-                        <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                            onClick={() => handleViewOrderDetails(order)}
-                        >
-                          View Details
-                        </button>
-                      </td>
-                    </tr>
+                  <tr
+                    key={index}
+                    className="cursor-pointer hover:bg-gray-600 hover:font-bold"
+                  >
+                    <td className="p-2 border">{order.retail_order_id}</td>
+                    <td className="p-2 border">{order.discount}</td>
+                    <td className="p-2 border">{order.actual_price}</td>
+                    <td className="p-2 border">{order.total_amount}</td>
+                    <td className="p-2 border">{order.date}</td>
+                    <td className="p-2 border">
+                      <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => handleViewOrderDetails(order)}
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
                 ))}
 
-            {visibleTable === "return" &&
+              {visibleTable === "return" &&
                 filteredReturnOrders.map((order, index) => (
-                    <tr key={index} className="cursor-pointer hover:bg-gray-600 hover:font-bold">
-                      <td className="p-2 border">{order.return_order_id}</td>
-                      <td className="p-2 border">{order.reason}</td>
-                      <td className="p-2 border">{order.price}</td>
-                      <td className="p-2 border">{order.date}</td>
-                      <td className="p-2 border">
-                        <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                            onClick={() => handleViewOrderDetails(order)}
-                        >
-                          View Details
-                        </button>
-                      </td>
-                    </tr>
+                  <tr
+                    key={index}
+                    className="cursor-pointer hover:bg-gray-600 hover:font-bold"
+                  >
+                    <td className="p-2 border">{order.return_order_id}</td>
+                    <td className="p-2 border">{order.reason}</td>
+                    <td className="p-2 border">{order.price}</td>
+                    <td className="p-2 border">{order.date}</td>
+                    <td className="p-2 border">
+                      <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => handleViewOrderDetails(order)}
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
                 ))}
             </tbody>
           </table>
@@ -392,11 +407,35 @@ export default function WholesaleOrderView() {
                   <h2 className="text-2xl font-bold mb-4 text-green-500">
                     Item Details
                   </h2>
-                  <p>
-                    <strong>Items:</strong>{" "}
-                    {(selectedOrder as WholesaleOrder).items?.join(", ") ||
-                      "N/A"}
-                  </p>
+                  <ul className="mt-4 space-y-2">
+                    {(selectedOrder as WholesaleOrder).items.map(
+                      (item, index) => (
+                        <li
+                          key={index}
+                          className="p-2 border-2 border-black rounded-lg"
+                        >
+                          <p>
+                            <strong>Item ID:</strong> {item.item_id || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Name:</strong> {item.name || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Category:</strong> {item.category || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Brand:</strong> {item.brand || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Colour:</strong> {item.colour || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Price:</strong> {item.price || "N/A"}
+                          </p>
+                        </li>
+                      )
+                    )}
+                  </ul>
 
                   <br />
                   <h2 className="text-2xl font-bold mb-4 text-red-500">
@@ -490,11 +529,36 @@ export default function WholesaleOrderView() {
                   <h2 className="text-2xl font-bold mb-4 text-green-500">
                     Item Details
                   </h2>
-                  <p>
-                    <strong>Items:</strong>{" "}
-                    {(selectedOrder as RetailOrder).items?.join(", ") || "N/A"}
-                  </p>
-
+                  <ul className="mt-4 space-y-2">
+                    {(selectedOrder as WholesaleOrder).items.map(
+                      (item, index) => (
+                        <li
+                          key={index}
+                          className="p-2 border-2 border-black rounded-lg"
+                        >
+                          <p>
+                            <strong>Item ID:</strong> {item.item_id || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Name:</strong> {item.name || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Category:</strong> {item.category || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Brand:</strong> {item.brand || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Colour:</strong> {item.colour || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Price:</strong> {item.price || "N/A"}
+                          </p>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                  
                   <br />
                   <h2 className="text-2xl font-bold mb-4 text-red-500">
                     Phones Details

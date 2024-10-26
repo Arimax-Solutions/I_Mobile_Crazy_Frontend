@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
+import { backend_url } from "../../utill/utill";
 import {
   PieChart,
   Pie,
@@ -59,7 +60,7 @@ export default function Dashboard() {
       const fetchStockData = async () => {
         try {
           const response = await axios.get(
-            "http://localhost:8080/api/imei/count/sale"
+            `${backend_url}/api/imei/count/sale`
           );
           setStockData(response.data);
         } catch (error) {
@@ -85,17 +86,15 @@ export default function Dashboard() {
           wholesaleRes,
           returnRes,
         ] = await Promise.all([
-          axios.get("http://localhost:8080/api/dailyCost/monthly/cost"),
-          axios.get("http://localhost:8080/api/retailOrder/monthly"),
-          axios.get("http://localhost:8080/api/retailOrder/order/count"),
-          axios.get("http://localhost:8080/api/imei/sold-count-this-month"),
-          axios.get(
-            "http://localhost:8080/api/wholesaleOrder/count-this-month"
-          ),
-          fetch("http://localhost:8080/api/dailyCost/today"),
-          axios.get("http://localhost:8080/api/retailOrder/today"),
-          axios.get("http://localhost:8080/api/retailOrder/wholesale/today"),
-          axios.get("http://localhost:8080/api/retailOrder/return/today"),
+          axios.get(`${backend_url}/api/dailyCost/monthly/cost`),
+          axios.get(`${backend_url}/api/retailOrder/monthly`),
+          axios.get(`${backend_url}/api/retailOrder/order/count`),
+          axios.get(`${backend_url}/api/imei/sold-count-this-month`),
+          axios.get(`${backend_url}/api/wholesaleOrder/count-this-month`),
+          fetch(`${backend_url}/api/dailyCost/today`),
+          axios.get(`${backend_url}/api/retailOrder/today`),
+          axios.get(`${backend_url}/api/retailOrder/wholesale/today`),
+          axios.get(`${backend_url}/api/retailOrder/return/today`),
         ]);
 
         // Set each state based on respective API responses
@@ -305,8 +304,6 @@ export default function Dashboard() {
   useEffect(() => {
     setNetIncome(totalIncome - dailyCost);
   }, [totalIncome, dailyCost]);
-
-
 
   const productData = useMemo(
     () =>
