@@ -280,69 +280,65 @@ export default function ReturnItem() {
       <div className="m-4">
         <TopNavbar />
       </div>
-
-      {/* Input Fields with Updated Error Message Placement */}
+  
+      {/* Input Fields */}
       <div className="m-4 text-white font-semibold">
-        <div className="mt-5 flex flex-row justify-between">
-          <div className="">
+        {/* First Row of Input Fields */}
+        <div className="mt-5 flex gap-4">
+          <div>
             <input
-              className="text-feild mb-4 md:mb-0"
+              className="text-feild max-w-[25vw]"
               value={category}
               onChange={handleCategoryChange}
-              placeholder="   Category"
+              placeholder="Category"
             />
             {errors.category && (
               <span className="text-red-500 text-xs">{errors.category}</span>
             )}
           </div>
-
-          <div className="">
+          <div>
             <input
-              className="text-feild mb-4 md:mb-0"
+              className="text-feild max-w-[25vw]"
               value={name}
               onChange={handleNameChange}
-              placeholder="   handleNameChange"
+              placeholder="Name"
             />
             {errors.name && (
               <span className="text-red-500 text-xs">{errors.name}</span>
             )}
           </div>
-
-          <div className="">
+          <div className="max-w-[25vw]">
             <Combobox
               value={brand}
               onChange={handleBrandChange}
               options={brandOptions}
-              placeholder="  Brand"
+              placeholder="Brand"
             />
             {errors.brand && (
               <span className="text-red-500 text-xs">{errors.brand}</span>
             )}
           </div>
         </div>
-      </div>
-
-      {/* Second Row of Input Fields */}
-      <div className="m-4 text-white font-semibold">
-        <div className="mt-5 flex flex-col sm:flex-row gap-8">
-          <div className="flex flex-col md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1">
+  
+        {/* Second Row of Input Fields */}
+        <div className="mt-5 flex gap-8">
+          <div>
             <input
-              className="text-feild mb-4 md:mb-0"
+              className="text-feild"
               value={reason}
               onChange={handleReasonChange}
-              placeholder="   Reason"
+              placeholder="Reason"
             />
             {errors.reason && (
               <span className="text-red-500 text-xs">{errors.reason}</span>
             )}
           </div>
-
-          <div className="flex flex-col md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1">
+          <div>
             <input
-              className="text-feild mb-4 md:mb-0"
+              className="text-feild"
               value={contact_number}
               onChange={handleContactNumberChange}
-              placeholder="   Contact Number"
+              placeholder="Contact Number"
             />
             {errors.contact_number && (
               <span className="text-red-500 text-xs">
@@ -352,8 +348,8 @@ export default function ReturnItem() {
           </div>
         </div>
       </div>
-
-      {/* buttons */}
+  
+      {/* Buttons */}
       <div className="m-4 flex mt-5 gap-x-[3vw] justify-end">
         <Button
           onClick={handleAddReturnItem}
@@ -380,7 +376,7 @@ export default function ReturnItem() {
           UPDATE
         </Button>
       </div>
-
+  
       {/* Table to display users */}
       <div className="m-4 mt-5 overflow-x-auto">
         <table className="min-w-full divide-y table-styles">
@@ -440,4 +436,4 @@ export default function ReturnItem() {
       </div>
     </div>
   );
-}
+}  
