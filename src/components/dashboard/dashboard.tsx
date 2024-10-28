@@ -20,6 +20,11 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import logo from "../../assets/images/logo2.png";
 import { useNavigate } from "react-router-dom";
+import dailCost from "../../assets/icons/daily cost.svg";
+import icon1 from "../../assets/icons/icon 1.svg";
+import icon2 from "../../assets/icons/icon 2.svg";
+import icon3 from "../../assets/icons/icon 3.svg";
+import icon4 from "../../assets/icons/icon 4.svg"
 
 interface StockData {
   [model: string]: number;
@@ -587,7 +592,7 @@ export default function Dashboard() {
           >
             Daily Cost
             <img
-              src={"src/assets/icons/daily cost.svg"}
+              src={dailCost}
               className="ml-2"
               alt="icon"
             />
@@ -599,7 +604,7 @@ export default function Dashboard() {
           >
             Check IMEI
             <img
-              src={"src/assets/icons/daily cost.svg"}
+              src={dailCost}
               className="ml-2"
               alt="icon"
             />
@@ -620,7 +625,7 @@ export default function Dashboard() {
               <div className="custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center">
                 <div className="mb-2">
                   <img
-                    src={"src/assets/icons/Icon 1.svg"}
+                    src={icon1}
                     alt="icon"
                     className="mx-auto"
                   />
@@ -633,7 +638,7 @@ export default function Dashboard() {
               <div className="custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center">
                 <div className="mb-2">
                   <img
-                    src={"src/assets/icons/Icon 2.svg"}
+                    src={icon2}
                     alt="icon"
                     className="mx-auto"
                   />
@@ -646,7 +651,7 @@ export default function Dashboard() {
               <div className="custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center">
                 <div className="mb-2">
                   <img
-                    src={"src/assets/icons/Icon 3.svg"}
+                    src={icon3}
                     alt="icon"
                     className="mx-auto"
                   />
@@ -660,7 +665,7 @@ export default function Dashboard() {
               <div className="custom-div w-[12vw] bg-gray-800 p-4 rounded-lg text-center">
                 <div className="mb-2">
                   <img
-                    src={"src/assets/icons/Icon 4.svg"}
+                    src={icon4}
                     alt="icon"
                     className="w-fit mx-auto"
                   />

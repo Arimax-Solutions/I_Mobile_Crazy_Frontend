@@ -4,6 +4,9 @@ import Button from '../crudbuttons/buttons';
 import Swal from "sweetalert2";
 import axios from 'axios';
 import { backend_url } from '../../utill/utill';
+import editIcon from '../../assets/icons/Update Btn.svg';
+import addIcon from '../../assets/icons/Add Btn.svg';
+import deleteIcon from '../../assets/icons/Delete Btn.svg'
 
 interface UserData {
     user_id: number;
@@ -36,7 +39,6 @@ const User: React.FC = () => {
     useEffect(() => {
         fetchItems();
     }, []);
-
 
     const validateEmail = (email: string): boolean => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -360,7 +362,7 @@ const User: React.FC = () => {
                 <Button
                     onClick={() => handleAddUser()}
                     className='mr-[6vw] buttons-styles bg-green-button w-[7vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                    iconSrc={'src/assets/icons/Add Btn.svg'}
+                    iconSrc={addIcon}
                     iconAlt='add icon'
                 >
                     ADD
@@ -368,7 +370,7 @@ const User: React.FC = () => {
                 <Button
                     onClick={() => handleItemDeleteOnClick(selectedUser?.user_id || 0)}
                     className='mr-[6vw] buttons-styles bg-red-button w-[8vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                    iconSrc={'src/assets/icons/Delete Btn.svg'}
+                    iconSrc={deleteIcon}
                     iconAlt='delete icon'
                 >
                     DELETE
@@ -376,7 +378,7 @@ const User: React.FC = () => {
                 <Button
                     onClick={() => handleItemUpdateOnClick()}
                     className='buttons-styles bg-blue-button w-[8vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                    iconSrc={'src/assets/icons/Update Btn.svg'}
+                    iconSrc={editIcon}
                     iconAlt='update icon'
                 >
                     UPDATE

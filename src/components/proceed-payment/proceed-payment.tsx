@@ -190,11 +190,6 @@ const ProceedPayment: React.FC<any> = (props: any) => {
         setDiscount(value);
       };
 
-      /*const handleCustomerAmountChange = (e) => {
-          const value = parseFloat(e.target.value) || 0;
-          setCustomerAmount(value);
-        };*/
-
       const handleCustomerAmountChange = (e:any) => {
         const inputValue = e.target.value;
 
@@ -461,7 +456,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               // Include item data
               order.items.forEach((item: any, index: number) => {
                 doc.text(
-                    `${item.name} - ${item.warranty_period} WARRANTY`,
+                    `${item.name} - ${item.warranty_period ? item.warranty_period + " WARRANTY" : "-"}`,
                     leftInsideMargin,
                     itemsStartY + index * 10
                 );
@@ -548,7 +543,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
                     imeiStartY + index * 10
                 );
                 doc.text(
-                    `${imei.warranty}`,
+                    imei.warranty === 0 || imei.warranty === null ? "-" : `${imei.warranty}`,
                     leftMargin + 120,
                     imeiStartY + index * 10
                 );
@@ -978,7 +973,6 @@ const ProceedPayment: React.FC<any> = (props: any) => {
         };
       };
 
-
     function parsePrice(price: string | number): number {
       if (typeof price === 'string') {
         return parseFloat(price.replace(/,/g, '')); // Remove commas and convert to number
@@ -1204,7 +1198,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
               // Include item data
               wholesaleOrder.items.forEach((item: any, index: number) => {
                 doc.text(
-                    `${item.name} - ${item.warranty_period} WARRANTY`,
+                    `${item.name} - ${item.warranty_period ? item.warranty_period + " WARRANTY" : "-"}`,
                     leftInsideMargin,
                     itemsStartY + index * 10
                 );
@@ -1390,7 +1384,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             icon: "success",
             confirmButtonText: "OK",
           });
-          navigate(`/order`);
+          //navigate(`/order`);
 
           console.log("Wholesale order saved successfully:", response.data);
         } catch (error) {
@@ -1994,7 +1988,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             icon: "success",
             confirmButtonText: "OK",
           });
-          navigate("/order")
+          //navigate("/order")
           console.log("Return order saved successfully:", response.data);
         } catch (error) {
           // SweetAlert error message

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import TopNavbar from '../topNavbar';
-import '../item/item.css'; // Ensure this file does not override Tailwind classes
+import '../item/item.css';
 import axios from 'axios';
 import { backend_url } from '../../utill/utill';
 import Swal from "sweetalert2";
+import editIcon from '../../assets/icons/Update Btn.svg';
+import addIcon from '../../assets/icons/Add Btn.svg';
+import deleteIcon from '../../assets/icons/Delete Btn.svg'
 
 interface ItemData {
     category: string;
@@ -255,7 +258,7 @@ const Item = () => {
         if (!brand) newErrors.brand = 'Brand is required';
         if (!colour) newErrors.colour = 'Colour is required';
         if (!price) newErrors.price = 'Price is required';
-        if (!warranty_period) newErrors.warranty_period = 'Warranty period is required';
+        if (warranty_period) newErrors.warranty_period = 'Warranty period is required';
         if (!qty) newErrors.qty = 'Quantity is required';
     
         // Validate numeric price
@@ -282,7 +285,6 @@ const Item = () => {
             setErrors(newErrors);
         }
     };
-
 
     const formatNumber = (value:any) => {
         // Remove non-numeric characters
@@ -346,11 +348,11 @@ const Item = () => {
 
                 <div className='flex  mt-5'>
                 <button onClick={handleItemAddOnClick} className='mr-[6vw] buttons-styles bg-green-button w-[7vw] h-[5vh] text-center rounded-xl flex justify-center items-center'>
-                    <img src={'src/assets/icons/Add Btn.svg'} className='mr-[0.3vw]' alt='add icon' />ADD</button>
+                    <img src={addIcon} className='mr-[0.3vw]' alt='add icon' />ADD</button>
                 <button onClick={handleItemDeleteOnClick} className='mr-[6vw] buttons-styles bg-red-button w-[8vw] h-[5vh] text-center rounded-xl flex justify-center items-center'>
-                    <img src={'src/assets/icons/Delete Btn.svg'} className='mr-[0.3vw]' alt='delete icon' />DELETE</button>
+                    <img src={deleteIcon} className='mr-[0.3vw]' alt='delete icon' />DELETE</button>
                 <button onClick={handleItemUpdateOnClick} className='buttons-styles bg-blue-button w-[8vw] h-[5vh] text-center rounded-xl flex justify-center items-center'>
-                    <img src={'src/assets/icons/Update Btn.svg'} className='mr-[0.3vw]' alt='update icon' />UPDATE</button>
+                    <img src={editIcon} className='mr-[0.3vw]' alt='update icon' />UPDATE</button>
             </div>
             </div>
             

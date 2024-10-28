@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import logout from "../assets/icons/Logout.svg";
 
 const TopNavbar = React.memo((): JSX.Element => {
   // @ts-ignore
@@ -77,7 +78,7 @@ const TopNavbar = React.memo((): JSX.Element => {
           className="input-bg-gradient-custom p-2 bg-blue-500 rounded-full text-white"
         >
           <img
-            src={"src/assets/icons/Logout.svg"}
+            src={logout}
             className="w-fit h-[3vh]"
             alt="Logout Icon"
           />
