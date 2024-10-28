@@ -57,7 +57,7 @@ export default function LoginForm() {
   const handleLogin = async () => {
     const userData: UserData = { username: username, password: password };
     try {
-      const response = await axios.post(backend_url+'/auth/login', userData);
+      const response = await axios.post(backend_url+'/api/auth/login', userData);
       if (response.data.token) {
         Swal.fire({
           title: "Success!",
