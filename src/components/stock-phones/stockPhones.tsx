@@ -5,6 +5,10 @@ import Button from "../crudbuttons/buttons";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { backend_url } from "../../utill/utill";
+import editIcon from '../../assets/icons/Update Btn.svg';
+import addIcon from '../../assets/icons/Add Btn.svg';
+import deleteIcon from '../../assets/icons/Delete Btn.svg'
+
 interface Phone {
   id: number;
   name: string;
@@ -69,11 +73,19 @@ export default function StockPhones() {
 
   const colourOptions = [
     { value: "Gold", label: "Gold" },
-    { value: "White", label: "White" },
-    { value: "Black", label: "Black" },
     { value: "Rose Gold", label: "Rose Gold" },
     { value: "Silver", label: "Silver" },
+    { value: "White", label: "White" },
+    { value: "Black", label: "Black" },
     { value: "Red", label: "Red" },
+    { value: "Blue", label: "Blue" },
+    { value: "Grey", label: "Grey" },
+    { value: "Green", label: "Green" },
+    { value: "Yellow", label: "Yellow" },
+    { value: "Purple", label: "Purple" },
+    { value: "Graphite", label: "Graphite" },
+    { value: "MidNight Blue", label: "MidNight Blue" },
+    { value: "Deep Purple", label: "Deep Purple" },
   ];
 
   const storageOptions = [
@@ -118,7 +130,7 @@ export default function StockPhones() {
     storage: /^(64GB|128GB|256GB|512GB|1TB)$/,
     iosversion: /^\d+$/,
     batteryHealth: /^\d+$/,
-    colour: /^(Gold|White|Red|Black|Silver|Rose Gold)$/,
+    colour: /^(Gold|White|Red|Black|Silver|Rose Gold|Blue|Grey|Green|Yellow|Purple|Graphite|MidNight Blue|Deep Purple)$/,
   };
   const validateForm = (): boolean => {
     // Validate stockName
@@ -250,7 +262,6 @@ export default function StockPhones() {
     }
   }, [token]);
 
-
   const handleTableRowClick = (phone: Phone) => {
     setSelectedPhone(phone);
     setStockName(phone.name);
@@ -350,7 +361,6 @@ export default function StockPhones() {
     }
   }, [stockName, description, quantity, phoneModels, token]);
 
-  
   const handleItemUpdateOnClick = async () => {
     if (!selectedPhone) return;
     const updatedPhoneModels = modelsTable
@@ -680,7 +690,7 @@ export default function StockPhones() {
         <Button
           onClick={handleAddPhone}
           className="buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center"
-          iconSrc={"src/assets/icons/Add Btn.svg"}
+          iconSrc={addIcon}
           iconAlt="add icon"
         >
           ADD
@@ -688,7 +698,7 @@ export default function StockPhones() {
         <Button
           onClick={handleItemDeleteOnClick} // Directly use the handler
           className="buttons-styles bg-red-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center"
-          iconSrc={"src/assets/icons/Delete Btn.svg"}
+          iconSrc={deleteIcon}
           iconAlt="delete icon"
         >
           DELETE
@@ -697,7 +707,7 @@ export default function StockPhones() {
         <Button
           onClick={handleItemUpdateOnClick}
           className="buttons-styles bg-blue-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center"
-          iconSrc={"src/assets/icons/Update Btn.svg"}
+          iconSrc={editIcon}
           iconAlt="update icon"
         >
           UPDATE
@@ -707,7 +717,7 @@ export default function StockPhones() {
           className={`buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center ${
             isPushDisabled ? "hidden" : ""
           }`}
-          iconSrc={"src/assets/icons/Add Btn.svg"}
+          iconSrc={addIcon}
           iconAlt="add icon"
         >
           PUSH

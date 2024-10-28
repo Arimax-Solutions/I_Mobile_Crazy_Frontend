@@ -2,7 +2,15 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Swal from 'sweetalert2';
-
+import logo from '../../assets/images/logo2.png';
+import layer1 from '../../../assets/images/navbar/layer1.svg';
+import stockPhone from '../../../assets/images/navbar/Stock phones.svg';
+import returnPhone from '../../../assets/images/navbar/Return phones.svg';
+import item from '../../../assets/images/navbar/Items.svg';
+import returnItem from '../../../assets/images/navbar/Return item.svg';
+import user from '../../../assets/images/navbar/Users.svg';
+import shop from '../../../assets/images/navbar/Shops.svg';
+import placeOrder from '../../../assets/images/navbar/cart-svgrepo-com 1.svg';
 // Authentication check function
 const isAuthenticated = () => {
     return localStorage.getItem('authToken') !== null;
@@ -32,13 +40,13 @@ function NavigationMenu() {
     return (
         <nav className="fixed top-8 left-0 pt-3 flex flex-col min-w-[270px] w-[270px] h-[95%] bg-[#1D1D27] rounded-r-[40px] items-center overflow-hidden">
             <div className='mt-2 self-start pl-8'>
-                <img width="120px" src="src/assets/images/logo.png" alt="company logo" />
+                <img width="120px" src={logo} alt="company logo" />
             </div>
             <div className="w-full h-full flex flex-col">
                 <div className="w-full flex-1">
                     <ul className='mt-10 w-full pl-8 flex flex-col gap-10 mb-2'>
                         <NavItems
-                            logo='src/assets/images/navbar/layer1.svg'
+                            logo={layer1}
                             name='Reports'
                             location='/dashboard'
                             selected={selectedItem}
@@ -46,7 +54,7 @@ function NavigationMenu() {
                             onClick={() => handleNavigation('/dashboard')}
                         />
                         <NavItems
-                            logo='src/assets/images/navbar/Stock Phones.svg'
+                            logo={stockPhone}
                             name='Stock Phones'
                             location='/StockPhones'
                             selected={selectedItem}
@@ -54,7 +62,7 @@ function NavigationMenu() {
                             onClick={() => handleNavigation('/StockPhones')}
                         />
                         <NavItems
-                            logo='src/assets/images/navbar/Return Phones.svg'
+                            logo={returnPhone}
                             name='Return Phones'
                             location='/returnPhone'
                             selected={selectedItem}
@@ -62,7 +70,7 @@ function NavigationMenu() {
                             onClick={() => handleNavigation('/returnPhone')}
                         />
                         <NavItems
-                            logo='src/assets/images/navbar/Items.svg'
+                            logo={item}
                             name='Items'
                             location='/item'
                             selected={selectedItem}
@@ -70,7 +78,7 @@ function NavigationMenu() {
                             onClick={() => handleNavigation('/item')}
                         />
                         <NavItems
-                            logo='src/assets/images/navbar/Return item.svg'
+                            logo={returnItem}
                             name='Return Items'
                             location='/returnItem'
                             selected={selectedItem}
@@ -78,7 +86,7 @@ function NavigationMenu() {
                             onClick={() => handleNavigation('/returnItem')}
                         />
                         <NavItems
-                            logo='src/assets/images/navbar/Users.svg'
+                            logo={user}
                             name='Users'
                             location='/user'
                             selected={selectedItem}
@@ -86,7 +94,7 @@ function NavigationMenu() {
                             onClick={() => handleNavigation('/user')}
                         />
                         <NavItems
-                            logo='src/assets/images/navbar/Shops.svg'
+                            logo={shop}
                             name='Shops'
                             location='/shop'
                             selected={selectedItem}
@@ -94,7 +102,7 @@ function NavigationMenu() {
                             onClick={() => handleNavigation('/shop')}
                         />
                         <NavItems
-                            logo='src/assets/images/navbar/Shops.svg'
+                            logo={shop}
                             name='View Orders'
                             location='/orderView'
                             selected={selectedItem}
@@ -109,7 +117,7 @@ function NavigationMenu() {
                         to="/order"
                         className="mt-5 flex text-[25px] w-full justify-center rounded-md bg-[#5356EC] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 items-center gap-3"
                     >
-                        <img src="src/assets/images/navbar/cart-svgrepo-com 1.svg" alt="cart" />
+                        <img src={placeOrder} alt="cart" />
                         Place Order
                     </NavLink>
                 </div>

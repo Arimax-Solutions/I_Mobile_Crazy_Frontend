@@ -5,6 +5,9 @@ import axios from "axios";
 import { backend_url } from "../../utill/utill.ts";
 import Swal from "sweetalert2";
 import Combobox from '../combobox/combobox.tsx';
+import editIcon from '../../assets/icons/Update Btn.svg';
+import addIcon from '../../assets/icons/Add Btn.svg';
+import deleteIcon from '../../assets/icons/Delete Btn.svg'
 
 const brandOptions = [
     { value: 'Samsung', label: 'Samsung' },
@@ -58,7 +61,6 @@ export default function ReturnItem() {
     
         return Object.values(newErrors).every(error => error === '');
     };
-    
 
     const fetchReturnItem = async () => {
         const token = localStorage.getItem('authToken');
@@ -312,7 +314,7 @@ export default function ReturnItem() {
                 <Button
                     onClick={handleAddReturnItem}
                     className='buttons-styles bg-green-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                    iconSrc={'src/assets/icons/Add Btn.svg'}
+                    iconSrc={addIcon}
                     iconAlt='add icon'
                 >
                     ADD
@@ -320,7 +322,7 @@ export default function ReturnItem() {
                 <Button
                     onClick={handleItemDeleteOnClick}
                     className='buttons-styles bg-red-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                    iconSrc={'src/assets/icons/Delete Btn.svg'}
+                    iconSrc={deleteIcon}
                     iconAlt='delete icon'
                 >
                     DELETE
@@ -328,7 +330,7 @@ export default function ReturnItem() {
                 <Button
                     onClick={handleItemUpdateOnClick}
                     className='buttons-styles bg-blue-button w-full sm:w-[20%] md:w-[15%] lg:w-[15%] xl:w-[10vw] h-[5vh] text-center rounded-xl flex justify-center items-center'
-                    iconSrc={'src/assets/icons/Update Btn.svg'}
+                    iconSrc={editIcon}
                     iconAlt='update icon'
                 >
                     UPDATE
