@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Swal from 'sweetalert2';
-import logo from '../../assets/images/logo2.png';
+import logo from '../../../assets/images/logo2.png';
 import layer1 from '../../../assets/images/navbar/layer1.svg';
 import stockPhone from '../../../assets/images/navbar/Stock phones.svg';
 import returnPhone from '../../../assets/images/navbar/Return phones.svg';
