@@ -4,17 +4,9 @@ import Button from "../crudbuttons/buttons.tsx";
 import axios from "axios";
 import { backend_url } from "../../utill/utill.ts";
 import Swal from "sweetalert2";
-import Combobox from "../combobox/combobox.tsx";
 import editIcon from "../../assets/icons/Update Btn.svg";
 import addIcon from "../../assets/icons/Add Btn.svg";
 import deleteIcon from "../../assets/icons/Delete Btn.svg";
-
-const brandOptions = [
-  { value: "Samsung", label: "Samsung" },
-  { value: "Apple", label: "Apple" },
-  { value: "OMS", label: "OMS" },
-];
-
 interface ReturnPhones {
   return_phone_id: number;
   brand: string;
@@ -268,9 +260,9 @@ export default function ReturnItem() {
     }
   };
 
-  const handleBrandChange = (ev: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleBrandChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
     setBrand(ev.target.value);
-    if (ev.target.value !== "") {
+    if (ev.target.value.trim() !== "") {
       setErrors((prev) => ({ ...prev, brand: "" }));
     }
   };
@@ -307,11 +299,11 @@ export default function ReturnItem() {
               <span className="text-red-500 text-xs">{errors.name}</span>
             )}
           </div>
-          <div className="max-w-[25vw]">
-            <Combobox
+           <div>
+            <input
+              className="text-feild max-w-[25vw]"
               value={brand}
               onChange={handleBrandChange}
-              options={brandOptions}
               placeholder="Brand"
             />
             {errors.brand && (

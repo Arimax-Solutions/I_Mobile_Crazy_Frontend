@@ -477,7 +477,7 @@ export default function ReturnPhone() {
 
                 <div className='mt-3 flex flex-col sm:flex-row justify-between'>
                     <DatePicker
-                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
+                        className='text-feild mb-4 md:mb-0 md:min-w-[27%] lg:mx-2 md:mx-2 sm:mx-1'
                         selected={date || null}
                         onChange={(date) => setDate(date)}
                         placeholderText='   Date'
