@@ -75,8 +75,8 @@ const Item = () => {
         setQty(item.qty);
     };
 
-    // Function to handle adding an item
-    const handleItemAddOnClick = async () => {
+    // add item
+    /*const handleItemAddOnClick = async () => {
         if (!validateForm()) {
             return;
         }
@@ -90,6 +90,8 @@ const Item = () => {
             warranty_period,
             qty
         };
+
+        console.log("Item object : "+newItemData.price);
 
         try {
             const response = await axios.post(
@@ -133,7 +135,74 @@ const Item = () => {
                 confirmButtonText: 'OK'
             });
         }
+    };*/
+
+    const handleItemAddOnClick = async () => {
+        // Validate form fields
+        if (!validateForm()) {
+            return; // Exit if validation fails
+        }
+
+        // Prepare new item data
+        const newItemData = {
+            category,
+            name,
+            brand,
+            colour,
+            price: parseFloat(price.replace(/,/g, '')),
+            warranty_period,
+            qty,
+        };
+
+        console.log("Item object:", newItemData.price);
+
+        try {
+            // Send POST request to add new item
+            const response = await axios.post(
+                `${backend_url}/api/items`,
+                newItemData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,  // Token for auth
+                    },
+                }
+            );
+
+            console.log(response);
+
+            // Show success alert
+            Swal.fire({
+                title: 'Success!',
+                text: 'Item added successfully',
+                icon: 'success',
+                confirmButtonText: 'OK',
+            });
+
+            // Clear input fields after successful addition
+            setCategory('');
+            setName('');
+            setBrand('');
+            setColour('');
+            setPrice('');
+            setWarrantyPeriod('');
+            setQty('');
+
+            // Refresh items list after adding item
+            fetchItems();
+        } catch (error) {
+            console.error('Error adding item:', error);
+
+            // Show error alert
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to add item',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+        }
     };
+
 
     // Function to handle deleting an item
     const handleItemDeleteOnClick = async () => {
@@ -198,7 +267,7 @@ const Item = () => {
             name,
             brand,
             colour,
-            price: parseFloat(price),
+            price: parseFloat(price.replace(/,/g, '')),
             warranty_period,
             qty,
         };
@@ -249,16 +318,15 @@ const Item = () => {
         }
     };
 
-
     const validateForm = (): boolean => {
         const newErrors: { [key: string]: string } = {};
 
         if (!category) newErrors.category = 'Category is required';
         if (!name) newErrors.name = 'Name is required';
         if (!brand) newErrors.brand = 'Brand is required';
-        if (!colour) newErrors.colour = 'Colour is required';
+        //if (!colour) newErrors.colour = 'Colour is required';
         if (!price) newErrors.price = 'Price is required';
-        if (warranty_period) newErrors.warranty_period = 'Warranty period is required';
+        //if (!warranty_period) newErrors.warranty_period = 'Warranty period is required';
         if (!qty) newErrors.qty = 'Quantity is required';
     
         // Validate numeric price
@@ -322,6 +390,7 @@ const Item = () => {
                         {errors.brand && <span className='text-red-500 text-xs ml-[0.5vw]'>{errors.brand}</span>}
                     </div>
                 </div>
+
                 <div className='mt-4 flex justify-between'>
                     <div className='flex flex-col'>
                             <input className='text-feild' value={colour} onChange={handleInputChange(setColour, 'colour')} placeholder='   colour' />

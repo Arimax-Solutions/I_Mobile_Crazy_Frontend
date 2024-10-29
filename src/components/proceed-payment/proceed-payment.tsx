@@ -159,7 +159,6 @@ const ProceedPayment: React.FC<any> = (props: any) => {
   }
 
   useEffect(() => {
-    // Generate and set the order ID when the component mounts
     const id = generateRetailOrderId();
     setOrderId(id);
   }, []);
@@ -290,7 +289,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             `${backend_url}/api/retailOrder`,
             order
           );
-          const doc = new jsPDF();
+          const doc = new jsPDF({ compress: true });
 
           const img = new Image();
           img.src = logo;
@@ -903,20 +902,6 @@ const ProceedPayment: React.FC<any> = (props: any) => {
         setDiscountWholesale(value);
       };
 
-      /*const calculateTotalsWholesale = (
-        discountValueWholesale: number,
-        customerAmountValueWholesale: number
-      ) => {
-        const totalPhonePriceWholesale = parseFloat(
-          wholesalePhones
-            .reduce(
-              (sum: number, wholesalePhone: any) =>
-                sum + parseFloat(wholesalePhone.price || 0),
-              0
-            )
-            .toFixed(2)
-        );*/
-
       const calculateTotalsWholesale = (discountValueWholesale: number, customerAmountValueWholesale: number) => {
         const totalPhonePriceWholesale = parseFloat(
             wholesalePhones
@@ -985,6 +970,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
         const { subtotalWholesale, totalAfterDiscountWholesale } =
           calculateTotalsWholesale(discountWholesale, customerAmountWholesale);
 
+
         const wholesaleOrder = {
           wholesale_order_id: generateRetailOrderId(),
           discount: discountWholesale,
@@ -1027,12 +1013,13 @@ const ProceedPayment: React.FC<any> = (props: any) => {
           })),
         };
 
+
         try {
           const response = await axios.post(
             `${backend_url}/api/wholesaleOrder`,
             wholesaleOrder
           );
-          const doc = new jsPDF();
+          const doc = new jsPDF({ compress: true });
 
           const img = new Image();
           img.src = logo; // Path to your uploaded image
@@ -1384,7 +1371,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             icon: "success",
             confirmButtonText: "OK",
           });
-          //navigate(`/order`);
+          navigate(`/order`);
 
           console.log("Wholesale order saved successfully:", response.data);
         } catch (error) {
@@ -1709,7 +1696,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             `${backend_url}/api/returnOrder`,
             returnOrder
           );
-          const doc = new jsPDF();
+          const doc = new jsPDF({ compress: true });
 
           const img = new Image();
           img.src = logo; // Path to your uploaded image
@@ -1988,7 +1975,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             icon: "success",
             confirmButtonText: "OK",
           });
-          //navigate("/order")
+          navigate("/order")
           console.log("Return order saved successfully:", response.data);
         } catch (error) {
           // SweetAlert error message

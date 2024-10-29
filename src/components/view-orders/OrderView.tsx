@@ -3,6 +3,8 @@ import axios from "axios";
 import Button from "../crudbuttons/buttons";
 import { backend_url } from "../../utill/utill";
 import TopNavbar from "../topNavbar.tsx";
+import { jsPDF } from "jspdf";
+import logo from "../../assets/images/logo2.png";
 
 // Interfaces
 interface Shop {
@@ -24,6 +26,7 @@ interface Item {
   colour: string;
   brand: string;
   price: string;
+  warranty_period: string;
 }
 
 interface WholesaleOrder {
@@ -108,6 +111,7 @@ export default function WholesaleOrderView() {
     if (storedToken) setToken(storedToken);
   }, []);
 
+
   // Fetch data based on visibleTable change
   useEffect(() => {
     const fetchOrders = async () => {
@@ -179,6 +183,644 @@ export default function WholesaleOrderView() {
     const orderMonth = String(orderDate.getMonth() + 1).padStart(2, "0");
     return selectedMonth ? orderMonth === selectedMonth : true;
   });
+
+  const handleDownloadPdfWholesale = () => {
+    if (!selectedOrder) return;
+
+    const doc = new jsPDF({ compress: true });
+
+    const img = new Image();
+    img.src = logo;
+
+    img.onload = () => {
+      const topMargin = 20;
+      const sectionMargin = 10;
+      const rowHeight = 10;
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const leftMargin = 10;
+      const leftInsideMargin = 20;
+
+      const imgWidth = 20;
+      const imgHeight = imgWidth * (img.height / img.width);
+      const imgX = 20;
+      const imgY = 33;
+
+      const centerFX = imgX + imgWidth / 2;
+      const centerY = imgY + imgHeight / 2;
+      const radius = Math.min(imgWidth, imgHeight) / 2;
+
+      doc.setFillColor(255, 255, 255);
+      doc.circle(centerFX, centerY, radius, 'F');
+
+      doc.addImage(img, 'JPEG', imgX, imgY, imgWidth, imgHeight);
+
+      doc.setFillColor(0, 100, 0);
+      doc.rect(leftMargin, topMargin, 80, 40, 'F');
+
+      doc.ellipse(leftMargin + 80, topMargin + 20, 20, 20, 'F');
+
+      doc.setFontSize(20);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 100, 0);
+      doc.text("INVOICE", pageWidth - 20, topMargin + 10, {align: "right"});
+
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("I MOBILE CRAZY", 69, 40, {
+        align: "center",
+      });
+
+      doc.setFontSize(10);
+      doc.setTextColor(255, 255, 255);
+      doc.text("Distributors of Mobile", 62, 45, {
+        align: "center",
+      });
+      doc.text("Phones & Accessories", 62, 50, {
+        align: "center",
+      });
+
+      const greyShade = 200;
+      doc.setFillColor(greyShade, greyShade, greyShade);
+
+      doc.addImage(img, "PNG", imgX, imgY, imgWidth, imgHeight, "", "NONE");
+
+      doc.setDrawColor(0, 0, 0);
+      doc.rect(leftMargin, topMargin, pageWidth - 2 * leftMargin, pageHeight - 2 * topMargin);
+
+      const newY = topMargin + 15;
+      const lineSpacing = 5;
+
+      doc.setTextColor(0, 0, 0);
+      doc.text(
+          "Galekade junction, Halthota road,",
+          pageWidth - 42,
+          newY,
+          {align: "right"}
+      );
+      doc.text(
+          "Raigama, Bandaragama.",
+          pageWidth - 57,
+          newY + lineSpacing,
+          {align: "right"}
+      );
+      doc.text(
+          "Hotline: 076 311 0859",
+          pageWidth - 62.5,
+          newY + 2 * lineSpacing,
+          {align: "right"}
+      );
+      doc.text(
+          "Email: imobilecrazybandaragama@gmail.com",
+          pageWidth - 21,
+          newY + 3 * lineSpacing,
+          {align: "right"}
+      );
+
+      const customerY = topMargin + 50;
+      doc.setFontSize(12);
+      const orderID = (selectedOrder as WholesaleOrder).wholesale_order_id || "N/A";
+      const shopName = (selectedOrder as WholesaleOrder).shop?.shop_name || "N/A";
+      const contactNumber = (selectedOrder as WholesaleOrder).shop?.contact_number || "N/A";
+      const actualPrice = (selectedOrder as WholesaleOrder).actual_price || 0;
+      const discount  = (selectedOrder as WholesaleOrder).discount || 0;
+      const totalAmount  = (selectedOrder as WholesaleOrder).total_amount || 0;
+      const invoiceDate = (selectedOrder as WholesaleOrder).date || "N/A";
+      const itemNames = (selectedOrder as WholesaleOrder).items || [];
+      const formattedDate = invoiceDate !== "N/A" ? new Date(invoiceDate).toLocaleDateString() : "N/A";
+
+      doc.text("BILL TO:", leftInsideMargin, customerY);
+
+      doc.text(shopName, leftInsideMargin, customerY + 5);
+      doc.text(
+          contactNumber,
+          leftInsideMargin,
+          customerY + 10
+      );
+
+      doc.text(
+          `Bill No: ${orderID}`,
+          pageWidth - 70,
+          customerY
+      );
+
+      doc.text(
+          `Invoice Date: ${formattedDate}`,
+          pageWidth - 70,
+          customerY + 5
+      );
+
+      let startY = customerY + 30;
+      doc.setFillColor(0, 100, 0);
+      const headers = ["Items", "Price"];
+      const headerStartX = [
+        leftInsideMargin,
+        leftMargin + 120,
+      ];
+
+      const items = (selectedOrder as WholesaleOrder).items;
+
+      if (items.length > 0) {
+        doc.setTextColor(255, 255, 255); // White text color
+        doc.rect(
+            leftInsideMargin,
+            startY - rowHeight,
+            170,
+            rowHeight,
+            "F"
+        );
+
+        doc.setFontSize(12);
+        headers.forEach((header, index) => {
+          const x = headerStartX[index] + 2;
+          const y = startY - rowHeight / 2 + 4;
+          doc.text(header, x, y, { align: "left" });
+        });
+
+        doc.setTextColor(0, 0, 0);
+
+        let itemsStartY = startY + 8;
+
+        items.forEach((item: any, index: number) => {
+          doc.text(
+              `${itemNames[index].name} - ${itemNames[index].warranty_period ? item.warranty_period + " WARRANTY" : "-"}`,
+              leftInsideMargin,
+              itemsStartY + index * 10
+          );
+          doc.text(
+              `${itemNames[index].price}`,
+              leftMargin + 120,
+              itemsStartY + index * 10
+          );
+        });
+
+        doc.setFillColor(0, 100, 0);
+        doc.rect(
+            leftInsideMargin,
+            startY,
+            170,
+            9
+        );
+
+        startY += items.length * 10;
+      }
+
+      let imeiStartY = startY + sectionMargin;
+
+      doc.setFillColor(0, 100, 0);
+      doc.rect(
+          leftInsideMargin,
+          startY,
+          170,
+          9
+      );
+
+      const imeiHeaders = ["Model", "Storage", "IMEI", "Warranty", "Price"];
+      const imeiHeaderStartX = [
+        leftInsideMargin,
+        leftMargin + 40,
+        leftMargin + 70,
+        leftMargin + 120,
+        leftMargin + 150,
+      ];
+
+      const imeis = (selectedOrder as WholesaleOrder).imeis;
+
+      if (imeis.length > 0) {
+        doc.setFillColor(0, 100, 0);
+        doc.setTextColor(255, 255, 255);
+        doc.rect(
+            leftInsideMargin,
+            imeiStartY - rowHeight,
+            170,
+            rowHeight,
+            "F"
+        );
+
+        doc.setFontSize(12);
+        imeiHeaders.forEach((header, index) => {
+          const x = imeiHeaderStartX[index] + 2;
+          const y = imeiStartY - rowHeight / 2 + 4;
+          doc.text(header, x, y, { align: "left" });
+        });
+
+        doc.setTextColor(0, 0, 0);
+
+        imeis.forEach((imei: any, index: number) => {
+          doc.text(
+              `${imei.modelId.name}`,
+              leftInsideMargin,
+              imeiStartY + 5 + index * 10
+          );
+          doc.text(
+              `${imei.storage}`,
+              leftMargin + 40,
+              imeiStartY + 5 + index * 10
+          );
+          doc.text(
+              `${imei.imei}`,
+              leftMargin + 70,
+              imeiStartY + 5 + index * 10
+          );
+          doc.text(
+              `${imei.warranty}`,
+              leftMargin + 120,
+              imeiStartY + 5 + index * 10
+          );
+          doc.text(
+              `${imei.price}`,
+              leftMargin + 150,
+              imeiStartY + 5 + index * 10
+          );
+        });
+
+        doc.setFillColor(0, 100, 0);
+        doc.rect(
+            leftInsideMargin,
+            imeiStartY,
+            170,
+            9
+        );
+      }
+
+      const footerY = pageHeight - 60;
+      const footerStartY = footerY - 30;
+      doc.setFontSize(12);
+
+      doc.text(
+          `Actual Price: ${actualPrice.toFixed(2)}`,
+          190,
+          footerStartY,
+          { align: "right" }
+      );
+      doc.text(
+          `Discount: ${discount.toFixed(2)}`,
+          190,
+          footerStartY + 5,
+          { align: "right" }
+      );
+      doc.text(
+          `Total Amount: ${totalAmount.toFixed(2)}`,
+          190,
+          footerStartY + 10,
+          { align: "right" }
+      );
+
+      doc.setFontSize(10);
+      const warrantyOffsetY = footerStartY + 20;
+
+      const footerText = [
+        "Warranty terms & conditions!",
+        " >  Warranty void if stickers damaged or removed.",
+        " >  Bill must be presented, No cash returns.",
+      ];
+
+      footerText.forEach((line, index) => {
+        doc.text(line, leftInsideMargin, warrantyOffsetY + index * 5);
+      });
+
+      const thankYouText = "Thank you for shopping with us!";
+      const developerText = "Developed by Arimax Solutions";
+
+      const textWidth = doc.getTextWidth(thankYouText);
+      const centerX = (pageWidth - textWidth) / 2;
+      const thankYouY = pageHeight - 40;
+
+      doc.setFontSize(12);
+      doc.text(thankYouText, centerX, thankYouY);
+
+      const developerY = thankYouY + 20;
+
+      doc.setFontSize(10);
+      doc.text(developerText, 85, developerY - 15);
+
+      const rectY = thankYouY+8;
+
+      doc.setFillColor(0, 100, 0);
+      doc.roundedRect(leftInsideMargin, rectY, 170, 4, 4, 4, 'F');
+
+      doc.save(`${shopName}.bill.pdf`);
+    }
+  };
+
+  const handleDownloadPdfRetail = () => {
+    if (!selectedOrder) return;
+
+    const doc = new jsPDF({ compress: true });
+
+    const img = new Image();
+    img.src = logo;
+
+    img.onload = () => {
+      const topMargin = 20;
+      const sectionMargin = 10;
+      const rowHeight = 10;
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const leftMargin = 10;
+      const leftInsideMargin = 20;
+
+      const imgWidth = 20;
+      const imgHeight = imgWidth * (img.height / img.width);
+      const imgX = 20;
+      const imgY = 33;
+
+      const centerFX = imgX + imgWidth / 2;
+      const centerY = imgY + imgHeight / 2;
+      const radius = Math.min(imgWidth, imgHeight) / 2;
+
+      doc.setFillColor(255, 255, 255);
+      doc.circle(centerFX, centerY, radius, 'F');
+
+      doc.addImage(img, 'JPEG', imgX, imgY, imgWidth, imgHeight);
+
+      doc.setFillColor(0, 100, 0);
+      doc.rect(leftMargin, topMargin, 80, 40, 'F');
+
+      doc.ellipse(leftMargin + 80, topMargin + 20, 20, 20, 'F');
+
+      doc.setFontSize(20);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 100, 0);
+      doc.text("INVOICE", pageWidth - 20, topMargin + 10, {align: "right"});
+
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("I MOBILE CRAZY", 69, 40, {
+        align: "center",
+      });
+
+      doc.setFontSize(10);
+      doc.setTextColor(255, 255, 255);
+      doc.text("Distributors of Mobile", 62, 45, {
+        align: "center",
+      });
+      doc.text("Phones & Accessories", 62, 50, {
+        align: "center",
+      });
+
+      const greyShade = 200;
+      doc.setFillColor(greyShade, greyShade, greyShade);
+
+      doc.addImage(img, "PNG", imgX, imgY, imgWidth, imgHeight, "", "NONE");
+
+      doc.setDrawColor(0, 0, 0);
+      doc.rect(leftMargin, topMargin, pageWidth - 2 * leftMargin, pageHeight - 2 * topMargin);
+
+      const newY = topMargin + 15;
+      const lineSpacing = 5;
+
+      doc.setTextColor(0, 0, 0);
+      doc.text(
+          "Galekade junction, Halthota road,",
+          pageWidth - 42,
+          newY,
+          {align: "right"}
+      );
+      doc.text(
+          "Raigama, Bandaragama.",
+          pageWidth - 57,
+          newY + lineSpacing,
+          {align: "right"}
+      );
+      doc.text(
+          "Hotline: 076 311 0859",
+          pageWidth - 62.5,
+          newY + 2 * lineSpacing,
+          {align: "right"}
+      );
+      doc.text(
+          "Email: imobilecrazybandaragama@gmail.com",
+          pageWidth - 21,
+          newY + 3 * lineSpacing,
+          {align: "right"}
+      );
+
+      const customerY = topMargin + 50;
+      doc.setFontSize(12);
+      const orderID = (selectedOrder as RetailOrder).retail_order_id || "N/A";
+      const shopName = (selectedOrder as RetailOrder).customer?.name || "N/A";
+      const contactNumber = (selectedOrder as RetailOrder).customer?.contact_phone || "N/A";
+      const actualPrice = (selectedOrder as RetailOrder).actual_price || 0;
+      const discount  = (selectedOrder as RetailOrder).discount || 0;
+      const totalAmount  = (selectedOrder as RetailOrder).total_amount || 0;
+      const invoiceDate = (selectedOrder as RetailOrder).date || "N/A";
+      const itemNames = (selectedOrder as RetailOrder).items || [];
+      const formattedDate = invoiceDate !== "N/A" ? new Date(invoiceDate).toLocaleDateString() : "N/A";
+
+      doc.text("BILL TO:", leftInsideMargin, customerY);
+
+      doc.text(shopName, leftInsideMargin, customerY + 5);
+      doc.text(
+          contactNumber,
+          leftInsideMargin,
+          customerY + 10
+      );
+
+      doc.text(
+          `Bill No: ${orderID}`,
+          pageWidth - 70,
+          customerY
+      );
+
+      doc.text(
+          `Invoice Date: ${formattedDate}`,
+          pageWidth - 70,
+          customerY + 5
+      );
+
+      let startY = customerY + 30;
+      doc.setFillColor(0, 100, 0);
+      const headers = ["Items", "Price"];
+      const headerStartX = [
+        leftInsideMargin,
+        leftMargin + 120,
+      ];
+
+      const items = (selectedOrder as WholesaleOrder).items;
+
+      if (items.length > 0) {
+        doc.setTextColor(255, 255, 255); // White text color
+        doc.rect(
+            leftInsideMargin,
+            startY - rowHeight,
+            170,
+            rowHeight,
+            "F"
+        );
+
+        doc.setFontSize(12);
+        headers.forEach((header, index) => {
+          const x = headerStartX[index] + 2;
+          const y = startY - rowHeight / 2 + 4;
+          doc.text(header, x, y, { align: "left" });
+        });
+
+        doc.setTextColor(0, 0, 0);
+
+        let itemsStartY = startY + 8;
+
+        items.forEach((item: any, index: number) => {
+          doc.text(
+              `${itemNames[index].name} - ${itemNames[index].warranty_period ? item.warranty_period + " WARRANTY" : "-"}`,
+              leftInsideMargin,
+              itemsStartY + index * 10
+          );
+          doc.text(
+              `${itemNames[index].price}`,
+              leftMargin + 120,
+              itemsStartY + index * 10
+          );
+        });
+
+        doc.setFillColor(0, 100, 0);
+        doc.rect(
+            leftInsideMargin,
+            startY,
+            170,
+            9
+        );
+
+        startY += items.length * 10;
+      }
+
+      let imeiStartY = startY + sectionMargin;
+
+      doc.setFillColor(0, 100, 0);
+      doc.rect(
+          leftInsideMargin,
+          startY,
+          170,
+          9
+      );
+
+      const imeiHeaders = ["Model", "Storage", "IMEI", "Warranty", "Price"];
+      const imeiHeaderStartX = [
+        leftInsideMargin,
+        leftMargin + 40,
+        leftMargin + 70,
+        leftMargin + 120,
+        leftMargin + 150,
+      ];
+
+      const imeis = (selectedOrder as WholesaleOrder).imeis;
+
+      if (imeis.length > 0) {
+        doc.setFillColor(0, 100, 0);
+        doc.setTextColor(255, 255, 255);
+        doc.rect(
+            leftInsideMargin,
+            imeiStartY - rowHeight,
+            170,
+            rowHeight,
+            "F"
+        );
+
+        doc.setFontSize(12);
+        imeiHeaders.forEach((header, index) => {
+          const x = imeiHeaderStartX[index] + 2;
+          const y = imeiStartY - rowHeight / 2 + 4;
+          doc.text(header, x, y, { align: "left" });
+        });
+
+        doc.setTextColor(0, 0, 0);
+
+        imeis.forEach((imei: any, index: number) => {
+          doc.text(
+              `${imei.modelId.name}`,
+              leftInsideMargin,
+              imeiStartY + 5 + index * 10
+          );
+          doc.text(
+              `${imei.storage}`,
+              leftMargin + 40,
+              imeiStartY + 5 + index * 10
+          );
+          doc.text(
+              `${imei.imei}`,
+              leftMargin + 70,
+              imeiStartY + 5 + index * 10
+          );
+          doc.text(
+              `${imei.warranty}`,
+              leftMargin + 120,
+              imeiStartY + 5 + index * 10
+          );
+          doc.text(
+              `${imei.price}`,
+              leftMargin + 150,
+              imeiStartY + 5 + index * 10
+          );
+        });
+
+        doc.setFillColor(0, 100, 0);
+        doc.rect(
+            leftInsideMargin,
+            imeiStartY,
+            170,
+            9
+        );
+      }
+
+      const footerY = pageHeight - 60;
+      const footerStartY = footerY - 30;
+      doc.setFontSize(12);
+
+      doc.text(
+          `Actual Price: ${actualPrice.toFixed(2)}`,
+          190,
+          footerStartY,
+          { align: "right" }
+      );
+      doc.text(
+          `Discount: ${discount.toFixed(2)}`,
+          190,
+          footerStartY + 5,
+          { align: "right" }
+      );
+      doc.text(
+          `Total Amount: ${totalAmount.toFixed(2)}`,
+          190,
+          footerStartY + 10,
+          { align: "right" }
+      );
+
+      doc.setFontSize(10);
+      const warrantyOffsetY = footerStartY + 20;
+
+      const footerText = [
+        "Warranty terms & conditions!",
+        " >  Warranty void if stickers damaged or removed.",
+        " >  Bill must be presented, No cash returns.",
+      ];
+
+      footerText.forEach((line, index) => {
+        doc.text(line, leftInsideMargin, warrantyOffsetY + index * 5);
+      });
+
+      const thankYouText = "Thank you for shopping with us!";
+      const developerText = "Developed by Arimax Solutions";
+
+      const textWidth = doc.getTextWidth(thankYouText);
+      const centerX = (pageWidth - textWidth) / 2;
+      const thankYouY = pageHeight - 40;
+
+      doc.setFontSize(12);
+      doc.text(thankYouText, centerX, thankYouY);
+
+      const developerY = thankYouY + 20;
+
+      doc.setFontSize(10);
+      doc.text(developerText, 85, developerY - 15);
+
+      const rectY = thankYouY+8;
+
+      doc.setFillColor(0, 100, 0);
+      doc.roundedRect(leftInsideMargin, rectY, 170, 4, 4, 4, 'F');
+
+      doc.save(`${shopName}.bill.pdf`);
+    }
+  };
 
   return (
     <div className="m-4 w-full">
@@ -353,7 +995,7 @@ export default function WholesaleOrderView() {
                   </p>
                   <p>
                     <strong>Discount:</strong>{" "}
-                    {(selectedOrder as WholesaleOrder).discount || "N/A"}
+                    {(selectedOrder as WholesaleOrder).discount || 0}
                   </p>
                   <p>
                     <strong>Actual Price:</strong>{" "}
@@ -432,6 +1074,9 @@ export default function WholesaleOrderView() {
                           <p>
                             <strong>Price:</strong> {item.price || "N/A"}
                           </p>
+                          <p>
+                            <strong>Warranty:</strong> {item.warranty_period || "N/A"}
+                          </p>
                         </li>
                       )
                     )}
@@ -478,6 +1123,12 @@ export default function WholesaleOrderView() {
                       )
                     )}
                   </ul>
+                  <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
+                      onClick={handleDownloadPdfWholesale}
+                  >
+                    Download PDF
+                  </button>
                 </div>
               )}
               {visibleTable === "retail" && (
@@ -488,7 +1139,7 @@ export default function WholesaleOrderView() {
                   </p>
                   <p>
                     <strong>Discount:</strong>{" "}
-                    {(selectedOrder as RetailOrder).discount || "N/A"}
+                    {(selectedOrder as RetailOrder).discount || 0}
                   </p>
                   <p>
                     <strong>Actual Price:</strong>{" "}
@@ -598,6 +1249,12 @@ export default function WholesaleOrderView() {
                       </li>
                     ))}
                   </ul>
+                  <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
+                      onClick={handleDownloadPdfRetail}
+                  >
+                    Download PDF
+                  </button>
                 </div>
               )}
               {visibleTable === "return" && (
