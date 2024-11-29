@@ -18,42 +18,6 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-
-  /*const handleLogin = async () => {
-    const userData: UserData = { username: username, password: password };
-    try {
-      const response = await axios.post(backend_url+'/auth/login', userData);
-      if (response.data.token) {
-        Swal.fire({
-          title: "Success!",
-          text: "Login successful.",
-          icon: "success"
-        });
-        setUsername("");
-        setPassword("")
-        setError('');
-        localStorage.setItem('authToken', response.data.token);
-        localStorage.setItem('username', response.data.authenticatedUser.name);
-        
-        navigate('/dashboard');
-      } else {
-        Swal.fire({
-          title: "Error!",
-          text: response.data.message || "Invalid username or password.",
-          icon: "error"
-        });
-        setError('Invalid username or password');
-      }
-    } catch (error) {
-      Swal.fire({
-        title: "Error!",
-        text: "Invalid username or password.",
-        icon: "error"
-      });
-  
-      setError('Invalid username or password');
-    }
-  };*/
   const handleLogin = async () => {
     const userData: UserData = { username: username, password: password };
     try {

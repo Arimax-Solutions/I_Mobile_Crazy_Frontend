@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Swal from 'sweetalert2';
@@ -11,15 +11,26 @@ import returnItem from '../../../assets/images/navbar/Return item.svg';
 import user from '../../../assets/images/navbar/Users.svg';
 import shop from '../../../assets/images/navbar/Shops.svg';
 import placeOrder from '../../../assets/images/navbar/cart-svgrepo-com 1.svg';
+
 // Authentication check function
-const isAuthenticated = () => {
+/*const isAuthenticated = () => {
     return localStorage.getItem('authToken') !== null;
-};
+};*/
 
 function NavigationMenu() {
     const [selectedItem, setSelectedItem] = useState<string>("");
+    const [userRole, setUserRole] = useState<string | null>(null); // Store user role
     const navigate = useNavigate();
 
+
+    useEffect(() => {
+        const role = localStorage.getItem("userRole");
+        setUserRole(role); // Set user role
+    }, []);
+
+    const isAuthenticated = () => {
+        return localStorage.getItem("authToken") !== null;
+    };
     const handleNavigation = (location: string) => {
         if (isAuthenticated()) {
             navigate(location);
@@ -38,7 +49,7 @@ function NavigationMenu() {
     };
 
     return (
-        <nav className="fixed top-8 left-0 pt-3 flex flex-col min-w-[270px] w-[270px] h-[95%] bg-[#1D1D27] rounded-r-[40px] items-center overflow-hidden">
+        /*<nav className="fixed top-8 left-0 pt-3 flex flex-col min-w-[270px] w-[270px] h-[95%] bg-[#1D1D27] rounded-r-[40px] items-center overflow-hidden">
             <div className='mt-2 self-start pl-8'>
                 <img width="120px" src={logo} alt="company logo" />
             </div>
@@ -113,6 +124,125 @@ function NavigationMenu() {
                 </div>
 
                 <div className='w-full px-8 mb-5'>
+                    <NavLink
+                        to="/order"
+                        className="mt-5 flex text-[25px] w-full justify-center rounded-md bg-[#5356EC] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 items-center gap-3"
+                    >
+                        <img src={placeOrder} alt="cart" />
+                        Place Order
+                    </NavLink>
+                </div>
+            </div>
+        </nav>*/
+        <nav className="fixed top-8 left-0 pt-3 flex flex-col min-w-[270px] w-[270px] h-[95%] bg-[#1D1D27] rounded-r-[40px] items-center overflow-hidden">
+            <div className="mt-2 self-start pl-8">
+                <img width="120px" src={logo} alt="company logo" />
+            </div>
+            <div className="w-full h-full flex flex-col">
+                <div className="w-full flex-1">
+                    <ul className="mt-10 w-full pl-8 flex flex-col gap-10 mb-2">
+                        {/* Show these NavItems only if the user role is "ADMIN" */}
+                        {userRole === "ADMIN" && (
+                            <>
+                                <NavItems
+                                    logo={layer1}
+                                    name="Reports"
+                                    location="/dashboard"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/dashboard")}
+                                />
+                                <NavItems
+                                    logo={stockPhone}
+                                    name="Stock Phones"
+                                    location="/StockPhones"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/StockPhones")}
+                                />
+                                <NavItems
+                                    logo={returnPhone}
+                                    name="Return Phones"
+                                    location="/returnPhone"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/returnPhone")}
+                                />
+                                <NavItems
+                                    logo={item}
+                                    name="Items"
+                                    location="/item"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/item")}
+                                />
+                                <NavItems
+                                    logo={returnItem}
+                                    name="Return Items"
+                                    location="/returnItem"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/returnItem")}
+                                />
+                                <NavItems
+                                    logo={user}
+                                    name="Users"
+                                    location="/user"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/user")}
+                                />
+                                <NavItems
+                                    logo={shop}
+                                    name="Shops"
+                                    location="/shop"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/shop")}
+                                />
+                                <NavItems
+                                    logo={shop}
+                                    name="View Orders"
+                                    location="/orderView"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/orderView")}
+                                />
+                            </>
+                        )}
+                        {/* Show a limited set of NavItems for "USER" role */}
+                        {userRole === "USER" && (
+                            <>
+                                <NavItems
+                                    logo={returnPhone}
+                                    name="Return Phones"
+                                    location="/returnPhone"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/returnPhone")}
+                                />
+                                <NavItems
+                                    logo={returnItem}
+                                    name="Return Items"
+                                    location="/returnItem"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/returnItem")}
+                                />
+                                <NavItems
+                                    logo={shop}
+                                    name="Shops"
+                                    location="/shop"
+                                    selected={selectedItem}
+                                    setSelected={setSelectedItem}
+                                    onClick={() => handleNavigation("/shop")}
+                                />
+                            </>
+                        )}
+                    </ul>
+                </div>
+
+                <div className="w-full px-8 mb-5">
                     <NavLink
                         to="/order"
                         className="mt-5 flex text-[25px] w-full justify-center rounded-md bg-[#5356EC] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 items-center gap-3"

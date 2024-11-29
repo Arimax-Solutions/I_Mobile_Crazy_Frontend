@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -182,10 +182,19 @@ export default function RetailOrder(prop: IProp) {
         price: ''
     });
 
-    const [items, setItems] = React.useState<Item[]>([]);
+    const [items, setItems] = useState<Item[]>([]); // List of added items
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+
 
     const handleFetchItemData = async () => {
         try {
+            // Adjusted validation to allow symbols, letters, and numbers
+            const invalidInput = /^[\s]*$/; // Matches empty or whitespace-only input
+            if (invalidInput.test(itemData.name)) {
+                alert("Invalid item name. Please enter a valid name.");
+                return; // Exit the function if validation fails
+            }
+
             const response = await axios.get(`http://localhost:8080/api/items/search/${itemData.name}`);
             if (response.data.status === 200 && response.data.data.length > 0) {
                 const item = response.data.data[0];
@@ -217,7 +226,7 @@ export default function RetailOrder(prop: IProp) {
         }
     };
 
-    const handleKeyPress = (event:any) => {
+    const handleKeyPress = (event: any) => {
         if (event.key === 'Enter') {
             handleFetchItemData();
         }
@@ -236,11 +245,32 @@ export default function RetailOrder(prop: IProp) {
                 qty: '',
                 price: ''
             });
-            prop.handleAddNewItemModelClose(); // Close the modal
+            prop.handleAddNewItemModelClose();
         } else {
             alert('Please enter item details before adding.');
         }
     };
+
+    // Handle search as user types the name
+    const handleSearch = async (searchTerm: string) => {
+        if (searchTerm.length > 0) {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/items/search/${searchTerm}`);
+                if (response.data.status === 200) {
+                    setSearchResults(response.data.data);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        } else {
+            setSearchResults([]); // Clear search results when search term is empty
+        }
+    };
+
+    // Trigger search when the item name changes
+    useEffect(() => {
+        handleSearch(itemData.name);
+    }, [itemData.name]);
 
     const handleProceedToPayment = (orderType: string) => {
         console.log("ID : " + customerId);
@@ -256,6 +286,7 @@ export default function RetailOrder(prop: IProp) {
     /*const handleCustomerIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setcustomerId(e.target.value);
     };*/
+
 
     const fetchCustomerName = async () => {
         try {
@@ -522,77 +553,113 @@ export default function RetailOrder(prop: IProp) {
             </div>
 
             {/* model add items*/}
-             <div>
-                    <Modal
-                        open={prop.isAddNewItemsModelOpen}
-                        onClose={prop.handleAddNewItemModelClose}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                    >
-                        <Box sx={{ ...style }}>
-                            <Typography id="modal-modal-title" variant="h5" component="h2">
-                                Add Item
-                            </Typography>
-                            <div className='w-full flex flex-col mt-2'>
+            <div>
+                <Modal
+                    open={prop.isAddNewItemsModelOpen}
+                    onClose={prop.handleAddNewItemModelClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={{ ...style }}>
+                        <Typography id="modal-modal-title" variant="h5" component="h2">
+                            Add Item
+                        </Typography>
+                        <div className="w-full flex flex-col mt-2">
+                            <input
+                                className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                value={itemData.name}
+                                onChange={(ev) => setItemData({ ...itemData, name: ev.target.value })}
+                                onKeyDown={handleKeyPress}
+                                placeholder="Item Name"
+                            />
+                            {/* Show search results based on input */}
+                            {searchResults.length > 0 && (
+                                <div className="mt-2">
+                                    <ul>
+                                        {searchResults.map((item) => (
+                                            <li
+                                                key={item.item_id}
+                                                onClick={() => {
+                                                    setItemData({
+                                                        ...itemData,
+                                                        name: item.name,
+                                                        category: item.category,  // Optionally set category
+                                                        brand: item.brand,        // Optionally set brand
+                                                        colour: item.colour,      // Optionally set colour
+                                                        warranty_period: item.warranty_period, // Optionally set warranty period
+                                                        qty: item.qty,            // Optionally set quantity
+                                                        price: item.price         // Optionally set price
+                                                    });
+                                                    setSearchResults([]); // Clear the search results
+                                                }}
+                                                style={{
+                                                    backgroundColor: 'transparent',  // Transparent background
+                                                    cursor: 'pointer',               // Hand cursor on hover
+                                                    padding: '8px',                  // Padding for better click area
+                                                    borderBottom: '1px solid #ddd', // Border to separate items
+                                                }}
+                                            >
+                                                {item.name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                            <div className="flex">
                                 <input
-                                    className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                    value={itemData.name}
-                                    onChange={(ev) => setItemData({...itemData, name: ev.target.value})}
-                                    onKeyDown={handleKeyPress}
-                                    placeholder='Item Name'
+                                    className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                    value={itemData.category}
+                                    onChange={(ev) => setItemData({ ...itemData, category: ev.target.value })}
+                                    placeholder="Category"
                                 />
-                                <div className='flex'>
-                                    <input
-                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                        value={itemData.category}
-                                        onChange={(ev) => setItemData({...itemData, category: ev.target.value})}
-                                        placeholder='Category'
-                                    />
-                                    <input
-                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                        value={itemData.brand}
-                                        onChange={(ev) => setItemData({...itemData, brand: ev.target.value})}
-                                        placeholder='Brand'
-                                    />
-                                </div>
-                                <div>
-                                    <input
-                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                        value={itemData.colour}
-                                        onChange={(ev) => setItemData({...itemData, colour: ev.target.value})}
-                                        placeholder='Color'
-                                    />
-                                    <input
-                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                        value={itemData.warranty_period}
-                                        onChange={(ev) => setItemData({...itemData, warranty_period: ev.target.value})}
-                                        placeholder='Warranty Period'
-                                    />
-                                </div>
-                                <div>
-                                    <input
-                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                        value={itemData.qty}
-                                        onChange={(ev) => setItemData({...itemData, qty: ev.target.value})}
-                                        placeholder='Quantity'
-                                    />
-                                    <input
-                                        className='text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1'
-                                        value={itemData.price}
-                                        onChange={(ev) => setItemData({...itemData, price: ev.target.value})}
-                                        placeholder='Price'
-                                    />
-                                </div>
+                                <input
+                                    className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                    value={itemData.brand}
+                                    onChange={(ev) => setItemData({ ...itemData, brand: ev.target.value })}
+                                    placeholder="Brand"
+                                />
                             </div>
-
-                            <div className='w-full flex gap-2 mt-5 justify-end'>
-                                <Button onClick={handleAddItem} variant="contained" color="success">Add</Button>
-                                <Button onClick={prop.handleAddNewItemModelClose} variant="contained" color="error">Close</Button>
+                            <div>
+                                <input
+                                    className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                    value={itemData.colour}
+                                    onChange={(ev) => setItemData({ ...itemData, colour: ev.target.value })}
+                                    placeholder="Color"
+                                />
+                                <input
+                                    className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                    value={itemData.warranty_period}
+                                    onChange={(ev) => setItemData({ ...itemData, warranty_period: ev.target.value })}
+                                    placeholder="Warranty Period"
+                                />
                             </div>
-                        </Box>
-                    </Modal>
+                            <div>
+                                <input
+                                    className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                    value={itemData.qty}
+                                    onChange={(ev) => setItemData({ ...itemData, qty: ev.target.value })}
+                                    placeholder="Quantity"
+                                />
+                                <input
+                                    className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                    value={itemData.price}
+                                    onChange={(ev) => setItemData({ ...itemData, price: ev.target.value })}
+                                    placeholder="Price"
+                                />
+                            </div>
+                        </div>
 
-                </div>
+                        <div className="w-full flex gap-2 mt-5 justify-end">
+                            <Button onClick={handleAddItem} variant="contained" color="success">
+                                Add
+                            </Button>
+                            <Button onClick={prop.handleAddNewItemModelClose} variant="contained" color="error">Close</Button>
+                        </div>
+                    </Box>
+                </Modal>
+            </div>
+
+
             <ProceedPayment phones={phones} itemData={itemData} customerName={customerName} contactNumber={contactNumber} customerId={customerId} customerOutstanding={customerOutstanding} />
         </>
     );
