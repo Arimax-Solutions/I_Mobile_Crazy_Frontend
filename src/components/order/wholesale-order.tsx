@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -149,9 +149,47 @@ export default function WholeSaleOrder(prop:IProp) {
     });
 
     const [wholesaleItems, setWholesaleItems] = useState<WholesaleItem[]>([]);
+    const [searchResultsWholesale, setSearchResultsWholesale] = useState<any[]>([]);
 
     const handleFetchwholesaleItemData = async () => {
+        /*try {
+            const response = await axios.get(`http://localhost:8080/api/items/search/${wholesaleItemData.name}`);
+            if (response.data.status === 200 && response.data.data.length > 0) {
+                const item = response.data.data[0];
+                setwholesaleItemData({
+                    item_id: item.item_id,
+                    category: item.category,
+                    brand: item.brand,
+                    name: item.name,
+                    colour: item.colour,
+                    warranty_period: item.warranty_period,
+                    qty: item.qty,
+                    price: item.price
+                });
+            } else {
+                setwholesaleItemData({
+                    item_id: '',
+                    category: '',
+                    brand: '',
+                    name: '',
+                    colour: '',
+                    warranty_period: '',
+                    qty: '',
+                    price: ''
+                });
+                alert('No items found');
+            }
+        } catch (error) {
+            console.error('Error fetching item data:', error);
+        }*/
         try {
+            // Adjusted validation to allow symbols, letters, and numbers
+            const invalidInput = /^[\s]*$/; // Matches empty or whitespace-only input
+            if (invalidInput.test(wholesaleItemData.name)) {
+                alert("Invalid item name. Please enter a valid name.");
+                return; // Exit the function if validation fails
+            }
+
             const response = await axios.get(`http://localhost:8080/api/items/search/${wholesaleItemData.name}`);
             if (response.data.status === 200 && response.data.data.length > 0) {
                 const item = response.data.data[0];
@@ -190,7 +228,7 @@ export default function WholeSaleOrder(prop:IProp) {
     };
 
     const handleAddItem = () => {
-        setWholesaleItems([...wholesaleItems, wholesaleItemData]);
+        /*setWholesaleItems([...wholesaleItems, wholesaleItemData]);
         // Reset the form after adding the item (optional)
         setwholesaleItemData({
             item_id: '',
@@ -201,8 +239,44 @@ export default function WholeSaleOrder(prop:IProp) {
             warranty_period: '',
             qty: '',
             price: ''
-        });
+        });*/
+        if (wholesaleItemData.name) {
+            setWholesaleItems([...wholesaleItems, wholesaleItemData]); // Add the new item to the list
+            setwholesaleItemData({
+                item_id: '',
+                category: '',
+                brand: '',
+                name: '',
+                colour: '',
+                warranty_period: '',
+                qty: '',
+                price: ''
+            });
+            prop.handleAddNewItemModelClose();
+        } else {
+            alert('Please enter item details before adding.');
+        }
     };
+
+    const handleSearchWholesale = async (searchTerm: string) => {
+        if (searchTerm.length > 0) {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/items/search/${searchTerm}`);
+                if (response.data.status === 200) {
+                    setSearchResultsWholesale(response.data.data);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        } else {
+            setSearchResultsWholesale([]); // Clear search results when search term is empty
+        }
+    };
+
+    useEffect(() => {
+        handleSearchWholesale(wholesaleItemData.name);
+    }, [wholesaleItemData.name]);
+
 
     async function fetchPhoneDetails(imei: string) {
         try {
@@ -416,7 +490,7 @@ export default function WholeSaleOrder(prop:IProp) {
         </div>
 
         {/* model add items*/}
-        <div>
+        {/*<div>
             <Modal
                 open={prop.isAddNewItemsModelOpen}
                 onClose={prop.handleAddNewItemModelClose}
@@ -486,6 +560,111 @@ export default function WholeSaleOrder(prop:IProp) {
                 </Box>
             </Modal>
 
+        </div>*/}
+        <div>
+            <Modal
+                open={prop.isAddNewItemsModelOpen}
+                onClose={prop.handleAddNewItemModelClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={{ ...style }}>
+                    <Typography id="modal-modal-title" variant="h5" component="h2">
+                        Add Item
+                    </Typography>
+                    <div className="w-full flex flex-col mt-2">
+                        <input
+                            className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                            value={wholesaleItemData.name}
+                            onChange={(ev) => setwholesaleItemData({ ...wholesaleItemData, name: ev.target.value })}
+                            onKeyDown={handleKeyPress}
+                            placeholder="Item Name"
+                        />
+                        {/* Show search results based on input */}
+                        {searchResultsWholesale.length > 0 && (
+                            <div className="mt-2">
+                                <ul>
+                                    {searchResultsWholesale.map((item:any) => (
+                                        <li
+                                            key={item.item_id}
+                                            onClick={() => {
+                                                setwholesaleItemData({
+                                                    ...wholesaleItemData,
+                                                    name: item.name,
+                                                    category: item.category,  // Optionally set category
+                                                    brand: item.brand,        // Optionally set brand
+                                                    colour: item.colour,      // Optionally set colour
+                                                    warranty_period: item.warranty_period, // Optionally set warranty period
+                                                    qty: item.qty,            // Optionally set quantity
+                                                    price: item.price         // Optionally set price
+                                                });
+                                                setSearchResultsWholesale([]); // Clear the search results
+                                            }}
+                                            style={{
+                                                backgroundColor: 'transparent',  // Transparent background
+                                                cursor: 'pointer',               // Hand cursor on hover
+                                                padding: '8px',                  // Padding for better click area
+                                                borderBottom: '1px solid #ddd', // Border to separate items
+                                            }}
+                                        >
+                                            {item.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        <div className="flex">
+                            <input
+                                className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                value={wholesaleItemData.category}
+                                onChange={(ev) => setwholesaleItemData({ ...wholesaleItemData, category: ev.target.value })}
+                                placeholder="Category"
+                            />
+                            <input
+                                className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                value={wholesaleItemData.brand}
+                                onChange={(ev) => setwholesaleItemData({ ...wholesaleItemData, brand: ev.target.value })}
+                                placeholder="Brand"
+                            />
+                        </div>
+                        <div>
+                            <input
+                                className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                value={wholesaleItemData.colour}
+                                onChange={(ev) => setwholesaleItemData({ ...wholesaleItemData, colour: ev.target.value })}
+                                placeholder="Color"
+                            />
+                            <input
+                                className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                value={wholesaleItemData.warranty_period}
+                                onChange={(ev) => setwholesaleItemData({ ...wholesaleItemData, warranty_period: ev.target.value })}
+                                placeholder="Warranty Period"
+                            />
+                        </div>
+                        <div>
+                            <input
+                                className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                value={wholesaleItemData.qty}
+                                onChange={(ev) => setwholesaleItemData({ ...wholesaleItemData, qty: ev.target.value })}
+                                placeholder="Quantity"
+                            />
+                            <input
+                                className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
+                                value={wholesaleItemData.price}
+                                onChange={(ev) => setwholesaleItemData({ ...wholesaleItemData, price: ev.target.value })}
+                                placeholder="Price"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="w-full flex gap-2 mt-5 justify-end">
+                        <Button onClick={handleAddItem} variant="contained" color="success">
+                            Add
+                        </Button>
+                        <Button onClick={prop.handleAddNewItemModelClose} variant="contained" color="error">Close</Button>
+                    </div>
+                </Box>
+            </Modal>
         </div>
 
         <ProceedPayment wholesalePhones={wholesalePhones} wholesaleItemData={wholesaleItemData} shopName={shopName} shopContactNumber={shopContactNumber} shopId={shopId} outstanding={outstanding} address={address} shopEmail={shopEmail} shopOwnerNic={shopOwnerNic} shopCreditLimit={shopCreditLimit}/>
