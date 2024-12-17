@@ -419,7 +419,7 @@ const ProceedPayment: React.FC<any> = (props: any) => {
             let startY = customerY + 30;
 
             // Check if there are items to display
-            if (order.items.length > 0) {
+            /*if (order.items.length > 0) {
               doc.setFillColor(0, 100, 0);
               const headers = ["Items", "Quantity", "Price", "Amount"];
               const headerStartX = [
@@ -487,7 +487,65 @@ const ProceedPayment: React.FC<any> = (props: any) => {
 
               // Update Y for IMEIs
               startY = itemsStartY + order.items.length * 10 + sectionMargin;
+            }*/
+
+            if (order.items.length > 0) {
+              doc.setFillColor(0, 100, 0);
+
+              const tableHeaders = ["Items", "Quantity", "Price", "Amount"];
+              const headerPositions = [
+                leftInsideMargin,
+                leftMargin + 90,
+                leftMargin + 120,
+                leftMargin + 150,
+              ];
+
+              // Draw header background and text
+              doc.setTextColor(255, 255, 255); // White text color
+              doc.rect(leftInsideMargin, startY - rowHeight, 170, rowHeight, "F");
+
+              doc.setFontSize(12);
+              tableHeaders.forEach((header, headerIndex) => {
+                const textX = headerPositions[headerIndex] + 2;
+                const textY = startY - rowHeight / 2 + 4;
+                doc.text(header, textX, textY, { align: "left" });
+              });
+
+              // Reset text color for table content
+              doc.setTextColor(0, 0, 0);
+
+              // Start Y for the table rows
+              const initialItemsY = startY + 8;
+
+              // Define the row height
+              const itemRowHeight = 10;
+
+              // Add items to the table
+              order.items.forEach((item: any, itemIndex: number) => {
+                const currentItemY = initialItemsY + itemIndex * itemRowHeight;
+
+                // Add item details in table rows
+                doc.text(
+                    `${item.name}   ${item.warranty_period ? item.warranty_period + " WARRANTY" : ""}`,
+                    leftInsideMargin,
+                    currentItemY
+                );
+                doc.text(`${item.qty}`, leftMargin + 100, currentItemY);
+                doc.text(`${item.price.toFixed(2)}`, leftMargin + 120, currentItemY);
+                doc.text(`${(item.qty * item.price).toFixed(2)}`, leftMargin + 150, currentItemY);
+              });
+
+              // Calculate dynamic height for the border
+              const tableBorderHeight = itemRowHeight * order.items.length;
+
+              // Draw the border around the table
+              doc.setFillColor(0, 100, 0);
+              doc.rect(leftInsideMargin, startY, 170, tableBorderHeight, "S");
+
+              // Update the startY for the next section
+              startY = initialItemsY + order.items.length * itemRowHeight + sectionMargin;
             }
+
 
             // Check if there are IMEIs to display
             if (order.imeis.length > 0) {
