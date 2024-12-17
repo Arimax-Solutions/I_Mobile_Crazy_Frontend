@@ -6,7 +6,7 @@ import Modal from '@mui/material/Modal';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { backend_url } from '../../utill/utill';
-import { isValidEmail, isValidNIC, isValidPhoneNumber, notNullString } from "../../utill/validation.ts";
+import {isValidPhoneNumber, notNullString } from "../../utill/validation.ts";
 import {useNavigate} from "react-router-dom";
 import ProceedPayment from "../proceed-payment/proceed-payment.tsx";
 
@@ -106,8 +106,8 @@ export default function RetailOrder(prop: IProp) {
     async function handleSaveCustomer() {
         try {
             notNullString(customerName);
-            isValidNIC(customerNic);
-            isValidEmail(customerEmail);
+            /*isValidNIC(customerNic);
+            isValidEmail(customerEmail);*/
             const phoneNumber = isValidPhoneNumber(customerContactNumber);
 
             const response = await axios.post(`${backend_url}/api/customer`, {
@@ -572,7 +572,7 @@ export default function RetailOrder(prop: IProp) {
                                 onKeyDown={handleKeyPress}
                                 placeholder="Item Name"
                             />
-                            {/* Show search results based on input */}
+                            {/* Show search results based on input
                             {searchResults.length > 0 && (
                                 <div className="mt-2">
                                     <ul>
@@ -604,7 +604,52 @@ export default function RetailOrder(prop: IProp) {
                                         ))}
                                     </ul>
                                 </div>
+                            )}*/}
+                            {/* Show search results based on input */}
+                            {searchResults.length > 0 && (
+                                <div className="mt-2">
+                                    <ul
+                                        style={{
+                                            maxHeight: '200px', // Set maximum height (adjust as needed)
+                                            overflowY: 'auto',  // Enable vertical scrolling
+                                            border: '1px solid #ddd', // Optional border for the container
+                                            borderRadius: '4px',      // Optional border radius
+                                            padding: '0',            // Remove default padding
+                                            margin: '0',             // Remove default margin
+                                            listStyle: 'none'        // Remove list bullets
+                                        }}
+                                    >
+                                        {searchResults.map((item) => (
+                                            <li
+                                                key={item.item_id}
+                                                onClick={() => {
+                                                    setItemData({
+                                                        ...itemData,
+                                                        name: item.name,
+                                                        category: item.category,  // Optionally set category
+                                                        brand: item.brand,        // Optionally set brand
+                                                        colour: item.colour,      // Optionally set colour
+                                                        warranty_period: item.warranty_period, // Optionally set warranty period
+                                                        qty: item.qty,            // Optionally set quantity
+                                                        price: item.price         // Optionally set price
+                                                    });
+                                                    setSearchResults([]); // Clear the search results
+                                                }}
+                                                style={{
+                                                    backgroundColor: 'transparent',  // Transparent background
+                                                    cursor: 'pointer',               // Hand cursor on hover
+                                                    padding: '8px',                  // Padding for better click area
+                                                    borderBottom: '1px solid #ddd', // Border to separate items
+                                                }}
+                                            >
+                                                {item.name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             )}
+
+
                             <div className="flex">
                                 <input
                                     className="text-feild mb-4 md:mb-0 md:w-[30%] lg:mx-2 md:mx-2 sm:mx-1"
