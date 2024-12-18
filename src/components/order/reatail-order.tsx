@@ -625,6 +625,7 @@ export default function RetailOrder(prop: IProp) {
                                                 onClick={() => {
                                                     setItemData({
                                                         ...itemData,
+                                                        item_id: item.item_id,
                                                         name: item.name,
                                                         category: item.category,  // Optionally set category
                                                         brand: item.brand,        // Optionally set brand

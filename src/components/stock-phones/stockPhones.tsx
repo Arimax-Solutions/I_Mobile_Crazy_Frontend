@@ -100,6 +100,11 @@ export default function StockPhones() {
   const validateNumber = (value: Number, max: Number) =>
     /^\d+$/.test(value.toString()) && value <= max;
 
+  const validateNumber2 = (value: number | string, max: number): boolean => {
+    return /^\d+$/.test(value.toString()) && Number(value) <= max;
+  };
+
+
   const handleInputChange = (
     setter: any,
     validator: any,
@@ -128,7 +133,7 @@ export default function StockPhones() {
     model: /^[a-zA-Z0-9\s]+$/,
     imeiNumber: /^\d+$/,
     storage: /^(64GB|128GB|256GB|512GB|1TB)$/,
-    iosversion: /^\d+$/,
+    iosversion: /^\d+(\.\d+)*$/,
     batteryHealth: /^\d+$/,
     colour: /^(Gold|White|Red|Black|Silver|Rose Gold|Blue|Grey|Green|Yellow|Purple|Graphite|MidNight Blue|Deep Purple)$/,
   };
@@ -568,7 +573,7 @@ export default function StockPhones() {
             onChange={(ev) =>
               handleInputChange(
                 setIosversion,
-                validateNumber,
+                  validateNumber2,
                 ev.target.value,
                 50,
                 "iOS version must be a number"
