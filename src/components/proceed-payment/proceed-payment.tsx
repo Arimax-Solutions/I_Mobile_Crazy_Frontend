@@ -283,6 +283,8 @@ const ProceedPayment: React.FC<any> = (props: any) => {
           })),
         };
 
+        console.log('ORDER: ', order);
+
 
         try {
           const response = await axios.post(
