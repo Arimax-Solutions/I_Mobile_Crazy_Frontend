@@ -18,13 +18,13 @@ import TopNavbar from "../topNavbar.tsx";
 import axios from "axios";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
-import logo from "../../assets/images/logo2.png";
 import { useNavigate } from "react-router-dom";
 import dailCost from "../../assets/icons/daily cost.svg";
 import icon1 from "../../assets/icons/icon 1.svg";
 import icon2 from "../../assets/icons/icon 2.svg";
 import icon3 from "../../assets/icons/icon 3.svg";
-import icon4 from "../../assets/icons/icon 4.svg"
+import icon4 from "../../assets/icons/icon 4.svg";
+import logo from "../../assets/images/logo2.png";
 
 interface StockData {
   [model: string]: number;
@@ -269,7 +269,7 @@ export default function Dashboard() {
     }
   };
 
-  const saveToPDFStock = () => {
+  /*const saveToPDFStock = () => {
     const input = document.getElementById("pdf-content");
     if (input) {
       html2canvas(input, { scale: 2 }).then((canvas) => {
@@ -304,7 +304,134 @@ export default function Dashboard() {
         pdf.save("stock-report.pdf");
       });
     }
+  };*/
+
+  const saveToPDFStock = () => {
+    const input = document.getElementById("pdf-content");
+    let rowCount = 0; // Declare rowCount here
+    if (input) {
+      html2canvas(input, { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
+        const imgWidth = 210;
+        const pageHeight = 295;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+
+        const topMargin = 20;
+        const pageWidth = 210;
+
+        const leftMargin = 10;
+        const centerX = pageWidth / 2; // Center the content
+
+        const imgX = centerX - imgWidth / 2; // Center image horizontally
+        const imgY = 33;
+
+        // Calculate circle properties
+        const centerFX = imgX + imgWidth / 2;
+        const centerY = imgY + imgHeight / 2;
+        const radius = Math.min(imgWidth, imgHeight) / 2;
+
+        // Draw a white circle behind the image
+        pdf.setFillColor(255, 255, 255);
+        pdf.circle(centerFX, centerY, radius, 'F');
+
+        // Set dark green background for the upper section
+        pdf.setFillColor(0, 100, 0);
+        pdf.rect(leftMargin, topMargin, 80, 40, 'F');
+
+        // Draw the right rounded end
+        pdf.ellipse(leftMargin + 80, topMargin + 20, 20, 20, 'F');
+
+        // Header
+        pdf.setFontSize(20);
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(0, 100, 0);
+        pdf.text("STOCK REPORT", pageWidth - 20, topMargin + 10, { align: "right" });
+
+        // "I MOBILE CRAZY" Text
+        pdf.setFontSize(18);
+        pdf.setTextColor(255, 255, 255);
+        pdf.text("I MOBILE CRAZY", 69, 40, { align: "center" });
+
+        // Additional Information
+        pdf.setFontSize(10);
+        pdf.setTextColor(255, 255, 255);
+        pdf.text("Distributors of Mobile", 62, 45, { align: "center" });
+        pdf.text("Phones & Accessories", 62, 50, { align: "center" });
+
+        // Set grey color for the watermark
+        const greyShade = 200;
+        pdf.setFillColor(greyShade, greyShade, greyShade);
+
+        // Draw page border
+        pdf.setDrawColor(0, 0, 0);
+        pdf.rect(leftMargin, topMargin, pageWidth - 2 * leftMargin, pageHeight - 2 * topMargin);
+
+        // Define the starting vertical position and spacing for address
+        const newY = topMargin + 15;
+        const lineSpacing = 5;
+
+        pdf.setTextColor(0, 0, 0);
+        pdf.text("Galekade junction, Halthota road,", pageWidth - 42, newY, { align: "right" });
+        pdf.text("Raigama, Bandaragama.", pageWidth - 57, newY + lineSpacing, { align: "right" });
+        pdf.text("Hotline: 076 311 0859", pageWidth - 62.5, newY + 2 * lineSpacing, { align: "right" });
+        pdf.text("Email: imobilecrazybandaragama@gmail.com", pageWidth - 21, newY + 3 * lineSpacing, { align: "right" });
+        pdf.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 20, newY + 4 * lineSpacing, { align: "right" });
+
+        const addTableRowsToPDF = (startIndex: any) => {
+          const rows = Array.from(input.querySelectorAll("tbody tr"));
+          rows.slice(startIndex, startIndex + 20).forEach((row, index) => {
+            const cells = row.querySelectorAll("td");
+            const modelName = cells[0].innerText;
+            const count = cells[1].innerText;
+
+            // Define the vertical position to place the rows 30px from the bottom of the page
+            const bottomOffset = 50; // 30px from the bottom
+            const rowHeight = 10; // Assuming 10px height per row for spacing
+            const rowY = pageHeight - bottomOffset - (index * rowHeight) - rowHeight;
+
+            // Center the table rows in the page
+            const rowX = 14;
+            const modelX = rowX + (pageWidth - rowX * 2) / 2 - 30; // Adjust model name position
+            const countX = modelX + 100; // Adjust count position
+
+            pdf.text(modelName, modelX, rowY);
+            pdf.text(count, countX, rowY); // Adjust text position for the count column
+          });
+        };
+
+
+// Add content (table rows)
+        addTableRowsToPDF(0);
+        heightLeft -= pageHeight - 40;
+
+        while (heightLeft >= 0) {
+          pdf.addPage();
+
+          // Place header and date on each page
+          pdf.text("Stock Report", 14, 20);
+          pdf.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 20, 30, { align: "right" });  // Right-align date
+
+          heightLeft -= imgHeight;
+          pdf.addImage(imgData, "PNG", imgX, heightLeft + 40, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          // Add next set of rows (20 per page)
+          addTableRowsToPDF(rowCount * 20);
+          rowCount++; // Increment rowCount here
+        }
+
+
+        pdf.save("stock-report.pdf");
+      });
+    }
   };
+
+
+
+
+
 
   useEffect(() => {
     setNetIncome(totalIncome - dailyCost);
@@ -538,52 +665,91 @@ export default function Dashboard() {
             </button>
 
             {isModalOpen1 && (
-              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                <div className="bg-white p-8 rounded shadow-lg w-full max-w-md z-60">
-                  <h2 className="text-xl mb-4">Stock Report</h2>
-                  <div id="pdf-content">
-                    <table className="w-full border-collapse">
-                      <thead>
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                  <div className="bg-white p-8 rounded shadow-lg w-full max-w-md">
+                    <h2 className="text-xl mb-4">Stock Report</h2>
+                    <div id="pdf-content" className="max-h-96 overflow-y-scroll">
+                      <table className="w-full border-collapse">
+                        <thead>
                         <tr className="bg-gray-200">
-                          <th className="border px-4 py-2 text-left">
-                            Model Name
-                          </th>
+                          <th className="border px-4 py-2 text-left">Model Name</th>
                           <th className="border px-4 py-2 text-left">Count</th>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {Object.entries(stockData).map(([model, count]) => (
-                          <tr key={model}>
-                            <td className="border px-4 py-2">{model}</td>
-                            <td className="border px-4 py-2">{count}</td>
-                          </tr>
-                        ))}
+                        </thead>
+                        <tbody>
+                        {Object.entries(stockData)
+                            .sort((a, b) => {
+                              const modelA = a[0].toLowerCase();
+                              const modelB = b[0].toLowerCase();
+
+                              // Define the custom order for iPhone models (base, Pro, Pro Max)
+                              const modelOrder = [
+                                '7 plus', '8 plus', 'se2', 'x', 'xs', '11', '11 pro', '11 pro max',
+                                '12', '12 pro', '12 pro max', '13', '13 pro', '13 pro max',
+                                '14', '14 pro', '14 pro max', '15', '15 pro', '15 pro max', // Add more as needed
+                              ];
+
+                              // A helper function to get the base model name
+                              const getBaseModelName = (model:any) => {
+                                if (model.includes('pro max')) return model.replace('pro max', ''); // Remove "pro max"
+                                if (model.includes('pro')) return model.replace('pro', ''); // Remove "pro"
+                                return model;
+                              };
+
+                              // Compare models by their base name and then by Pro/Pro Max suffix
+                              const baseModelA = getBaseModelName(modelA);
+                              const baseModelB = getBaseModelName(modelB);
+
+                              const indexA = modelOrder.findIndex(model => baseModelA.includes(model));
+                              const indexB = modelOrder.findIndex(model => baseModelB.includes(model));
+
+                              // Sort first by base model order and then handle Pro/Pro Max distinction
+                              if (indexA === indexB) {
+                                // Further sort by suffix (Pro Max should come last)
+                                if (modelA.includes('pro max') && !modelB.includes('pro max')) return 1;
+                                if (!modelA.includes('pro max') && modelB.includes('pro max')) return -1;
+                                return 0;
+                              }
+
+                              return indexA - indexB;
+                            })
+                            .map(([model, count]) => (
+                                <tr key={model}>
+                                  <td className="border px-4 py-2">{model}</td>
+                                  <td className="border px-4 py-2">{count}</td>
+                                </tr>
+                            ))}
                         <tr className="font-bold">
                           <td className="border px-4 py-2">Total</td>
-                          <td className="border px-4 py-2">
-                            {totalStockCount}
-                          </td>
+                          <td className="border px-4 py-2">{totalStockCount}</td>
                         </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="flex justify-end mt-4">
-                    <button
-                      className="bg-red-500 text-white py-2 px-4 rounded"
-                      onClick={toggleModal1}
-                    >
-                      Close
-                    </button>
-                    <button
-                      className="bg-blue-500 text-white py-2 px-4 rounded mr-2"
-                      onClick={saveToPDFStock}
-                    >
-                      Save
-                    </button>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="flex justify-end mt-4">
+                      <button
+                          className="bg-red-500 text-white py-2 px-4 rounded"
+                          onClick={toggleModal1}
+                      >
+                        Close
+                      </button>
+                      <button
+                          className="bg-blue-500 text-white py-2 px-4 rounded mr-2"
+                          onClick={saveToPDFStock}
+                      >
+                        Save
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
             )}
+
+
+
+
+
+
+
           </div>
 
           <button
